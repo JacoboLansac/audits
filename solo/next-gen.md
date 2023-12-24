@@ -14,7 +14,7 @@ business or product and can never be used as a guarantee that the protocol is bu
 # Protocol Summary
 
 NextGen is a series of contracts whose purpose is to explore more experimental directions in generative art and other non-art use cases of 100% on-chain NFTs.
-At a high-level, is a classic on-chain generative contract with extended functionality: phase-based, allowlist-based, delegation-based 
+At a high level, is a classic on-chain generative contract with extended functionality: phase-based, allowlist-based, delegation-based 
 minting philosophy of The Memes, the ability to pass arbitrary data to the contract for specific addresses to customize the outputs, 
 a wide range of minting models, etc. 
 
@@ -76,7 +76,7 @@ Files and contracts in scope for this audit in the table below:
 | Finding ID | Description | Severity |
 |--|--|--|
 | \[H-1\] | Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make auctions vulnerable to DDOS attack | High |
-| \[H-2\] | An auction can become unclaimable if the token is transfered to another address during the auction, locking all the ether from all bids in the contract | High |
+| \[H-2\] | An auction can become unclaimable if the token is transferred to another address during the auction, locking all the ether from all bids in the contract | High |
 | \[H-3\] | The value from the highest bid is not transferred to the owner of the auctioned token | High |
 | \[M-1\] | Earnings from auctioned tokens are not shared with the teams and the artists | Medium |
 | \[L-1\] | Tokens can be minted after collection is frozen if certain conditions are met | Low |
@@ -89,7 +89,7 @@ Files and contracts in scope for this audit in the table below:
 
 #### Description
 
-The `claimAuction()` performs external calls to arbitrary addresses inside a the for-loop that returns ether from non-winning bids. 
+The `claimAuction()` performs external calls to arbitrary addresses inside a for-loop that returns ether from non-winning bids. 
 A malicious contract can make a bid, and then have a `receive()` function that reverts, making the `claimAuction()` 
 revert every time. The auction could never be claimed, and the bids would be locked in the contract.
 
@@ -127,17 +127,17 @@ this one will revert, locking all the ether from all other bids in the contract.
 #### Recommendation
 
 The `claimAuction()` function should be refactored to use a pull-over-push pattern, where the winner can claim the token
-and the bidders can claim their loosing bids, instead of the `claimAuction()` making all the transfers.
+and the bidders can claim their losing bids, instead of the `claimAuction()` making all the transfers.
 
 ## High
 
-### [H-2] An auction can become unclaimable if the token is transfered to another address during the auction, locking all the ether from all bids in the contract
+### [H-2] An auction can become unclaimable if the token is transferred to another address during the auction, locking all the ether from all bids in the contract
 
 #### Description
 
 The auctioned token is not locked in the auction contract when an auction is started. When the auction is finished,
-the `claimAuction()` expects it be owned in an address that has approved the auction contract. If the token is transferred
-to another wallet,the call to `ERC721.safeTransferFrom()` will revert with `ERC721: caller is not token owner or approved`. This revert makes the auction unclaimable, 
+the `claimAuction()` expects the token to be owned in an address that has approved the auction contract. If the token is transferred
+to another wallet, the call to `ERC721.safeTransferFrom()` will revert with the message `ERC721: caller is not token owner or approved`. This revert makes the auction unclaimable, 
 and all the ether from participating bids will be locked in the contract.
 
 ```javascript
@@ -150,7 +150,7 @@ and all the ether from participating bids will be locked in the contract.
         // ...
 ```
 
-This will also happen if the `AuctionDemo` contract is not approved, but in the specifications it was explicitly said that it is assumed that it is approved.
+This will also happen if the `AuctionDemo` contract is not approved, but in the specifications, it was explicitly said that it is assumed that it is approved.
 
 #### Severity classification
 
@@ -209,7 +209,7 @@ Send the auctioned token to `ownerOfToken` instead of `owner()`.
 
 #### Description
 
-When items are minted using `MinterContract::mint()`, the value sent by message sender to pay for the mint is stored in `collectionTotalAmount`, which is later shared among the team and the collection aritsts. 
+When items are minted using `MinterContract::mint()`, the value sent by the message sender to pay for the mint is stored in `collectionTotalAmount`, which is later shared among the team and the collection artists. 
 
 ```javascript
     function mint(
@@ -225,7 +225,7 @@ When items are minted using `MinterContract::mint()`, the value sent by message 
 However, when an item is auctioned, it is minted using the `MinterContract::mintAndAuction()` function, which does not store any `msg.value` 
 to the `collectionTotalAmount`. Moreover, when the auction is finished with a winning bid, the full value from the highest bid goes to the owner of the token.
 
-This means that the artist and the team will not receive their share of the earnings from from auctioned tokens. 
+This means that the artist and the team will not receive their share of the earnings from auctioned tokens. 
 
 #### Severity classification
 
@@ -260,17 +260,17 @@ to `true`:
 When new tokens are minted, the only requirements are that the total supply is not exceeded and that the 
 `publicEndTime` hasn't been reached yet. However, there is no check to see if the collection has been frozen or not. 
 Thus, if a collection is frozen before the `publicEndTime` is reached, and the supply is below the total supply cap, the frozing 
-mechanism would not impede the mint of more tokens. 
+mechanism would not impede the minting of more tokens. 
 
 #### Severity classification
 
-- Likelihood: Low, as the collections will tipically be frozen only after the `publicEndTime` has been reached. 
+- Likelihood: Low, as the collections will typically be frozen only after the `publicEndTime` has been reached. 
 - Impact: Medium, as it breaks a core premise of the protocol which is that frozen collections don't change.
 - Overall severity: **Medium**
 
 #### Recommendation
 
-When a collection is frozen, the total supply should be overwriten by calling `setFinalSupply()`. 
+When a collection is frozen, the total supply should be overwritten by calling `setFinalSupply()`. 
 
 ```diff
     function freezeCollection(uint256 _collectionID) public FunctionAdminRequired(this.freezeCollection.selector) {
