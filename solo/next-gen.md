@@ -137,10 +137,20 @@ and the bidders can claim their loosing bids, instead of the `claimAuction()` ma
 
 The auctioned token is not locked in the auction contract when an auction is started. When the auction is finished,
 the `claimAuction()` expects it be owned in an address that has approved the auction contract. If the token is transferred
-to another wallet,the call to `transferFrom()` will revert with `ERC721: caller is not token owner or approved`. This revert makes the auction unclaimable, 
+to another wallet,the call to `ERC721.safeTransferFrom()` will revert with `ERC721: caller is not token owner or approved`. This revert makes the auction unclaimable, 
 and all the ether from participating bids will be locked in the contract.
 
-This will also happen if the `Auction` contract is not approved, but in the specifications it was explicitly said that it is assumed that it is approved.
+```javascript
+    function claimAuction(uint256 _tokenid) public WinnerOrAdminRequired(_tokenid, this.claimAuction.selector) {
+        
+        // ...
+
+@>            IERC721(gencore).safeTransferFrom(ownerOfToken, highestBidder, _tokenid);
+        
+        // ...
+```
+
+This will also happen if the `AuctionDemo` contract is not approved, but in the specifications it was explicitly said that it is assumed that it is approved.
 
 #### Severity classification
 
@@ -150,7 +160,7 @@ This will also happen if the `Auction` contract is not approved, but in the spec
 
 #### Recommendation
 
-The auctioned token should be locked in the auction contract.
+The auctioned token should be locked in the auction contract during the auction.
 
 ## High
 
@@ -212,9 +222,10 @@ When items are minted using `MinterContract::mint()`, the value sent by message 
 
 ```
 
-However, when an item is auctioned, it is minted using the `MinterContract::mintAndAuction()` function, which does not store any `msg.value` to the `collectionTotalAmount`. Instead, it is designed so that the full value from the highest bid goes to the owner of the token.
+However, when an item is auctioned, it is minted using the `MinterContract::mintAndAuction()` function, which does not store any `msg.value` 
+to the `collectionTotalAmount`. Moreover, when the auction is finished with a winning bid, the full value from the highest bid goes to the owner of the token.
 
-This means that the artist and the team will not receive any earnings from this auctioned tokens. 
+This means that the artist and the team will not receive their share of the earnings from from auctioned tokens. 
 
 #### Severity classification
 
@@ -224,8 +235,8 @@ This means that the artist and the team will not receive any earnings from this 
 
 #### Recommendation
 
-The value from the highest bid should also be shared with the artists and NextGen team members.
-
+The value from the highest bid should also be shared with the artists and NextGen team members. A way of implementing it would be to enable a function in 
+`MinterContract` to deposit value to `collectionTotalAmount` so that the `claimAuction()` function could deposit a share of the winning bid.
 
 ## Low
 
@@ -233,9 +244,10 @@ The value from the highest bid should also be shared with the artists and NextGe
 
 #### Description
 
-One of the specifications of the protocol is that frozen collections cannot have the metadata changed, and more tokens
-cannot be minted. Collections are frozen using the `NextGenCore.freezeCollection()` which sets the `collectionFreeze`
-to true.
+One of the specifications of the protocol is that frozen collections cannot have the metadata changed. Presumably, if the metadata cannot be changed, the 
+collection supply should also be frozen, so no more tokens can be minted. 
+Collections are frozen using the `NextGenCore.freezeCollection()` which sets the `collectionFreeze`
+to `true`:
 
 ```javascript
     function freezeCollection(uint256 _collectionID) public FunctionAdminRequired(this.freezeCollection.selector) {
@@ -247,8 +259,7 @@ to true.
 
 When new tokens are minted, the only requirements are that the total supply is not exceeded and that the 
 `publicEndTime` hasn't been reached yet. However, there is no check to see if the collection has been frozen or not. 
-
-If a collection is frozen before the `publicEndTime` is reached, and the total supply hasn't reached, the frozing 
+Thus, if a collection is frozen before the `publicEndTime` is reached, and the supply is below the total supply cap, the frozing 
 mechanism would not impede the mint of more tokens. 
 
 #### Severity classification
