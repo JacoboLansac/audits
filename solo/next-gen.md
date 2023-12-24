@@ -48,10 +48,10 @@ More info can be found in NextGen's [gitbook documentation](https://seize-io.git
 
 # Scope
 
-- Date: Audited as a warden from [Code4rena](https://code4rena.com/audits/2023-10-nextgen)
-- Duration of the audit: 14 days (part-time)
-- Audited commit hash: [a6f2397b68ef2865374c1bf7629349f25e71a44d](https://github.com/code-423n4/2023-10-nextgen/commit/a6f2397b68ef2865374c1bf7629349f25e71a44d)
 - Number of Solidity Lines Of Code (nSLOC): 1265
+- Audited commit hash: [a6f2397b68ef2865374c1bf7629349f25e71a44d](https://github.com/code-423n4/2023-10-nextgen/commit/a6f2397b68ef2865374c1bf7629349f25e71a44d)
+- Audited as a warden from [Code4rena](https://code4rena.com/audits/2023-10-nextgen)
+- Submission date: `2023-11-12`
 
 ## Inside scope
 
@@ -71,29 +71,52 @@ Files and contracts in scope for this audit in the table below:
 
 # Executive Summary
 
-## Observations
-
 ## Main Findings Summary
 
 | Finding ID | Description | Severity |
 |--|--|--|
-| \[H-1\] | Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make it vulnerable to DDOS attack | High |
-| \[H-2\] | An auction can become unclaimable if the token is transfered to another address during the auction | High |
-| \[H-3\] | The value from the highest bid is not transferred to the owner of the token being auctioned | High |
-| \[M-1\] | Earnings from the auctioned items are not shared with the teams and the artists | Medium |
-| \[L-1\] | Tokens can be minted after collection is frozen | Low |
+| \[H-1\] | Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make auctions vulnerable to DDOS attack | High |
+| \[H-2\] | An auction can become unclaimable if the token is transfered to another address during the auction, locking all the ether from all bids in the contract | High |
+| \[H-3\] | The value from the highest bid is not transferred to the owner of the auctioned token | High |
+| \[M-1\] | Earnings from auctioned tokens are not shared with the teams and the artists | Medium |
+| \[L-1\] | Tokens can be minted after collection is frozen if certain conditions are met | Low |
 
 # Detailed findings
 
 ## High
 
-### [H-1] Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make it vulnerable to DDOS attack
+### [H-1] Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make auctions vulnerable to DDOS attack
 
 #### Description
 
-The `claimAuction()` is vulnerable to reentrancy, as external calls are made to arbitrary addresses in a for loop. 
+The `claimAuction()` performs external calls to arbitrary addresses inside a the for-loop that returns ether from non-winning bids. 
 A malicious contract can make a bid, and then have a `receive()` function that reverts, making the `claimAuction()` 
 revert every time. The auction could never be claimed, and the bids would be locked in the contract.
+
+#### Proof of concept
+
+The malicious contract could look something like this:
+
+```javascript
+contract Attacker {
+    Auction auction;
+
+    constructor(Auction _auction) {
+        auction = _auction;
+    }
+
+    function participate(uint256 tokenId) external payable {
+        auction.participateToAuction{value: msg.value}(tokenId);
+    }
+
+    receive() external payable {
+@>      revert();
+    }
+}
+```
+
+So, if the attacker contract does not win the auction, when the `claimAuction()` is called and it attempts to return ether to the attacker contract, 
+this one will revert, locking all the ether from all other bids in the contract.
 
 #### Severity classification
 
@@ -108,7 +131,7 @@ and the bidders can claim their loosing bids.
 
 ## High
 
-### [H-2] An auction can become unclaimable if the token is transfered to another address during the auction
+### [H-2] An auction can become unclaimable if the token is transfered to another address during the auction, locking all the ether from all bids in the contract
 
 #### Description
 
@@ -129,7 +152,7 @@ The auctioned token should be locked in the auction contract.
 
 ## High
 
-### [H-3] The value from the highest bid is not transferred to the owner of the token being auctioned 
+### [H-3] The value from the highest bid is not transferred to the owner of the auctioned token 
 
 #### Description
 
@@ -170,7 +193,7 @@ Send the auctioned token to `ownerOfToken` instead of `owner()`.
 
 ## Medium
 
-### [M-1] Earnings from the auctioned items are not shared with the teams and the artists
+### [M-1] Earnings from auctioned tokens are not shared with the teams and the artists
 
 #### Description
 
@@ -204,7 +227,7 @@ The value from the highest bid should also be shared with the artists and NextGe
 
 ## Low
 
-### [L-1] Tokens can be minted after collection is frozen
+### [L-1] Tokens can be minted after collection is frozen if certain conditions are met
 
 #### Description
 
