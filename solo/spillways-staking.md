@@ -98,8 +98,7 @@ The staking contract inherits or interacts with the following libraries and smar
 Informational and gas optimizations are excluded from this table. All low-severity findings have been acknowledged. 
 
 
-# Issues found
-
+# Detailed findings
 
 ## High
 
