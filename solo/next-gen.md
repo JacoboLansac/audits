@@ -77,11 +77,11 @@ Files and contracts in scope for this audit in the table below:
 
 | Finding ID | Description | Severity |
 |--|--|--|
-| \[H\] | Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make it vulnerable to DDOS attack | High |
-| \[H\] | An auction can become unclaimable if the token is transfered to another address during the auction | High |
-| \[H\] | The value from the highest bid is not transferred to the owner of the token being auctioned | High |
-| \[M\] | Earnings from the auctioned items are not shared with the teams and the artists | Medium |
-| \[L\] | Tokens can be minted after collection is frozen | Low |
+| \[H-1\] | Arbitrary external calls inside a loop in `AuctionDemo::claimAuction()` make it vulnerable to DDOS attack | High |
+| \[H-2\] | An auction can become unclaimable if the token is transfered to another address during the auction | High |
+| \[H-3\] | The value from the highest bid is not transferred to the owner of the token being auctioned | High |
+| \[M-1\] | Earnings from the auctioned items are not shared with the teams and the artists | Medium |
+| \[L-1\] | Tokens can be minted after collection is frozen | Low |
 
 # Detailed findings
 
@@ -135,7 +135,7 @@ The auctioned token should be locked in the auction contract.
 
 The `claimAuction()` is supposed to send the ether from the highest bid to the owner of the token 
 (`ownerOfToken` in the snippet below). Instead, it is sent to the owner of the auction contract 
-(`owner()` in the snippet below).
+(`owner()` in the snippet below). The same mistake is made when emitting the `ClaimAuction` event.
 
 ```javascript
     function claimAuction(uint256 _tokenid) public WinnerOrAdminRequired(_tokenid, this.claimAuction.selector) {
@@ -191,15 +191,16 @@ However, when an item is auctioned, it is minted using the `MinterContract::mint
 
 This means that the artist and the team will not receive any earnings from this auctioned tokens. 
 
-#### Recommendation
-
-The value from the highest bid should also be shared with the artists and NextGen team members.
-
 #### Severity classification
 
 - Likelihood: high, as it will happen for every auctioned token
 - Impact: medium, as only the team and the artists are impacted, and it is not clear from the docs if this is an intended feature
 - Overall severity: **medium**
+
+#### Recommendation
+
+The value from the highest bid should also be shared with the artists and NextGen team members.
+
 
 ## Low
 
