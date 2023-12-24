@@ -126,8 +126,8 @@ this one will revert, locking all the ether from all other bids in the contract.
 
 #### Recommendation
 
-The `claimAuction()` function should be refactored to use a pull payment pattern, where the winner can claim the token
-and the bidders can claim their loosing bids.
+The `claimAuction()` function should be refactored to use a pull-over-push pattern, where the winner can claim the token
+and the bidders can claim their loosing bids, instead of the `claimAuction()` making all the transfers.
 
 ## High
 
@@ -137,8 +137,10 @@ and the bidders can claim their loosing bids.
 
 The auctioned token is not locked in the auction contract when an auction is started. When the auction is finished,
 the `claimAuction()` expects it be owned in an address that has approved the auction contract. If the token is transferred
-to another wallet, or if it is not approved, the `claimAuction()` will revert, and the auction will be unclaimable.
-All the funds from loosing bids will be locked in the contract.
+to another wallet,the call to `transferFrom()` will revert with `ERC721: caller is not token owner or approved`. This revert makes the auction unclaimable, 
+and all the ether from participating bids will be locked in the contract.
+
+This will also happen if the `Auction` contract is not approved, but in the specifications it was explicitly said that it is assumed that it is approved.
 
 #### Severity classification
 
