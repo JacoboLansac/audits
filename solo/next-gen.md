@@ -1,6 +1,6 @@
 # Introduction
 
-A time-boxed security review of the **NextGen** protocol, with a focus on smart contract security.
+A time-boxed security review of the **NextGen** protocol by [@punk6529](https://twitter.com/punk6529), with a focus on smart contract security.
 
 Author: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
 
