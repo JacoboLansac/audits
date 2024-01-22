@@ -1,4 +1,4 @@
-# audits
+# Smart contract reviews
 
 ## 2022 - October
 
