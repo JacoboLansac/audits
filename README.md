@@ -1,4 +1,4 @@
-# Smart contract reviews
+# Security-reviews
 
 ## 2022 - October
 
