@@ -14,4 +14,4 @@
 
 ## 2023 - January
 
-- [Curves](solo/curves.md)
+- [Curves protocol](solo/curves.md)
