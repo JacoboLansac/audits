@@ -1,5 +1,9 @@
 # audits
 
+## 2022 - October
+
+- [Spillways hack research](solo/spillways-hack.md)  (not an audit)
+
 ## 2022 - November
 
 - [NextGen](solo/next-gen.md)
