@@ -4,7 +4,7 @@ A time-boxed security review of the [**Vector Reserve**](https://twitter.com/vec
 smart contract security.
 
 Author: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
-Read [past security review](https://github.com/JacoboLansac/audits?tab=readme-ov-file).
+Read [past security reviews](https://github.com/JacoboLansac/audits?tab=readme-ov-file).
 
 ## Findings Overview
 
