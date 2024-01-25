@@ -64,4 +64,4 @@ The deployer was basically malicious, and deployed a contract that would allow h
 # Updates
 
 The spillways team asked me to perform a security review of the new staking contract. 
-The audit of the new contract can be found here: [Spillways staking](./spillways-staking.md)
+The audit of the new contract can be found here: [Spillways staking](spillways-staking.md)

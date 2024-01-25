@@ -1,0 +1,393 @@
+<mxfile host="app.diagrams.net" modified="2024-01-25T23:31:48.255Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="A7yxFlLNYdzwlSvPH7EO" version="23.0.1" type="github">
+  <diagram name="Page-1" id="JbyrvEDST0HZftn1f9sy">
+    <mxGraphModel dx="5720" dy="3294" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-4" value="" style="group;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="710" y="370" width="1580" height="1220" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1">
+          <mxGeometry y="34.4" width="1580" height="1185.6" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-3" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Vector Reserve protocol&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=default;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1">
+          <mxGeometry x="730" y="730" width="250" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-12" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="79.9964705882353" y="340" width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-8" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-12" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-9" value="&lt;b&gt;Expected Balances:&lt;/b&gt;&lt;br&gt;- vETH (when Vector or VectorBonding deposits WETH on vectorETH on behalf of treasury)&lt;br&gt;- tokenPrincipal from Vector Bonding" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="CGvlpZDmL0v3EOFs1nN5-8" vertex="1">
+          <mxGeometry y="30" width="371.764705882353" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=4;" parent="CGvlpZDmL0v3EOFs1nN5-8" source="CGvlpZDmL0v3EOFs1nN5-9" target="CGvlpZDmL0v3EOFs1nN5-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="10" y="135" />
+              <mxPoint x="10" y="83" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-24" value="minter can call&amp;nbsp; treasury.mint()&lt;br&gt;minter has the power to mint more VEC supply" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="kTpEf8xRcpx-kqrz5T3R-21" vertex="1" connectable="0">
+          <mxGeometry x="0.0525" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="CGvlpZDmL0v3EOFs1nN5-8" source="CGvlpZDmL0v3EOFs1nN5-9" target="CGvlpZDmL0v3EOFs1nN5-9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-11" value="vectorTreasury.sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-12" vertex="1">
+          <mxGeometry x="140.0035294117647" width="107.88" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-13" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="69.9964705882353" y="60" width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-14" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-13" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-15" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;Contract description:&lt;br&gt;&lt;/b&gt;Standard Olympus distributor.&amp;nbsp;&lt;br&gt;No exposed external/public functions&lt;br&gt;Distribution is only done by the VECStaking.sol contract&lt;br&gt;&lt;br&gt;&lt;b&gt;Expected balances:&lt;/b&gt;&lt;br&gt;- WETH&lt;br&gt;- ether" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="CGvlpZDmL0v3EOFs1nN5-14" vertex="1">
+          <mxGeometry y="30" width="371.764705882353" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-16" value="RewardsDistribtor.sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-13" vertex="1">
+          <mxGeometry x="120" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-17" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="79.9964705882353" y="690" width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-18" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-17" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-19" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;Contract description:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- users stake VEC&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- and receive sVEC 1:1 as a proof of the stake&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;b&gt;Expected token balances:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- VEC&lt;br&gt;- sVEC (supply sent at sVEC initialization)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="CGvlpZDmL0v3EOFs1nN5-18" vertex="1">
+          <mxGeometry y="30" width="371.764705882353" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-20" value="VECStaking.sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-17" vertex="1">
+          <mxGeometry x="140.0035294117647" width="107.88" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-21" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="589.9964705882353" y="70" width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-22" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-21" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="YlvOFjNhnHseokNZmxca-1" value="mint VEC tokens" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-22" source="CGvlpZDmL0v3EOFs1nN5-23" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-139.9964705882353" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-23" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;Contract description:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Accepts a principal to create bonds with payouts in VEC.&amp;nbsp;&lt;br&gt;Principals do not stay in the contract, they are handled in different ways&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;b&gt;Expected token balances:&lt;/b&gt;&lt;br&gt;- VEC for payouts, minted from treasury on deposits" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="CGvlpZDmL0v3EOFs1nN5-22" vertex="1">
+          <mxGeometry y="30" width="371.764705882353" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-24" value="VectorBonding.sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-21" vertex="1">
+          <mxGeometry x="140.0035294117647" width="107.88" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-33" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="1099.9964705882353" y="90" width="420" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-34" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-33" vertex="1" connectable="0">
+          <mxGeometry width="420" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-35" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;Contract description:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- Fee-on-Transfer token&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- deposits excess WETH from fees into vETH, receives vETH back&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;b&gt;Expected token balances:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;ether, WETH? but quickly converted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="CGvlpZDmL0v3EOFs1nN5-34" vertex="1">
+          <mxGeometry x="-50" y="30" width="470" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-36" value="Vector.sol" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-33" vertex="1">
+          <mxGeometry x="140.0035294117647" width="107.88" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-41" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="519.9964705882353" y="900" width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-42" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-41" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-43" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;Contract description:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Standard OHM rebasing staked token.&lt;br&gt;Supply and balances change when token is rebased&lt;br&gt;Supply can only increase.&amp;nbsp;&lt;br&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;b&gt;Expected token balances:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- vETH" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="CGvlpZDmL0v3EOFs1nN5-42" vertex="1">
+          <mxGeometry y="30" width="371.764705882353" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-44" value="sVEC.sol&lt;br&gt;staked VEC" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-41" vertex="1">
+          <mxGeometry x="140.0035294117647" width="107.88" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-45" value="" style="group;rounded=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="1070" y="520" width="371.76" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-46" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-45" vertex="1" connectable="0">
+          <mxGeometry width="371.76" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-47" value="&lt;b&gt;Contract description:&lt;/b&gt;&lt;br&gt;- users deposit WETH/LSTs&lt;br&gt;- and receive vETH in return&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Expected token balances:&lt;/b&gt;&lt;br&gt;- WETH&lt;br&gt;- LSTs: [ ... ]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="CGvlpZDmL0v3EOFs1nN5-46" vertex="1">
+          <mxGeometry y="30" width="371.76" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-48" value="VectorETH.sol&lt;br&gt;vETH" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-45" vertex="1">
+          <mxGeometry x="140.00175721518985" width="107.87863443037973" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-70" value="rebase()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-19" target="CGvlpZDmL0v3EOFs1nN5-43" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-89" value="mint()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-9" target="CGvlpZDmL0v3EOFs1nN5-35" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-93" value="distribute()&lt;br&gt;mints VEC&amp;nbsp;&lt;br&gt;to VECstaking" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-19" target="CGvlpZDmL0v3EOFs1nN5-15" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="772" />
+              <mxPoint x="520" y="248" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-1" value="ether&lt;br&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=0;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" parent="CGvlpZDmL0v3EOFs1nN5-4" target="CGvlpZDmL0v3EOFs1nN5-15" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="330" y="-100" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-42" value="deposit WETH on behalf of svETH&lt;br&gt;svETH receives vETH back" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-15" target="CGvlpZDmL0v3EOFs1nN5-47" edge="1">
+          <mxGeometry x="0.5405" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="560" y="195" />
+              <mxPoint x="560" y="655" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-6" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;vETH&lt;/span&gt;&lt;br style=&quot;border-color: var(--border-color); color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;from rewardsDistributor() deposit on distribute()&lt;/span&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-47" target="CGvlpZDmL0v3EOFs1nN5-39" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-11" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-4" vertex="1" connectable="0">
+          <mxGeometry x="1029.9964705882353" y="880" width="371.7647058823529" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-37" value="" style="group" parent="kTpEf8xRcpx-kqrz5T3R-11" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-38" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-37" vertex="1" connectable="0">
+          <mxGeometry width="371.764705882353" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-39" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;Contract description:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- users deposit vETH&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- and receive svETH&amp;nbsp; (shares of vETH)&lt;br&gt;vETH is sent by the rewardsDistributor, increasing the value of the shares over time (vETH/svETH)&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;b&gt;Expected token balances:&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;- vETH" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="CGvlpZDmL0v3EOFs1nN5-38" vertex="1">
+          <mxGeometry y="30" width="371.764705882353" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-40" value="StakedVectorETH.sol&lt;br&gt;svETH" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="kTpEf8xRcpx-kqrz5T3R-11" vertex="1">
+          <mxGeometry x="100.88000000000011" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-13" value="deposit WETH&lt;br&gt;on behalf of treasury" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-35" target="CGvlpZDmL0v3EOFs1nN5-47" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1379" y="330" />
+              <mxPoint x="1379" y="470" />
+              <mxPoint x="1349" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-14" value="treasury receives&lt;br&gt;vETH when Vector deposits WETH" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-47" target="CGvlpZDmL0v3EOFs1nN5-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1290" y="330" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1349" y="470" />
+              <mxPoint x="452" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YlvOFjNhnHseokNZmxca-3" value="deposit WETH on behalf of trasury&lt;br&gt;vETH is sent to treasury" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="CGvlpZDmL0v3EOFs1nN5-4" source="CGvlpZDmL0v3EOFs1nN5-23" target="CGvlpZDmL0v3EOFs1nN5-47" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-50" value="burnAndRedeem()&lt;br&gt;&lt;br&gt;burns VEC&lt;br&gt;receives portions of all tokens in treasury" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-56" target="CGvlpZDmL0v3EOFs1nN5-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="740" as="sourcePoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-63" value="mint()&lt;br&gt;transferFromTreasury()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-57" target="CGvlpZDmL0v3EOFs1nN5-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="855" />
+              <mxPoint x="270" y="850" />
+              <mxPoint x="790" y="850" />
+            </Array>
+            <mxPoint x="350" y="900" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-64" value="stake()&lt;br&gt;unstake()&lt;br&gt;rebase()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-58" target="CGvlpZDmL0v3EOFs1nN5-19" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="750" y="1203" as="targetPoint" />
+            <mxPoint x="295" y="1150" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-68" value="transfer()&lt;br&gt;transferFrom()&lt;br&gt;approve()&lt;br&gt;increaseAllowance()&lt;br&gt;decreaseAllowance()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-59" target="CGvlpZDmL0v3EOFs1nN5-43" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1490" y="1693" as="targetPoint" />
+            <mxPoint x="1015" y="1700" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-73" value="deposit()&lt;br&gt;redeem()&lt;br&gt;updateDeposit()&lt;br&gt;&lt;br&gt;WETH,&amp;nbsp;&lt;br&gt;LSTs(RestETH, ...)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-60" target="CGvlpZDmL0v3EOFs1nN5-47" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1996" y="1630" as="targetPoint" />
+            <mxPoint x="2625" y="1385" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="2580" y="1020" />
+              <mxPoint x="2152" y="1020" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-77" value="" style="group" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="2670" y="60" width="423.7611764705883" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-78" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-77" vertex="1" connectable="0">
+          <mxGeometry width="423.7611764705883" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-79" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="CGvlpZDmL0v3EOFs1nN5-78" vertex="1">
+          <mxGeometry y="21.25" width="371.76" height="148.75" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-81" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-78" vertex="1" connectable="0">
+          <mxGeometry x="60" y="60" width="333.76" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-82" value="" style="group" parent="CGvlpZDmL0v3EOFs1nN5-81" vertex="1" connectable="0">
+          <mxGeometry width="333.76" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-83" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="CGvlpZDmL0v3EOFs1nN5-82" vertex="1">
+          <mxGeometry y="22.5" width="333.76" height="157.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-84" value="other contracts" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;fillColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-81" vertex="1">
+          <mxGeometry x="125.69126987341771" width="96.85165974683544" height="22.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-80" value="ERC20" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="CGvlpZDmL0v3EOFs1nN5-77" vertex="1">
+          <mxGeometry x="99.99873417721517" width="169.9978481012658" height="21.25" as="geometry" />
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-87" value="burn()&lt;br&gt;burnFrom()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-61" target="CGvlpZDmL0v3EOFs1nN5-35" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2026" y="-110" as="targetPoint" />
+            <mxPoint x="1905" y="180.00000000000023" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-90" value="stake()&lt;br&gt;unstake()&lt;br&gt;&lt;br&gt;vETH&lt;br&gt;(VectorETH)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.9;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-60" target="CGvlpZDmL0v3EOFs1nN5-39" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2603" y="1080" as="targetPoint" />
+            <mxPoint x="2640" y="1375" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="2596" y="1380" />
+              <mxPoint x="2112" y="1380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="CGvlpZDmL0v3EOFs1nN5-94" value="deposit()&lt;br&gt;redeem()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#FF0000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="3ZNqRjyZhVcZMrpEpswC-63" target="CGvlpZDmL0v3EOFs1nN5-23" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1392.9376470588236" y="480" as="targetPoint" />
+            <mxPoint x="1396" y="140" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-41" value="WETH" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" target="CGvlpZDmL0v3EOFs1nN5-15" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="870" y="220" as="sourcePoint" />
+            <mxPoint x="1150" y="460" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="870" y="230" />
+              <mxPoint x="870" y="346" />
+              <mxPoint x="873" y="346" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-49" value="vETH&lt;br&gt;(VectorETH)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0.171;entryY=0.109;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="CGvlpZDmL0v3EOFs1nN5-47" target="3ZNqRjyZhVcZMrpEpswC-60" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2619.9900000000007" y="1359.98" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="2152" y="1100" />
+              <mxPoint x="2567" y="1100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-54" value="svETH&lt;br&gt;staked Vector ETH" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" parent="1" source="CGvlpZDmL0v3EOFs1nN5-39" target="3ZNqRjyZhVcZMrpEpswC-60" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2625" y="1355" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-55" value="WETH&lt;br&gt;LSTs&lt;br&gt;&lt;br&gt;from outside the &lt;br&gt;vector ecosystem" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="1" target="3ZNqRjyZhVcZMrpEpswC-60" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2940" y="1190" as="sourcePoint" />
+            <mxPoint x="2640" y="1415" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="2945" y="1185" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-56" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="280" y="700" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-57" value="&lt;br&gt;&lt;br&gt;minter" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="190" y="810" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-58" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="1110" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-59" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="960" y="1660" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-60" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="2560" y="1140" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-61" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1890" y="110" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3ZNqRjyZhVcZMrpEpswC-63" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1370" y="110" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-4" value="VEC + ETH&amp;nbsp;&lt;br&gt;for liquidity" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="kTpEf8xRcpx-kqrz5T3R-1" target="kTpEf8xRcpx-kqrz5T3R-18" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-5" value="TGE" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.9;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="kTpEf8xRcpx-kqrz5T3R-1" target="DGtKrqOw3l8J5alsancf-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-6" value="seed round" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="kTpEf8xRcpx-kqrz5T3R-1" target="DGtKrqOw3l8J5alsancf-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-7" value="vested" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="kTpEf8xRcpx-kqrz5T3R-1" target="DGtKrqOw3l8J5alsancf-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-1" value="&lt;br&gt;deployer" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="2520" y="510" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="CGvlpZDmL0v3EOFs1nN5-35" target="kTpEf8xRcpx-kqrz5T3R-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-3" value="initial VEC supply" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="kTpEf8xRcpx-kqrz5T3R-2" vertex="1" connectable="0">
+          <mxGeometry x="0.2038" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-16" value="" style="group" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="2170" y="100" width="270" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-17" value="" style="group" parent="kTpEf8xRcpx-kqrz5T3R-16" vertex="1" connectable="0">
+          <mxGeometry width="270" height="120.00000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-18" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="kTpEf8xRcpx-kqrz5T3R-17" vertex="1">
+          <mxGeometry y="15.000000000000002" width="270" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-19" value="Uniswap Pair&lt;br&gt;VEC/ETH&lt;br&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="kTpEf8xRcpx-kqrz5T3R-16" vertex="1">
+          <mxGeometry x="101.68" y="-13.411764705882353" width="78.35" height="28.23529411764706" as="geometry" />
+        </mxCell>
+        <mxCell id="kTpEf8xRcpx-kqrz5T3R-20" value="addLiquidity()&amp;nbsp;&lt;br&gt;on behalf of treasury" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" parent="1" source="CGvlpZDmL0v3EOFs1nN5-35" target="kTpEf8xRcpx-kqrz5T3R-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2113" y="290" />
+              <mxPoint x="2238" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-1" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="2720" y="590" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-2" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="2700" y="520" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DGtKrqOw3l8J5alsancf-3" value="&lt;br&gt;user" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="2680" y="440" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="YlvOFjNhnHseokNZmxca-2" value="addLiquidity&lt;br&gt;WETH/VEC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="CGvlpZDmL0v3EOFs1nN5-23" target="kTpEf8xRcpx-kqrz5T3R-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1700" y="522" />
+              <mxPoint x="1700" y="194" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8AuZLnvw7sAW6p-fp9xb-130" value="&lt;span style=&quot;font-size: 40px;&quot;&gt;Calls&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="40" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
