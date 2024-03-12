@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-03-12T10:39:30.737Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="VjuLOQlsZYAtky7B8ZCB" version="24.0.5" type="github">
+<mxfile host="app.diagrams.net" modified="2024-03-12T12:50:57.744Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="SX5Hg1yQ0elomDf6muhj" version="24.0.5" type="github">
   <diagram name="Page-1" id="6f-JhiVzj78bMLrCzDAU">
-    <mxGraphModel dx="3205" dy="1316" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1381" dy="772" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -290,10 +290,10 @@
           <mxGeometry x="1729.5" y="2140" width="170" height="18.33" as="geometry" />
         </mxCell>
         <mxCell id="Shvr4qjc4TtpCzl6Z2yE-129" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
-          <mxGeometry x="1396.5" y="1650" width="240" height="230" as="geometry" />
+          <mxGeometry x="1396.5" y="1640" width="240" height="230" as="geometry" />
         </mxCell>
         <mxCell id="Shvr4qjc4TtpCzl6Z2yE-130" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;OrigamiLendingClerk&lt;/b&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1396.5" y="1650" width="200" height="20.625" as="geometry" />
+          <mxGeometry x="1396.5" y="1644" width="200" height="20.625" as="geometry" />
         </mxCell>
         <mxCell id="Shvr4qjc4TtpCzl6Z2yE-138" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="Shvr4qjc4TtpCzl6Z2yE-131" target="Shvr4qjc4TtpCzl6Z2yE-113" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -319,8 +319,8 @@
         <mxCell id="Shvr4qjc4TtpCzl6Z2yE-132" value="withdraw()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;" parent="1" vertex="1">
           <mxGeometry x="1406.5" y="1725" width="120" height="18.333333333333332" as="geometry" />
         </mxCell>
-        <mxCell id="Shvr4qjc4TtpCzl6Z2yE-133" value="access control: onlySupplyManager" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1404.5" y="1670.63" width="220" height="30" as="geometry" />
+        <mxCell id="Shvr4qjc4TtpCzl6Z2yE-133" value="access control: onlySupplyManager&lt;div&gt;lovDsr == borrower&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="1404.5" y="1666.63" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Shvr4qjc4TtpCzl6Z2yE-142" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Shvr4qjc4TtpCzl6Z2yE-134" target="Shvr4qjc4TtpCzl6Z2yE-114" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -787,14 +787,14 @@
         <mxCell id="Shvr4qjc4TtpCzl6Z2yE-300" value="&lt;font size=&quot;1&quot; style=&quot;&quot;&gt;&lt;b style=&quot;font-size: 55px;&quot;&gt;State-changing calls diagram&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="1" vertex="1">
           <mxGeometry x="60" y="20" width="850" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="O78NIDBZIqbvDP41GVPC-10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="-240" y="877" width="260" height="123" as="geometry" />
+        <mxCell id="O78NIDBZIqbvDP41GVPC-10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="1633" y="2400" width="260" height="123" as="geometry" />
         </mxCell>
-        <mxCell id="O78NIDBZIqbvDP41GVPC-11" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;OrigamiLendingRewardsMinter&lt;/b&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-240" y="877" width="200" height="20.625" as="geometry" />
+        <mxCell id="O78NIDBZIqbvDP41GVPC-11" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;OrigamiLendingRewardsMinter&lt;/b&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="1633" y="2400" width="200" height="20.625" as="geometry" />
         </mxCell>
-        <mxCell id="O78NIDBZIqbvDP41GVPC-12" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;checkpointDebtAndMintRewards()&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="-225" y="927" width="205" height="18.33" as="geometry" />
+        <mxCell id="O78NIDBZIqbvDP41GVPC-12" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;checkpointDebtAndMintRewards()&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="1648" y="2450" width="205" height="18.33" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
