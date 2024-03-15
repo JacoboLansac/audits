@@ -117,7 +117,7 @@ The attacker successfully extracted 2 WETH from the contract bypassing the sanit
 
 If any tokens end up in the `OrigamiDexAggregatorSwapper`, an attacker can withdraw them before the owner calls `recoverToken()`.
 
-Even though this attack would represent a loss of funds for the protocol, I classify it as low, because said contract is **not** expected to have any balance.
+Even though this attack would represent a loss of funds, I classify it as low, because said contract is **not** expected to have any balance. Moreover, if the funds were sent by mistake to the contract, they could be considered lost already (except that the protocol has the `recoverTokens()` function implemented to recover them). 
 Tokens may only arrive at the contract's balance by mistake. However, if this contract was meant to have tokens in its balance, it would have been a high-severity vulnerability.
 
 **Recommendation**
