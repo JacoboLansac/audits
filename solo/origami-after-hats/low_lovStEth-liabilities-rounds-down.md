@@ -53,7 +53,7 @@ The price units returned by `OrigamiWstEthToEthOracle::latestPrice()` are *wstET
 
 The output of `latestPrice()` (*1 wsETH to ETH*) matches the oracle naming: `OrigamiWstEthToEthOracle`. So far, so good.
 
-However, in the `OrigamiLovTokenFlashAndBorrowManager` contract, which uses `OrigamiWstEthToEthOracle` for the calculation of the shares, the storage variable for this oracle is called `debtTokenToReserveTokenOracle`. Note that in the context of `lovStEth`, the assets are:
+However, in the `OrigamiLovTokenFlashAndBorrowManager` contract, which uses `OrigamiWstEthToEthOracle`, the storage variable for this oracle is called `debtTokenToReserveTokenOracle`. Note that in the context of `lovStEth`, the assets are:
 - `debtToken` = `WETH`
 - `reserveToken` = `wstETH`
 
@@ -75,7 +75,7 @@ contract OrigamiLovTokenFlashAndBorrowManager {
 
 **The Issue**
 
-The only place where this oracle is used is in the `liabilities()` function. This function reads the `debt` from the borrowLend contract, measured in `WETH`. Then the function invokes the oracle to convert the debt in `WETH` (debt token) to `wstETH` (reserve token). For this it uses the `debtTokenToReserveTokenOracle::convertAmount()` function. Note that the rounding method is ROUND_UP, to be conservative with the liabilities of the system. 
+The only place where this oracle is used is in the `liabilities()` function. This function reads the `debt` from the borrowLend contract, measured in `WETH`. Then the function invokes the oracle to convert the debt in `WETH` (debt token) to `wstETH` (reserve token). For this it uses the `debtTokenToReserveTokenOracle::convertAmount()` function. Note that the rounding method is ROUND_UP, which is a conservative (good) approach in the case of the vault's liabilities. 
 
 ```javascript
     function liabilities(IOrigamiOracle.PriceType debtPriceType) public override(OrigamiAbstractLovTokenManager,IOrigamiLovTokenManager) view returns (uint256) {
@@ -93,7 +93,7 @@ The only place where this oracle is used is in the `liabilities()` function. Thi
     }
 ```
 
-Note in the comments of the snippet above, that the `fromAsset = WETH`. Note below that `convertAmount()` flips the rounding method if `fromAsset == quoteAsset`, and remember that in this oracle  `quoteAsset = WETH`. Therefore, the second path is invoked, where the rounding method is flipped. The liabilities will be rounded DOWN, which is the less the opposite as intended (and a less conservative approach when calculating the ALratio).
+Note in the comments of the snippet above, that the `fromAsset = WETH`. Note below that `convertAmount()` flips the rounding method if `fromAsset == quoteAsset`, and remember that in this oracle  `quoteAsset = WETH`. Therefore, the second path is invoked, where the rounding method is flipped. The liabilities will be rounded DOWN, which is less conservative and probably the opposite or intended.
 
 ```javascript
     function convertAmount(
@@ -137,7 +137,7 @@ The `liabilities()` in lovStEth system will be rounded DOWN, instead of the cons
 
 **Recommendation**
 In `OrigamiLovTokenFlashAndBorrowManager`,
-- Change the naming of the oracle storage variable from `debtTokenToReserveTokenOracle` to `reserveTokenToDebtTokenOracle`, and the input args of `setOracles()`
+- Change the naming of the oracle storage variable from `debtTokenToReserveTokenOracle` to `reserveTokenToDebtTokenOracle`, and the input args of `setOracles()`. This has no real effect, but it is good for consistency.
 - Change the rounding strategy when calling `liabilities()`
 
 ```diff
