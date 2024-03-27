@@ -40,3 +40,5 @@
 **Recommendation**
 
 Perhaps reuse the function `_reservesCapacityFromTotalSupply()` to make sure the limit is not hit, or to reflect it in the output from `investQuote()`
+
+Alternatively, `_previewDepositIntoReserves()` (which is already used in `investQuote()`) could take into account the supply limit, and then `investQuote()` could revert if slippage limits were not respected
