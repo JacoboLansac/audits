@@ -41,4 +41,4 @@
 
 Perhaps reuse the function `_reservesCapacityFromTotalSupply()` to make sure the limit is not hit, or to reflect it in the output from `investQuote()`
 
-Alternatively, `_previewDepositIntoReserves()` (which is already used in `investQuote()`) could take into account the supply limit, and then `investQuote()` could revert if slippage limits were not respected
+Alternatively, `_previewDepositIntoReserves()` (which is already used in `investQuote()`) could take into account the supply limit, and then `investQuote()` could revert if slippage limits were not respected. But then I guess `_maxDepositIntoReserves()` should also reflect that supply limit, which I think is not how you intended to use this function. 
