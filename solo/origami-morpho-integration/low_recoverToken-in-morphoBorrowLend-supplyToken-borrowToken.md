@@ -83,3 +83,9 @@ The same principle applies to the `_borrowToken` in `onMorphoSupplyRepay()`, so 
         IERC20(token).safeTransfer(to, amount);
     }
 ```
+
+## Team response
+
+The idea was to be able to recover those dust tokens when fully deleveraged. But they decided to include a requirement so that they can only be removed if `debtBalance == 0`
+
+
