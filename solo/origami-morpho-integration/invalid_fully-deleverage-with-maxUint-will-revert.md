@@ -1,5 +1,11 @@
 # Attempting to fully deleverage by providing `withdrawCollateralAmount=type(uint256).max` will revert when swapping the collateral for debt token 
 
+## Invalidation reason
+
+The admins would never call `decreaseLeverage` with `withdrawCollateralAmount=type(uint256).max` because that includes the user funds. 
+
+## Description
+
 When calling `decreaseLeverage()`, the `onMorphoRepay()` function is called, which withdraws collateral and swaps it for `_borrowToken`. However, the output from `_withdraw()` is ignored. 
 
 ```javascript
