@@ -1,9 +1,17 @@
-# `OrigamiMorphoBorrowAndLend::setMaxSafeLtv()` should perhaps have a greater-or-equal requirement when comparing to morpho's LLTV
+# `OrigamiMorphoBorrowAndLend::setMaxSafeLtv()` allows setting `maxSafeLtv` equal to `morphoMarketLltv` against what doc-strigs suggest
 
-When setting the `maxSafeLtv`, a strict greater-than is used in the input validation allowing the Origami's `_maxSafeLtv` to be *equal* to morpho's `morphoMarketLltv`. However, the docstring suggests that the intention is to have a *safer* LTV limit than the one in morpho. This made me think that having a safer LTV would mean not allowing having the same limit, but strictly lower.  
+In the definition of the state variable  `maxSafeLtv`, the comment states that it should be a *lower* value than `morphoLTV`. However, in `setMaxSafeLtv()` a strict greater-than is used as the criteria to revert when doing input validation, allowing `maxSafeLtv` to be *equal* to `morphoMarketLltv`.
 
 *OrigamiMorphoBorrowAndLend.sol*
 ```javascript
+    // ...
+
+    // LTV = 90%, positions liquidated when loan/collateral >= 90%. 
+    // set to a safer value than morphoLTV, so a LOWER value.
+    uint256 public override maxSafeLtv;
+
+    // ...
+
     /**
      * @notice Set the max LTV we will allow when borrowing or withdrawing collateral.
      * @dev The morpho LTV is the liquidation LTV only, we don't want to allow up to that limit
@@ -105,4 +113,4 @@ Furthermore, if we look at the liquidation logic in the morpho market:
 We see in the comment in the `_isHealthy()` that the function *Rounds in favor of the protocol, so one might not be able to borrow exactly `maxBorrow` but one unit less*. 
 Thus `maxBorrow` is rounded down, which makes a position liquidatable at *one unit less*.
 
-Even though this unit of borrowed collateral does not translate into one unit of lltv, it simply manifests that the `_isHealthy()` rounds in favor of the protocol, therefore strengthening the case for putting a *greater-than-equal* restriction to always be below the `morphoMarketLltv`. 
+Even though this unit of borrowed collateral does not translate into one unit of `lltv`, it simply manifests that the `_isHealthy()` rounds in favor of the protocol, therefore strengthening the case for putting a *greater-than-equal* restriction to be safer.
