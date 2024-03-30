@@ -1,4 +1,4 @@
-# Morpho liquidations threshold
+# `OrigamiMorphoBorrowAndLend::setMaxSafeLtv()` should perhaps have a greater-or-equal requirement when comparing to morpho's LLTV
 
 When setting the `maxSafeLtv`, a strict greater-than is used in the input validation allowing the Origami's `_maxSafeLtv` to be *equal* to morpho's `morphoMarketLltv`. However, the docstring suggests that the intention is to have a *safer* LTV limit than the one in morpho. This made me think that having a safer LTV would mean not allowing having the same limit, but strictly lower.  
 
