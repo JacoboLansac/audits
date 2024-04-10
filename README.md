@@ -1,19 +1,12 @@
 # Security-reviews
 
 ## 2023 - October
-
 - [Spillways hack research](solo/spillways-hack.md)  (not an audit)
 
-## 2023 - November
-
-- [NextGen](solo/next-gen.md)
-
 ## 2023 - December
-
 - [Spillways staking](solo/spillways-staking.md) 
 
 ## 2024 - January
-- [Curves protocol](solo/curves.md)
 - [Vector Reserve protcol](solo/vector-reserve.md)
 
 ## 2024 - February
@@ -24,5 +17,5 @@
 - [Origami (HATS contest, #1st place)](https://app.hats.finance/audit-competitions/origami-0x998f1b716a5022be026ca6b919c0ddf45ca31abd/leaderboard)
 - [Origami Lov Tokens - Solo mitigation review](https://github.com/JacoboLansac/audits/blob/main/solo/origami-lov-mitigation-review.md)
 
-# 2024 - April
+## 2024 - April
 - [TempleDAO - Morpho/Ethena Lov Tokens](https://github.com/JacoboLansac/audits/blob/main/solo/temple-origami-morpho-integration-review.md)
