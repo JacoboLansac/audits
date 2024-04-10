@@ -1,7 +1,7 @@
 # Security-reviews
 
 ## 2023 - October
-- [Spillways hack research](solo/spillways-hack.md)  (not an audit)
+- [Spillways hack research](solo/spillways-hack.md)
 
 ## 2023 - December
 - [Spillways staking](solo/spillways-staking.md) 
