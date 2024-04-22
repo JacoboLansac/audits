@@ -20,4 +20,4 @@
 ## 2024 - April
 - [TempleDAO - Morpho Integration & Ethena Lov Tokens](solo/temple-origami-morpho-integration-review.md). Extension on existing codebase
 - TempleDAO - EtherFi & Renzo Lov Tokens. Extension on existing codebase. (No issues found). 
-- [Blendr - staking](solo/blendr-staking.md). Full security review
+- [Blendr Staking](solo/blendr-staking.md). Full security review
