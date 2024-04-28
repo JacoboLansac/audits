@@ -13,9 +13,6 @@ Read [past security reviews](https://github.com/JacoboLansac/audits).
 | \[H-1\] | The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated  |  High |   |
 | \[M-1\] | Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens |  Medium |   |
 | \[M-2\] | Users will not be able to request unstakes if the ether transfer to the `withdrawalManager` fails.  |  Medium |   |
-| \[C-1\] | CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake |  Centralization |   |
-| \[C-2\] | CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation |  Centralization |   |
-| \[C-3\] | CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`   |  Centralization |   |
 | \[L-1\] | In `requestUnstake()`, the `unstakingFee` is used as if it was measured in wTAO units, but it is expressed as a percentage (base 1000), making it trivial to bypass the requirement `yTAOAmt > unstakingFee` |  Low |   |
 | \[L-2\] | Pulling ether from the `yTAO` contract will revert if the recipient is not an EOA |  Low |   |
 | \[L-3\] | The `wrap()` function will revert when users attempt to wrap exactly `minStakingAmt` |  Low |   |
@@ -26,6 +23,9 @@ Read [past security reviews](https://github.com/JacoboLansac/audits).
 | \[L-8\] | In future contract updates, maxSupply needs to be checked against initial supply  |  Low |   |
 | \[L-9\] | The ussage of Ownable & Access control is redundant as they are both serving the same purpose. |  Low |   |
 | \[L-10\] | Use SafeERC20 library for ERC20 transfers |  Low |   |
+| \[C-1\] | CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake |  Centralization |   |
+| \[C-2\] | CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation |  Centralization |   |
+| \[C-3\] | CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`   |  Centralization |   |
 | \[G-1\] | Repeating the same check over and over for every request unstake |  Gas |   |
 | \[G-2\] | Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change |  Gas |   |
 | \[G-3\] | The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop |  Gas |   |
@@ -342,99 +342,6 @@ Favor the pullover push pattern with a state variable tracking the collected ser
 +    }
 
 ```
-
-
-------------------------------
-
-
-
-## Centralization risks
-
-
-
-
-### [C-1] CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake
-
-- Users deposits `wTAO` tokens in the `yTAO` contract in exchange for rewards, also in `wTAO` tokens. When users deposit `wTAO` using `wrap()`, they receive `yTAO` as a receipt.
-- To unstake, they need to submit a request by calling `requestUnstake`. In this same transaction, the corresponding amount of `yTAO` is burned. 
-- Then the admins approve the unstake requests with `approveMultipleUnstakes()`, setting the rewards for each request (presumably calculated off-chain). 
-
-However, the rewards distribution is entirely in the power of the contract admins, who sets the rewards to be given upon unstake approvals.
-If the protocol was insolvent, or simply malicious, they could choose to:
-- Accept the unstake requests, but grant 0 rewards.
-- Don't approve the unstake requests, which is equivalent to not letting users unstake.
-
-#### Impact: Medium
-
-- Probability: low, as it requires malicious admins or compromised keys
-- Impact: high, as users would lose their rewards or even their initial `wTAO` stakes
-
-#### Recommendation
-
-Unfortunately, the current architecture doesn't offer many alternatives, as the `wTAO` tokens are not in the `yTAO` contracts balance until the admins approve unstake requests. 
-This is a risk that the users have to take, and they must therefore be aware of it.
-
-
-
-
-
-
-
-
-
-
-
-
-
-### [C-2] CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation
-
-The owner of the transparent proxy has the power of upgrading the contract to a malicious implementation. 
-
-#### Impact: Medium
-
-Temporal DoS, as the contract may become unusable to request unstakes. 
-
-- Probability: low, as it requires a malicious owner or compromised keys
-- Impact: high, as users would lose all of their staked funds
-
-#### Recommendation
-
-The upgradeability feature should be protected with a multisig. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-### [C-3] CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`  
-
-With the power to update the `exchangeRate`, the `EXCHANGE_UPDATE_ROLE` role has the control over how many `yTAO` per `wTAO` are given in `wrap()` or `wTAO` per `yTAO` in `requestUnstake()`. 
-A malicious or compromised admin address with such a role could front-run users doing several malicious actions:
-- front-run `wrap()` with a very low exchange rate to decrease the amount of `yTAO` the user receives
-- front-run `requestUnstake()` with a very high exchange rate to decrease the amount of `wTAO` the user gets back
-- self-front-run his own `wrap()` with a high exchange rate to receive a disproportionate amount of `yTAO`
-
-#### Impact: Medium
-- Probability: low, as it requires a malicious admin or compromised keys
-- Impact: high, as it could significantly decrease the value of users funds in the blink of an eye
-
-#### Recommendation
-
-Use all protections possible to protect the `EXCHANGE_UPDATE_ROLE`. 
-Unfortunately, it seems to be a function that needs to be executed frequently, and it is time-sensitive. Therefore it is not very suitable for multisigs, as the delay time until all signatures are collected can have other serious impacts (outdated prices).
-
-
-
-
-
-
 
 
 
@@ -1138,6 +1045,102 @@ Besides the extra security it provides, it already does all the necessary safety
 
     }
 ```
+
+
+
+------------------------------
+
+
+
+## Centralization risks
+
+
+
+
+### [C-1] CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake
+
+- Users deposits `wTAO` tokens in the `yTAO` contract in exchange for rewards, also in `wTAO` tokens. When users deposit `wTAO` using `wrap()`, they receive `yTAO` as a receipt.
+- To unstake, they need to submit a request by calling `requestUnstake`. In this same transaction, the corresponding amount of `yTAO` is burned. 
+- Then the admins approve the unstake requests with `approveMultipleUnstakes()`, setting the rewards for each request (presumably calculated off-chain). 
+
+However, the rewards distribution is entirely in the power of the contract admins, who sets the rewards to be given upon unstake approvals.
+If the protocol was insolvent, or simply malicious, they could choose to:
+- Accept the unstake requests, but grant 0 rewards.
+- Don't approve the unstake requests, which is equivalent to not letting users unstake.
+
+#### Impact: Medium
+
+- Probability: low, as it requires malicious admins or compromised keys
+- Impact: high, as users would lose their rewards or even their initial `wTAO` stakes
+
+#### Recommendation
+
+Unfortunately, the current architecture doesn't offer many alternatives, as the `wTAO` tokens are not in the `yTAO` contracts balance until the admins approve unstake requests. 
+This is a risk that the users have to take, and they must therefore be aware of it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+### [C-2] CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation
+
+The owner of the transparent proxy has the power of upgrading the contract to a malicious implementation. 
+
+#### Impact: Medium
+
+Temporal DoS, as the contract may become unusable to request unstakes. 
+
+- Probability: low, as it requires a malicious owner or compromised keys
+- Impact: high, as users would lose all of their staked funds
+
+#### Recommendation
+
+The upgradeability feature should be protected with a multisig. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+### [C-3] CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`  
+
+With the power to update the `exchangeRate`, the `EXCHANGE_UPDATE_ROLE` role has the control over how many `yTAO` per `wTAO` are given in `wrap()` or `wTAO` per `yTAO` in `requestUnstake()`. 
+A malicious or compromised admin address with such a role could front-run users doing several malicious actions:
+- front-run `wrap()` with a very low exchange rate to decrease the amount of `yTAO` the user receives
+- front-run `requestUnstake()` with a very high exchange rate to decrease the amount of `wTAO` the user gets back
+- self-front-run his own `wrap()` with a high exchange rate to receive a disproportionate amount of `yTAO`
+
+#### Impact: Medium
+- Probability: low, as it requires a malicious admin or compromised keys
+- Impact: high, as it could significantly decrease the value of users funds in the blink of an eye
+
+#### Recommendation
+
+Use all protections possible to protect the `EXCHANGE_UPDATE_ROLE`. 
+Unfortunately, it seems to be a function that needs to be executed frequently, and it is time-sensitive. Therefore it is not very suitable for multisigs, as the delay time until all signatures are collected can have other serious impacts (outdated prices).
+
+
+
+
+
+
+
+
 
 
 
