@@ -26,13 +26,13 @@ Read [past security reviews](https://github.com/JacoboLansac/audits).
 | \[L-8\] | In future contract updates, maxSupply needs to be checked against initial supply  |  Low |   |
 | \[L-9\] | The ussage of Ownable & Access control is redundant as they are both serving the same purpose. |  Low |   |
 | \[L-10\] | Use SafeERC20 library for ERC20 transfers |  Low |   |
-| \[G-1\] | Repeating the same check over and over for every request unstake |  Gas optimization |   |
-| \[G-2\] | Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change |  Gas optimization |   |
-| \[G-3\] | The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop |  Gas optimization |   |
-| \[G-4\] | Unnecessary repeated check every time the exchange rate is updated |  Gas optimization |   |
-| \[G-5\] | Unnecessary allowance check in `approveMultipleUnstakes()` |  Gas optimization |   |
-| \[G-6\] | Read length from cached memory in `requestUnstake` as it has already been read before |  Gas optimization |   |
-| \[G-7\] | Save gas by storing bytes instead of strings for `nativeWalletReceiver` |  Gas optimization |   |
+| \[G-1\] | Repeating the same check over and over for every request unstake |  Gas |   |
+| \[G-2\] | Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change |  Gas |   |
+| \[G-3\] | The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop |  Gas |   |
+| \[G-4\] | Unnecessary repeated check every time the exchange rate is updated |  Gas |   |
+| \[G-5\] | Unnecessary allowance check in `approveMultipleUnstakes()` |  Gas |   |
+| \[G-6\] | Read length from cached memory in `requestUnstake` as it has already been read before |  Gas |   |
+| \[G-7\] | Save gas by storing bytes instead of strings for `nativeWalletReceiver` |  Gas |   |
 | \[I-1\] | The `checkPaused` modifier is used in `approveMultipleUnstakes()` |  Informational |   |
 | \[I-2\] | The nonReentrant modifier should be placed first for security |  Informational |   |
 | \[I-3\] | Wrong argument name in events  |  Informational |   |
