@@ -7,7 +7,41 @@ Read [past security reviews](https://github.com/JacoboLansac/audits).
 
 ## Findings Overview
 
-TODO: TBC
+
+| Finding | Description                                                                                                      | Severity | Status |
+| ------- | ---------------------------------------------------------------------------------------------------------------- | -------- | ------ |
+| \[H-1\] | The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated  |  High |   |
+| \[M-1\] | Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens |  Medium |   |
+| \[M-2\] | Users will not be able to request unstakes if the ether transfer to the `withdrawalManager` fails.  |  Medium |   |
+| \[C-1\] | CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake |  Centralization |   |
+| \[C-2\] | CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation |  Centralization |   |
+| \[C-3\] | CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`   |  Centralization |   |
+| \[L-1\] | In `requestUnstake()`, the `unstakingFee` is used as if it was measured in wTAO units, but it is expressed as a percentage (base 1000), making it trivial to bypass the requirement `yTAOAmt > unstakingFee` |  Low |   |
+| \[L-2\] | Pulling ether from the `yTAO` contract will revert if the recipient is not an EOA |  Low |   |
+| \[L-3\] | The `wrap()` function will revert when users attempt to wrap exactly `minStakingAmt` |  Low |   |
+| \[L-4\] | The `wrap()` function requires that the caller's `wTAO` balance is higher than the amount to stake (`wtaoAmount`) but ignores the fees in the requirement |  Low |   |
+| \[L-5\] | The function `approveMultipleUnstakes()` lacks protection against repeated unstake requests |  Low |   |
+| \[L-6\] | The parameter `minStakingAmount` cannot be ever set to 0, due to a wrong requirement in `setMinStakingAmount()`  |  Low |   |
+| \[L-7\] | The `maxDepositPerRequest` is not taken into account when calculating `maxTaoForWrap()` which will create reverts if users try to wrap the max amount |  Low |   |
+| \[L-8\] | In future contract updates, maxSupply needs to be checked against initial supply  |  Low |   |
+| \[L-9\] | The ussage of Ownable & Access control is redundant as they are both serving the same purpose. |  Low |   |
+| \[L-10\] | Use SafeERC20 library for ERC20 transfers |  Low |   |
+| \[G-1\] | Repeating the same check over and over for every request unstake |  Gas optimization |   |
+| \[G-2\] | Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change |  Gas optimization |   |
+| \[G-3\] | The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop |  Gas optimization |   |
+| \[G-4\] | Unnecessary repeated check every time the exchange rate is updated |  Gas optimization |   |
+| \[G-5\] | Unnecessary allowance check in `approveMultipleUnstakes()` |  Gas optimization |   |
+| \[G-6\] | Read length from cached memory in `requestUnstake` as it has already been read before |  Gas optimization |   |
+| \[G-7\] | Save gas by storing bytes instead of strings for `nativeWalletReceiver` |  Gas optimization |   |
+| \[I-1\] | The `checkPaused` modifier is used in `approveMultipleUnstakes()` |  Informational |   |
+| \[I-2\] | The nonReentrant modifier should be placed first for security |  Informational |   |
+| \[I-3\] | Wrong argument name in events  |  Informational |   |
+| \[I-4\] | Naming inconsistencies |  Informational |   |
+| \[I-5\] | Unnecessary initializations in `initialize()` |  Informational |   |
+| \[I-6\] | Redundant check in `setUpperExchangeRateBound()` |  Informational |   |
+| \[I-7\] | Avoid "magic" numbers and define constants instead (embedded in bytecode so they cost no gas) |  Informational |   |
+
+
 
 ----------
 
@@ -98,7 +132,7 @@ focus, but significant inefficiencies will also be reported.
 
 ## High risk
 
-### [H-] The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated 
+### [H-1] The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated 
 
 With large deviations from the free-market rate, wealthy attackers will be able to leech value from other honest depositors by depositing and requesting to unstake right before and right after an update in the exchange rate.
 
@@ -144,7 +178,7 @@ I personally favor option 2.
 
 
 
-### [M-] Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens
+### [M-1] Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens
 
 The unstaking flow goes as follows:
 1. User requests to unstake, by burning an amount of `yTAO` tokens. This registers the amount of `wTAO` tokens that should be given 
@@ -241,7 +275,7 @@ Keep track of the balance allocated to untakes in a state variable. Increase it 
 
 
 
-### [M-] Users will not be able to request unstakes if the ether transfer to the `withdrawalManager` fails. 
+### [M-2] Users will not be able to request unstakes if the ether transfer to the `withdrawalManager` fails. 
 
 Transfering the `serviceFee` to the `withdrawalManager` is done as part of the main execution flow inside `requestUnstake()`:
 
@@ -319,7 +353,7 @@ Favor the pullover push pattern with a state variable tracking the collected ser
 
 
 
-### [C-] CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake
+### [C-1] CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake
 
 - Users deposits `wTAO` tokens in the `yTAO` contract in exchange for rewards, also in `wTAO` tokens. When users deposit `wTAO` using `wrap()`, they receive `yTAO` as a receipt.
 - To unstake, they need to submit a request by calling `requestUnstake`. In this same transaction, the corresponding amount of `yTAO` is burned. 
@@ -352,7 +386,7 @@ This is a risk that the users have to take, and they must therefore be aware of 
 
 
 
-### [C-] CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation
+### [C-2] CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation
 
 The owner of the transparent proxy has the power of upgrading the contract to a malicious implementation. 
 
@@ -379,7 +413,7 @@ The upgradeability feature should be protected with a multisig.
 
 
 
-### [C-] CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`  
+### [C-3] CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`  
 
 With the power to update the `exchangeRate`, the `EXCHANGE_UPDATE_ROLE` role has the control over how many `yTAO` per `wTAO` are given in `wrap()` or `wTAO` per `yTAO` in `requestUnstake()`. 
 A malicious or compromised admin address with such a role could front-run users doing several malicious actions:
@@ -417,7 +451,7 @@ Unfortunately, it seems to be a function that needs to be executed frequently, a
 
 
 
-### [L-] In `requestUnstake()`, the `unstakingFee` is used as if it was measured in wTAO units, but it is expressed as a percentage (base 1000), making it trivial to bypass the requirement `yTAOAmt > unstakingFee`
+### [L-1] In `requestUnstake()`, the `unstakingFee` is used as if it was measured in wTAO units, but it is expressed as a percentage (base 1000), making it trivial to bypass the requirement `yTAOAmt > unstakingFee`
 
 In `requestUnstake()`, there is a requirement so that `yTAOAmnt` has to be higher than the `unstakingFee`. This requirement makes no sense as the `unstakingFee` is defined (and set) as a percentage (base 1000), and here is directly compared with `yTAOAmt`, which is expressed `wTAO` units (wei). Therefore, this requirement will be bypassed in the majority of cases. For example, if the unstaking fee is set to 10%, then `unstakingFee=100` (% in base 1000), and any unstake amount such that `yTAOAmt > 100 wei` will bypass the check. 
 
@@ -510,7 +544,7 @@ Replace the following requirement with another one that checks with absolute val
 
 
 
-### [L-] Pulling ether from the `yTAO` contract will revert if the recipient is not an EOA
+### [L-2] Pulling ether from the `yTAO` contract will revert if the recipient is not an EOA
 
 The `pullNativeToken()` function uses a low-level call to withdraw ether from the contract. However, the datatype `address` does does not have the call method with value by default unless it is an EOA. Any attempts to transfer funds to contracts will fail (a Treasury contract, a smart contract wallet, a multisig).
 
@@ -568,7 +602,7 @@ Wrap the `to` with the `payable` attribute to transfer the funds regardless if i
 
 
 
-### [L-] The `wrap()` function will revert when users attempt to wrap exactly `minStakingAmt`
+### [L-3] The `wrap()` function will revert when users attempt to wrap exactly `minStakingAmt`
 
 The `wrap()` function checks that the `wtaoAmount` is strictly greater than `minStakingAmount`, which means that the case `wtaoAmount == minStakingAmt` will revert.
 
@@ -619,7 +653,7 @@ Change it to greater or equal to:
 
 
 
-### [L-] The `wrap()` function requires that the caller's `wTAO` balance is higher than the amount to stake (`wtaoAmount`) but ignores the fees in the requirement
+### [L-4] The `wrap()` function requires that the caller's `wTAO` balance is higher than the amount to stake (`wtaoAmount`) but ignores the fees in the requirement
 
 There is a requirement in `wrap()` such that the `msg.sender` has at least `wtaoAmount` tokens in its balance. However, later in the same function it attempts to retrieve a higher amount of `wTAO` from the `msg.sender`: the sum of `wtaoAmount + stakingFees + bridgingFee`. 
 
@@ -699,7 +733,7 @@ The requirement can be removed because the `_transferToContract()` function will
 
 
 
-### [L-] The function `approveMultipleUnstakes()` lacks protection against repeated unstake requests
+### [L-5] The function `approveMultipleUnstakes()` lacks protection against repeated unstake requests
 
 
 In the function  `approveMultipleUnstakes()`, The requirement that a particular request has `isReadyForUnstake = false` is read in a different for-loop than the one that is setting `isReadyForUnstake = true`. This means that if the admins approve the same unstaking request multiple times in the same calldata array of pending requests, the contract will not revert on the repeated one. Instead, it will add twice the amount of wTAO required to be sent to the contract (`totalRequiredTaoAmt`): 
@@ -847,7 +881,7 @@ The suggested implementation is:
 
 
 
-### [L-] The parameter `minStakingAmount` cannot be ever set to 0, due to a wrong requirement in `setMinStakingAmount()` 
+### [L-6] The parameter `minStakingAmount` cannot be ever set to 0, due to a wrong requirement in `setMinStakingAmount()` 
 
 The docstring of `setMinStakingAmt()` states that `minStakingAmt` can be even 0. However, this is not true when the value is attempted to be set using the function `setMinStakingAmt`. 
 The reason is that the requirement uses a strictly greater than `bridgingFee`, and this means that even if the `bridgingFee == 0`, the `minStakingAmt` can't be 0, but has to be at least 1. 
@@ -893,7 +927,7 @@ One of the following:
 
 
 
-### [L-] The `maxDepositPerRequest` is not taken into account when calculating `maxTaoForWrap()` which will create reverts if users try to wrap the max amount
+### [L-7] The `maxDepositPerRequest` is not taken into account when calculating `maxTaoForWrap()` which will create reverts if users try to wrap the max amount
 
 The `wrap()` function imposes a hard check so that the staked `wtaoAmount` is lower than the parameter `maxDepositPerRequest`:
 
@@ -969,7 +1003,7 @@ The `maxTaoForWrap()` function should take this cap into account:
 
 
 
-### [L-] In future contract updates, maxSupply needs to be checked against initial supply 
+### [L-8] In future contract updates, maxSupply needs to be checked against initial supply 
 
 The initialize function sets the `maxSupply` to the input argument `initialSupply`. 
 
@@ -1012,7 +1046,7 @@ If this same contract was used as a template to deploy a new version, and the ma
 
 
 
-### [L-] The ussage of Ownable & Access control is redundant as they are both serving the same purpose.
+### [L-9] The ussage of Ownable & Access control is redundant as they are both serving the same purpose.
 
 The contract inherits both `Ownable2Step` and `AccessControl` which is redundant, as both are meant for access control. 
 Only the actual access control modifiers are used, the ownable could be removed.
@@ -1083,7 +1117,7 @@ Remove the ownable related functions in the initialization and `renounceOwnershi
 
 
 
-### [L-] Use SafeERC20 library for ERC20 transfers
+### [L-10] Use SafeERC20 library for ERC20 transfers
 
 The SafeERC20 library is imported but never used. Unsafe ERC20 transfers found in multiple token transfers. 
 
@@ -1120,7 +1154,7 @@ Besides the extra security it provides, it already does all the necessary safety
 
 
 
-### [G-] Repeating the same check over and over for every request unstake
+### [G-1] Repeating the same check over and over for every request unstake
 
 In `requestUnstake()`, there are two requirements to ensure that `wrappedToken` and `withdrawalManager` are not `address(0)`. 
 These checks should be only on the setter functions so that they are only checked **once** instead of being checked over and over for every new `requestUnstake()`. As a matter of fact, the checks are already in place in the setters, so there is absolutely no need to place them here. 
@@ -1242,7 +1276,7 @@ And remove unnecessary checks to save gas in the following places:
 
 
 
-### [G-] Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change
+### [G-2] Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change
 
 The `wTAO` is not an upgradeable contract, so it is safe to assume that it won't change. 
 The `approveMultipleUnstakes()` function checks that the `wrappedToken` (`wTAO` address) is the same in all requests. It is a reasonable check, but expensive if done for every request in history, especially if not expected to change.
@@ -1307,7 +1341,7 @@ Moreover, it could also be removed from the struct itself, and removed it everyw
 
 
 
-### [G-] The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop
+### [G-3] The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop
 
 Loops are expensive in solidity and should be avoided as much as possible. 
 In `approveMultipleUnstakes()` the array of `requests` is iterated **three** times instead of iterating once performing all necessary operations. 
@@ -1458,7 +1492,7 @@ The suggested implementation is:
 
 
 
-### [G-] Unnecessary repeated check every time the exchange rate is updated
+### [G-4] Unnecessary repeated check every time the exchange rate is updated
 
 This requirement is already enforced in the setter of `lowerExchangeRateBound` and `upperExchangeRateBound`. Repeating the check every time that the exchange rate is updated is very gas-costly for the protocol in the long term.
 
@@ -1481,7 +1515,7 @@ This requirement is already enforced in the setter of `lowerExchangeRateBound` a
 
 
 
-### [G-] Unnecessary allowance check in `approveMultipleUnstakes()`
+### [G-5] Unnecessary allowance check in `approveMultipleUnstakes()`
 
 This function checks the allowance every time some requests need to be approved. This is unnecessary as the later `transferFrom()` already performs the checks internally. Remove the allowance requirement and save gas.
 
@@ -1515,7 +1549,7 @@ This function checks the allowance every time some requests need to be approved.
 
 
 
-### [G-] Read length from cached memory in `requestUnstake` as it has already been read before
+### [G-6] Read length from cached memory in `requestUnstake` as it has already been read before
 
 ```diff
     function requestUnstake(uint256 yTAOAmt) public payable nonReentrant checkPaused {
@@ -1577,7 +1611,7 @@ This function checks the allowance every time some requests need to be approved.
 
 
 
-### [G-] Save gas by storing bytes instead of strings for `nativeWalletReceiver`
+### [G-7] Save gas by storing bytes instead of strings for `nativeWalletReceiver`
 
 Storing strings is an antipattern, except if they are constants (string literals). Storing bytes is recommended instead, and should only be converted to strings in the output of view functions if really required. 
 
@@ -1619,7 +1653,7 @@ Replace bytes in every instance of `_nativeWalletReceiver`, except in `bridgeBac
 
 ## Informational
 
-### [I-] The `checkPaused` modifier is used in `approveMultipleUnstakes()`
+### [I-1] The `checkPaused` modifier is used in `approveMultipleUnstakes()`
 
 A valid scenario is that the owner needs to pause the contract to process unstakes. This is not possible, however, as the `checkPaused` modifier also applies to the `approveMultipleUnstakes()` function. 
 so while paused, requests cannot be processed. 
@@ -1629,7 +1663,7 @@ so while paused, requests cannot be processed.
 I would remove the `checkPaused` from the admin functions unless there is a strong reason for keeping it. 
 
 
-### [I-] The nonReentrant modifier should be placed first for security
+### [I-2] The nonReentrant modifier should be placed first for security
 
 The order of the modifiers in the function definition defines the order in which they are verified. For safety, it is recommended to place the nonReentrant modifier the first one (if really needed).
 
@@ -1644,7 +1678,7 @@ The order of the modifiers in the function definition defines the order in which
 ```
 
 
-### [I-] Wrong argument name in events 
+### [I-3] Wrong argument name in events 
 
 The event `UserUnstakeRequested()` has to amounts named as `tao`, but one of them refers as `yTAO`:
 
@@ -1697,7 +1731,7 @@ As an example, these are the values when emitting the event:
 
 ```
 
-### [I-] Naming inconsistencies
+### [I-4] Naming inconsistencies
 
 #### Weird supplies variable naming in `initialize()`
 
@@ -1726,7 +1760,7 @@ Be consistent with naming.
 
 
 
-### [I-] Unnecessary initializations in `initialize()`
+### [I-5] Unnecessary initializations in `initialize()`
 
 The contract `YTAO` inherits `Ownable2StepUpgradeable`, which is a safer version of OwnableUpgradeable. It is safer because for transfering ownership, the destination needs to accept the transfer. This can save the day if the wrong address is passed when transferring ownership, as the new address will most likely not be accepted as it is not aware. 
 
@@ -1776,7 +1810,7 @@ Moreover, the action `_setRoleAdmin(DEFAULT_ADMIN_ROLE, DEFAULT_ADMIN_ROLE)` is 
     }
 ```
 
-### [I-] Redundant check in `setUpperExchangeRateBound()`
+### [I-6] Redundant check in `setUpperExchangeRateBound()`
 
 by checking `newUpper > lower`, the first check (greater than 0) is redundant.
 
@@ -1789,7 +1823,7 @@ by checking `newUpper > lower`, the first check (greater than 0) is redundant.
     }
 ```
 
-### [I-] Avoid "magic" numbers and define constants instead (embedded in bytecode so they cost no gas)
+### [I-7] Avoid "magic" numbers and define constants instead (embedded in bytecode so they cost no gas)
 
 ```diff
     
