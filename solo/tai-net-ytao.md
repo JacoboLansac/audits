@@ -152,23 +152,26 @@ This is only profitable if the % delta in the exchange rate is higher than the u
 - The attacker frontruns the exchange rate update by calling `wrap()`. By front-running he gets the amount of `yTAO` corresponding to the original exchange rate, therefore receiving more `yTAO` than he should.
 - The attacker backruns the tx calling `requestUnstake()`, which uses the fresh exchange rate to calculate the amount of wTAO. This will be +15% `wTAO` - 10% fees, so a net +5% in `wTAO` value.
 
-#### Recommendation
-
-It is true, that in order for it to be effective, the admin has to approve the unstake request, but this requires:
+It is true, that in order for the attack to be effective, the admin has to approve the unstake request, but this requires:
 1. That the admins are aware of this leeching attack
 2. They put in place the tools to filter out sandwich attackers... but... is it really fair to do this? that would lock their tokens, which is almost like stealing them. Not a very good solution either. 
+
+#### Recommendation
 
 Here are some alternatives, all of them with pros and cons:
 
 1. Impose a short commitment period of a few days after wrapping. Example: users cannot request to unstake until 2 days have passed since the last time they called `wrap()`. However, users could call `wrap()` and then transfer to another wallet to bypass this protection.
 2. Impose a restriction that a user cannot transfer `yTAO` tokens in the same block as they call `wrap()`. This can be implemented with an ERC20 hook such as `_beforeTokenTransfer()`. Although this would effectively kill the issue, it might lead to issues with protocols trying to integrate with yTAO. 
+3. Use private flashbots to update the exchange rate bypassing the mempool. It does not always work, but it minimizes the chances of sandwich attacks. 
 
-I personally favor option 2. 
-
-
-
+Clearly, 3 is the simplest solution. But option 2 would be the safest. 
 
 ----------------------------------------------------------
+
+
+
+
+
 
 ## Medium risk
 
