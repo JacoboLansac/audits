@@ -10,37 +10,36 @@ Read [past security reviews](https://github.com/JacoboLansac/audits).
 
 | Finding | Description                                                                                                      | Severity | Status |
 | ------- | ---------------------------------------------------------------------------------------------------------------- | -------- | ------ |
-| \[H-1\] | The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated  |  High |   |
-| \[M-1\] | Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens |  Medium |   |
-| \[M-2\] | Users will not be able to request unstakes if the ether transfer to the `withdrawalManager` fails.  |  Medium |   |
-| \[L-1\] | In `requestUnstake()`, the `unstakingFee` is used as if it was measured in wTAO units, but it is expressed as a percentage (base 1000), making it trivial to bypass the requirement `yTAOAmt > unstakingFee` |  Low |   |
-| \[L-2\] | Pulling ether from the `yTAO` contract will revert if the recipient is not an EOA |  Low |   |
-| \[L-3\] | The `wrap()` function will revert when users attempt to wrap exactly `minStakingAmt` |  Low |   |
-| \[L-4\] | The `wrap()` function requires that the caller's `wTAO` balance is higher than the amount to stake (`wtaoAmount`) but ignores the fees in the requirement |  Low |   |
-| \[L-5\] | The function `approveMultipleUnstakes()` lacks protection against repeated unstake requests |  Low |   |
-| \[L-6\] | The parameter `minStakingAmount` cannot be ever set to 0, due to a wrong requirement in `setMinStakingAmount()`  |  Low |   |
-| \[L-7\] | The `maxDepositPerRequest` is not taken into account when calculating `maxTaoForWrap()` which will create reverts if users try to wrap the max amount |  Low |   |
-| \[L-8\] | In future contract updates, maxSupply needs to be checked against initial supply  |  Low |   |
-| \[L-9\] | The ussage of Ownable & Access control is redundant as they are both serving the same purpose. |  Low |   |
-| \[L-10\] | Use SafeERC20 library for ERC20 transfers |  Low |   |
-| \[C-1\] | CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake |  Centralization |   |
-| \[C-2\] | CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation |  Centralization |   |
-| \[C-3\] | CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`   |  Centralization |   |
-| \[G-1\] | Repeating the same check over and over for every request unstake |  Gas |   |
-| \[G-2\] | Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change |  Gas |   |
-| \[G-3\] | The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop |  Gas |   |
-| \[G-4\] | Unnecessary repeated check every time the exchange rate is updated |  Gas |   |
-| \[G-5\] | Unnecessary allowance check in `approveMultipleUnstakes()` |  Gas |   |
-| \[G-6\] | Read length from cached memory in `requestUnstake` as it has already been read before |  Gas |   |
-| \[G-7\] | Save gas by storing bytes instead of strings for `nativeWalletReceiver` |  Gas |   |
-| \[I-1\] | The `checkPaused` modifier is used in `approveMultipleUnstakes()` |  Informational |   |
-| \[I-2\] | The nonReentrant modifier should be placed first for security |  Informational |   |
-| \[I-3\] | Wrong argument name in events  |  Informational |   |
-| \[I-4\] | Naming inconsistencies |  Informational |   |
-| \[I-5\] | Unnecessary initializations in `initialize()` |  Informational |   |
-| \[I-6\] | Redundant check in `setUpperExchangeRateBound()` |  Informational |   |
-| \[I-7\] | Avoid "magic" numbers and define constants instead (embedded in bytecode so they cost no gas) |  Informational |   |
-
+| \[H-1\] | The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated  |  High | Acknowledged |
+| \[M-1\] | Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens |  Medium | Acknowledged |
+| \[M-2\] | Users will not be able to request unstakes if the ether transfer to the `withdrawalManager` fails.  |  Medium | Acknowledged |
+| \[L-1\] | In `requestUnstake()`, the `unstakingFee` is used as if it was measured in wTAO units, but it is expressed as a percentage (base 1000), making it trivial to bypass the requirement `yTAOAmtAcknowledged> unstakingFee` |  Low | Acknowledged  |
+| \[L-2\] | Pulling ether from the `yTAO` contract will revert if the recipient is not an EOA |  Low | Acknowledged |
+| \[L-3\] | The `wrap()` function will revert when users attempt to wrap exactly `minStakingAmt` |  Low | Acknowledged |
+| \[L-4\] | The `wrap()` function requires that the caller's `wTAO` balance is higher than the amount to stake (`wtaoAmount`) but ignores the fees in the requirement |  Low | Acknowledged |
+| \[L-5\] | The function `approveMultipleUnstakes()` lacks protection against repeated unstake requests |  Low | Acknowledged |
+| \[L-6\] | The parameter `minStakingAmount` cannot be ever set to 0, due to a wrong requirement in `setMinStakingAmount()`  |  Low | Acknowledged |
+| \[L-7\] | The `maxDepositPerRequest` is not taken into account when calculating `maxTaoForWrap()` which will create reverts if users try to wrap the max amount |  Low | Acknowledged |
+| \[L-8\] | In future contract updates, maxSupply needs to be checked against initial supply  |  Low | Acknowledged |
+| \[L-9\] | The ussage of Ownable & Access control is redundant as they are both serving the same purpose. |  Low | Acknowledged |
+| \[L-10\] | Use SafeERC20 library for ERC20 transfers |  Low | Acknowledged |
+| \[C-1\] | CENTRALIZATION: There is no on-chain guarantee for depositors that they will receive rewards or their original stake |  Centralization | Acknowledged |
+| \[C-2\] | CENTRALIZATION: As `yTAO` is an upgradeable contract, user funds can be stolen if the contract is upgraded to a malicious implementation |  Centralization | Acknowledged |
+| \[C-3\] | CENTRALIZATION: Admin roles have the power to update the exchange rate between `yTAO` and `wTAO`   |  Centralization | Acknowledged |
+| \[G-1\] | Repeating the same check over and over for every request unstake |  Gas | Acknowledged |
+| \[G-2\] | Checking for the `wrappedToken` in every `UnstakeRequest` is expensive and unnecessary if the `wTAO` token is not expected to change |  Gas | Acknowledged |
+| \[G-3\] | The same array is iterated in three separated for-loops in the same function instead of performing all operations in the same loop |  Gas | Acknowledged |
+| \[G-4\] | Unnecessary repeated check every time the exchange rate is updated |  Gas | Acknowledged |
+| \[G-5\] | Unnecessary allowance check in `approveMultipleUnstakes()` |  Gas | Acknowledged |
+| \[G-6\] | Read length from cached memory in `requestUnstake` as it has already been read before |  Gas | Acknowledged |
+| \[G-7\] | Save gas by storing bytes instead of strings for `nativeWalletReceiver` |  Gas | Acknowledged |
+| \[I-1\] | The `checkPaused` modifier is used in `approveMultipleUnstakes()` |  Informational | Acknowledged |
+| \[I-2\] | The nonReentrant modifier should be placed first for security |  Informational | Acknowledged |
+| \[I-3\] | Wrong argument name in events  |  Informational | Acknowledged |
+| \[I-4\] | Naming inconsistencies |  Informational | Acknowledged |
+| \[I-5\] | Unnecessary initializations in `initialize()` |  Informational | Acknowledged |
+| \[I-6\] | Redundant check in `setUpperExchangeRateBound()` |  Informational | Acknowledged |
+| \[I-7\] | Avoid "magic" numbers and define constants instead (embedded in bytecode so they cost no gas) |  Informational | Acknowledged |
 
 
 ----------
@@ -89,11 +88,11 @@ focus, but significant inefficiencies will also be reported.
 
 ## Scope
 
-- Delivery date: `2024-05-02`
+- Delivery date: `2024-05-01`
 - Duration of the audit: 7 days
-- Audited commit
-  hash: [dfd3cea4db30eafbd69fdb48caccc6dc043e230c](https://github.com/thevoidcoder/taiNET_contracts/commit/dfd3cea4db30eafbd69fdb48caccc6dc043e230c)
-- Review Commit hash: [ ... ]
+- Audited commit hash: [dfd3cea4db30eafbd69fdb48caccc6dc043e230c](https://github.com/thevoidcoder/taiNET_contracts/commit/dfd3cea4db30eafbd69fdb48caccc6dc043e230c)
+- Review Commit hash: [847e8b03e1db2bd49fc4d4b09c910daa3e579143](https://github.com/thevoidcoder/taiNET_contracts/commit/847e8b03e1db2bd49fc4d4b09c910daa3e579143)
+- 
 
 - The following contracts are in the scope of the audit:
 
