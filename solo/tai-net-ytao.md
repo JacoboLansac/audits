@@ -8,7 +8,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits).
 ## Findings Overview
 
 
-| Finding | Description                                                                                                      | Severity | Status |
+| Finding | Description                                                                                                      | Severity | Team response |
 | ------- | ---------------------------------------------------------------------------------------------------------------- | -------- | ------ |
 | \[H-1\] | The exchange rate mechanism either makes the protocol vulnerable to sandwich attacks or dooms it to spend a huge amount of gas in keeping the rate updated  |  High | Acknowledged |
 | \[M-1\] | Lack of accountability of `wTAO` tokens can lead to users not being able to unstake their tokens |  Medium | Acknowledged |
