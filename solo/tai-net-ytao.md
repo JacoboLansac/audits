@@ -240,10 +240,10 @@ Keep track of the balance allocated to untakes in a state variable. Increase it 
         uint256 amountToTransfer = request.taoAmt + request.rewardAmount;
         // Update state to false
         delete unstakeRequests[msg.sender][requestIndex];
++       wTaoForUnstakes -= amountToTransfer;
+
         // Perform ERC20 transfer
         bool transferSuccessful = IERC20(request.wrappedToken).transfer(msg.sender, amountToTransfer);
-
-+       wTaoForUnstakes -= amountToTransfer;
 
         require(transferSuccessful, "wTAO transfer failed");
 
