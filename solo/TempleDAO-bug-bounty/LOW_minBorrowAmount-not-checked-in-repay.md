@@ -1,4 +1,4 @@
-# The `minBorrowAmount` check in `TempleLineOfCredit::borrow()` is easily bypassable due to the equivalent check missing in the `repay()` function
+# An account can have a lower debt than `minBorrowAmount` because the necessary requirement is only present in `TempleLineOfCredit::borrow()` but not in `repay()` 
 
 When a liquidation occurs in `TempleLineOfCredit`, the collateral (Temple tokens) goes to the `treasuryReservesVault`. This offers no incentive to the caller of the `batchLiquidate()` function (used to liquidate unhealthy accounts) which leads me to believe that the protocol admins are the intended liquidators (even though any account can liquidate any position).
 
