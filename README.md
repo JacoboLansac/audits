@@ -19,7 +19,7 @@
 
 ## 2024 - April
 - [TempleDAO - Morpho Integration & Ethena Lov Tokens](solo/temple-origami-morpho-integration-review.md). Extension on existing codebase
-- [TempleDAO - EtherFi & Renzo Lov Tokens](https://github.com/JacoboLansac/audits/edit/main/README.md). Extension on existing codebase. (No issues found). 
+- [TempleDAO - EtherFi & Renzo Lov Tokens](https://github.com/JacoboLansac/audits/blob/main/README.md). Extension on existing codebase. (No issues found). 
 - [Blendr Staking](solo/blendr-staking.md). Full security review
 
 ## 2024 - May
