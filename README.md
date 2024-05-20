@@ -23,4 +23,4 @@
 - [Blendr Staking](solo/blendr-staking.md). Full security review
 
 ## 2024 - May
-- [Tai Net](solo/tai-net-ytao.md). Full security review
+- [TaiNet Protocol](solo/tai-net-ytao.md). Full security review
