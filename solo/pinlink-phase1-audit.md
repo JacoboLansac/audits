@@ -1,5 +1,7 @@
 # PinLink security review
 
+***Preliminar version, 2024-05-29.***
+
 A time-boxed security review of the [**PinkLink**](https://pinlink.gitbook.io/pinlink) protocol, with a focus on smart contract security and gas optimizations.
 
 Author: [**Jacopod**](https://twitter.com/jacolansac), independent security researcher.
