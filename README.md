@@ -24,3 +24,4 @@
 
 ## 2024 - May
 - [TaiNet Protocol](solo/tai-net-ytao.md). Full security review
+- [PinLink protocol](solo/pinlink-phase1-audit.md). Full security review
