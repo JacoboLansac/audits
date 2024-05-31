@@ -9,6 +9,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings summary
 
+
 | Finding                                                                                                                                                                        | Severity   | Description                                                                                                                                                         | Status   |
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------|
 | [C-1](<#c-1-an-attacker-can-drain-the-pinlink_staking-contract-by-claiming-rewards-multiple-times-as-there-is-no-registry-of-the-last-claimed-timestamp>)                      | Critical   | An attacker can drain the `PinLink_staking` contract by claiming rewards multiple times as there is no registry of the last claimed timestamp                       | -        |
@@ -26,9 +27,9 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 | [H-9](<#h-9-the-pinlink_staking-contract-can-become-insolvent-because-user-staked-tokens-are-also-distributed-as-rewards>)                                                     | High       | The `PinLink_Staking` contract can become insolvent because user-staked tokens are also distributed as rewards                                                      | -        |
 | [H-10](<#h-10-any-account-with-the-renter_role-can-empty-the-marketplace-contract-from-rewards-tokens-by-listing-a-tokenid-with-a-very-high-rewardrateperhour>)                | High       | Any account with the `RENTER_ROLE` can empty the Marketplace contract from rewards tokens by listing a `tokenId` with a very high `rewardRatePerHour`               | -        |
 | [M-1](<#m-1-starting-and-ending-rentals-in-the-marketplace-will-revert-temporarily-if-a-scheduled-pause-starts-shortly-after-the-rental-is-started>)                           | Medium     | Starting and ending rentals in the Marketplace will revert temporarily if a scheduled pause starts shortly after the rental is started                              | -        |
-| [M-2](<#m-2-any-account-with-the-renter_role-can-steal-the-renter-status-from-another-renter-by-listing-with-tokenamount0-before-the-rightful-owner-does-it>)                  | Medium       | Any account with the `RENTER_ROLE` can steal the `renter` status from another renter by listing with `tokenAmount=0` before the rightful owner does it              | -        |
+| [M-2](<#m-2-any-account-with-the-renter_role-can-steal-the-renter-status-from-another-renter-by-listing-with-tokenamount0-before-the-rightful-owner-does-it>)                  | Medium     | Any account with the `RENTER_ROLE` can steal the `renter` status from another renter by listing with `tokenAmount=0` before the rightful owner does it              | -        |
 | [M-3](<#m-3-any-account-can-start-a-new-rent-on-delisted-tokens-when-they-are-delisted-without-being-withdrawn>)                                                               | Medium     | Any account can start a new rent on delisted tokens when they are delisted without being withdrawn                                                                  | -        |
-| [M-4](<#m-4-renters-can-overwrite-by-mistake-an-existing-pausetime-by-shortening-the-pauseduration-and-thus-making-rentees-earn-more-rewards>)                                 | Medium     | Renters can overwrite by mistake an existing `pauseTime` by shortening the `pauseDuration` and thus making rentees earn more rewards                                | -        |
+| [M-4](<#m-4-renters-can-overwrite-by-mistake-an-existing-pausetime-and-shorten-the-pauseduration-changing-the-rewards-calculations-for-the-period>)                            | Medium     | Renters can overwrite by mistake an existing `pauseTime` and shorten the `pauseDuration`, changing the rewards calculations for the period                          | -        |
 | [M-5](<#m-5-collateral-and-rentable-tokens-will-get-stuck-in-the-marketplace-contract-if-not-enough-rewards-tokens-in-the-balance>)                                            | Medium     | Collateral and rentable tokens will get stuck in the Marketplace contract if not enough rewards tokens in the balance                                               | -        |
 | [M-6](<#m-6-lack-of-input-validation-in-pintokensettransactiontax-can-cause-reverts-in-all-token-transfers-if-provided-wrong-inputs>)                                          | Medium     | Lack of input validation in `PinToken.setTransactionTax()` can cause reverts in all token transfers if provided wrong inputs                                        | -        |
 | [L-1](<#l-1-it-is-possible-to-mint-tokens-of-tokenid0-even-though-the-intention-is-to-keep-it-as-a-reserved-tokenid>)                                                          | Low        | It is possible to mint tokens of `tokenId==0` even though the intention is to keep it as a reserved `tokenId`                                                       | -        |
@@ -41,11 +42,12 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 | [L-8](<#l-8-incorrect-visibility-modifier-in-pinlink_stakingcalculatetotalrewardamount>)                                                                                       | Low        | Incorrect visibility modifier in `PinLink_Staking.calculateTotalRewardAmount()`                                                                                     | -        |
 | [L-9](<#l-9-in-pinlink_staking-missing-events-for-updatestakingperiod-and-updatepercentage-and-claimreward>)                                                                   | Low        | In `PinLink_Staking`, missing events for `updateStakingPeriod()` and `updatePercentage()` and `claimReward()`                                                       | -        |
 | [GAS-1](<#gas-1-use-rentable-from-memory-instead-of-accessing-the-rentablestokenid-array>)                                                                                     | Gas        | Use rentable from memory instead of accessing the `rentables[tokenId]` array                                                                                        | -        |
-| [GAS-2](<#gas-2-in-marketplace-store-pauseduration-in-rentable-instead-of-each-rental-to-avoid-a-for-loop>)                                                                    | Gas        | In `Marketplace` store `pauseDuration` in `rentable` instead of each rental to avoid a for loop                                                                     | -        |
+| [GAS-2](<#gas-2-adjusting-rewards-for-pauses-in-marketplace-is-not-scalable-as-the-gas-cost-depends-on-the-number-of-rentees>)                                                 | Gas        | Adjusting rewards for pauses in `Marketplace` is not scalable as the gas cost depends on the number of rentees                                                      | -        |
 | [GAS-3](<#gas-3-in-marketplacelist-apply-caching-in-rentablerenter>)                                                                                                           | Gas        | In `Marketplace.list()`, apply caching in `rentable.renter`                                                                                                         | -        |
 | [GAS-4](<#gas-4-in-marketplacelist-apply-conditional-checks-before-writing-collateralperunit-and-rewardrateperhour>)                                                           | Gas        | In `Marketplace.list()`, apply conditional checks before writing `collateralPerUnit` and `rewardRatePerHour`                                                        | -        |
 | [GAS-5](<#gas-5-redundant-renter-address-check-in-marketplacedelist-isvalidrenter>)                                                                                            | Gas        | Redundant renter address check in `Marketplace.delist()` `isValidRenter`                                                                                            | -        |
 | [GAS-6](<#gas-6-add-indexes-to-the-functions-to-avoid-looping-through-the-same-elements>)                                                                                      | Gas        | Add indexes to the functions to avoid looping through the same elements                                                                                             | -        |
+
 
 
 ## Introduction
@@ -86,7 +88,7 @@ focus, but significant inefficiencies will also be reported.
 
 ### Actions required by severity level
 
-- **High** - client **must** fix the issue.
+- **High/Critical** - client **must** fix the issue.
 - **Medium** - client **should** fix the issue.
 - **Low** - client **could** fix the issue.
 
@@ -135,6 +137,7 @@ Delivering The First RWA-Tokenized DePIN Protocol, Driving Down Cost For AI Deve
 ### Architecture high level review
 
 - The architecture of Marketplace and Staking contract are not efficient from a gas point of view, as they rely heavily on for-loops. Alternative implementations using "defi-math" are recommended. Feel free to reach out for further advice in this regard
+- The mechanics for adjsuting rewards in pauses of the Marketplaces have multuple issues and are not gas-efficient. A different approach should studied, also using "defi-math", not relying on less for-loops. As the team will be the only renter for this Proof of concept phase, it is recommended that they don't pause the contract at all even after issues have been fixed.
 - It is a common practice to request another audit even after the mitigation review, if there is more than 1 high per 100 lines of code. Here we have 15 crit/high for 434 lines of code, so it would be strongly recommended to get the code reviewed again. Especially if some architectural changes are done following the proposal of the previous point.
 
 # Findings
@@ -951,11 +954,11 @@ This can easily happen in the following scenario:
 
 #### Impact: Medium
 
-Temporal halt of important contract functions such as `takeOnRent()` and `returnOnRent()`, until the time from `rental.startTime` is larger than the pause duration. Once this period passes, this bug has no effect.
+Temporal halt of important contract functions such as `takeOnRent()` and `returnOnRent()`, until the time since `rental.startTime` until now is larger than the pause duration. Once this period passes, this bug has no effect.
 
 #### Recommendation
 
-The `calculateReward()` function should calculate zero rewards in the above scenario:
+Properly fixing this issue would require redesigning the pause logic. The easiest way to fixing it with low effort is that `calculateReward()` function should calculate zero rewards in the above scenario:
 
 ```diff
     function calculateReward(address account, uint256 tokenId, uint256 tokenAmount) private view returns (uint256) {
@@ -967,12 +970,14 @@ The `calculateReward()` function should calculate zero rewards in the above scen
     }
 ```
 
+However, note that this would be slightly unfair, as no rewards are given for the short period before the pause starts, but it is a good compromise compared to the alternative, which is having two critical functions reverting. 
+
 ---
 
 
 ### [M-2] Any account with the `RENTER_ROLE` can steal the `renter` status from another renter by listing with `tokenAmount=0` before the rightful owner does it
 
-When a `tokenId` is listed for the first time in the Marketplace contract, the `msg.sender` gets assigned the `rentable.renter` status. In order to do so, the `msg.sender` must own at least `tokenAmount` of `tokenId` in his account:
+When a `tokenId` is listed for the first time in the Marketplace contract, the `msg.sender` gets assigned the `rentable.renter` status. The requirement is that the `msg.sender` must own at least the `tokenAmount` listed of `tokenId`:
 
 ```javascript
     function list(uint256 tokenId, uint256 tokenAmount, address collateralToken, uint256 collateralPerUnit, uint256 rewardRatePerHour) external onlyRole(RENTER_ROLE) {
@@ -993,7 +998,9 @@ When a `tokenId` is listed for the first time in the Marketplace contract, the `
     }
 ```
 
-However, there is no requirement to list a positive amount such as `require(tokenAmount > 0)`. When this happens, neither `ERC1155` nor (`ERC20` for collateral transfer) reverts, and therefore the caller will be the assigned  `renter` of that `tokenId`, even if not have any of them in his wallet. Any account with `RENTER_ROLE` can call `list()` any `tokenId` passing `tokenAmount=0`, as long as they haven't been listed yet in the Marketplace. This allows renters to "steal" the renter status for any `tokenIds` from their rightful owners.
+However, there is no requirement to list a positive amount such as `require(tokenAmount > 0)`. Neiter `ERC1155` nor `ERC20` (for collateral transfer) reverts with 0 amounts, and therefore an attacker can list 0 tokens to get the `renter` status of that `tokenId`, even without owning any of the token in his wallet. 
+
+Any account with `RENTER_ROLE` can call `list()` any `tokenId` passing `tokenAmount=0` and get the renter role, as long as they haven't been listed yet in the Marketplace. This effectively steals the renter status from their rightful owners.
 
 Moreover, there isn't either a requirement so that such `tokenId` has `totalSupply > 0`, so nothing stops the attacker from claiming renter ownership from future tokenIds that have never been minted, although its impact is less important.
 
@@ -1004,7 +1011,7 @@ Moreover, there isn't either a requirement so that such `tokenId` has `totalSupp
 
 #### Recommendation
 
-Require that only positive `tokenAmount` can be listed. This also ensures that the supply for that `tokenId` is non zero, and therefore already exists.
+Require that only positive `tokenAmount` can be listed. This also ensures that the supply for that `tokenId` is non zero, and therefore tokens from a `tokenId` that hasn't minted cannot be listed.
 
 ```diff
     function list(uint256 tokenId, uint256 tokenAmount, address collateralToken, uint256 collateralPerUnit, uint256 rewardRatePerHour) external onlyRole(RENTER_ROLE) {
@@ -1031,7 +1038,7 @@ Require that only positive `tokenAmount` can be listed. This also ensures that t
 
 ### [M-3] Any account can start a new rent on delisted tokens when they are delisted without being withdrawn
 
-When a rentable is delisted, the `withdraw` boolean allows to withdraw the rentable tokens from the contract if `true`. Otherwise they are "delisted", but they stay in the contract balance:
+When a rentable is delisted, a `withdraw` boolean allows to withdraw the rentable tokens from the contract if set to `true`. Otherwise they are "delisted", but they stay in the Marketplace contract balance:
 
 ```javascript
     function delist(uint256 tokenId, bool withdraw) external isValidRenter(tokenId) {
@@ -1083,12 +1090,14 @@ The rentable can still be rented even after being delisted.
 One of the following:
 
 - Store the delisted state in the rentable and revert `takeOnRent()` for delisted tokens.
-- Remove the `witdraw` parameter from the `delist()` function, allowing for only two states: 'listed' and 'delisted'.
-- When delisting with `withdraw=false`, automatically pause the rentals.
+- Remove the `witdraw` parameter from the `delist()` function, allowing for only two states: 'listed' (in the contract) and 'delisted' (not in the contract).
+- When delisting with `withdraw=false`, automatically pause the rentals for that `tokenId`.
 
 #### Proof of concept
 
 ```javascript
+    // basic setup of variables, contracts, etc, ...
+
     function testDelistAllowsForRentingAgain() public {
         uint256 tokenId = 1;
         uint256 amount = 5;
@@ -1115,9 +1124,9 @@ One of the following:
 
 ---
 
-### [M-4] Renters can overwrite by mistake an existing `pauseTime` by shortening the `pauseDuration` and thus making rentees earn more rewards
+### [M-4] Renters can overwrite by mistake an existing `pauseTime` and shorten the `pauseDuration`, changing the rewards calculations for the period
 
-There is no requirement in `pause()` so that the pause time hasn't been already set. A renter can overwrite their existing `pauseTime` shortening the `pauseDuration` and thus affecting the rewards calculations.
+There is no requirement in the `pause()` function that stops from pausing again once a pause time hasn't been already set. A renter can overwrite their existing `pauseTime` shortening the `pauseDuration` and thus affecting the rewards calculations.
 
 ```javascript
     function pause(uint256 tokenId, uint256 pauseTime) external isValidRenter(tokenId) {
@@ -1126,20 +1135,29 @@ There is no requirement in `pause()` so that the pause time hasn't been already 
 
         emit Pause(tokenId, pauseTime);
     }
+
+    function calculateReward(address account, uint256 tokenId, uint256 tokenAmount) private view returns (uint256) {
+        Rental memory rental = rentals[tokenId][account];
+@>      uint256 duration = (block.timestamp - (rental.startTime + rental.pauseDuration)) / 1 hours;
+        uint256 reward = tokenAmount * rental.rewardRate * duration;
+        return reward;
+    }
 ```
 
 #### Impact: Medium
 
-All the rentees will receive different amounts of rewards.
+The rewards calculated for all rentees will be higher than they should, as the duration of the pause is shorted when overwritten.
 
 #### Recommendation
 
-Not trivial. `require(rental.pauseTime == 0)` can help, but then we need a way to reset them back to 0 after resuming. Bad UX for the renter.
-A better approach would be to store the pauseTime in the rental, and only adjust the individual rentals
+Not trivial. `require(rental.pauseTime == 0)` can help, but then a way to reset it back to 0 after resuming is needed. Bad UX for the renter.
+A better approach would be to store the pauseTime in the rental, and only adjust the individual rentals. 
+
+Generally, the pause dynamics could be rewritten in a better way.
 
 #### Team response:
 
-The team said this was only a proof of concept and a new version would be deployed in a near future. A different architecture to handle pauses can be discussed.
+The team said this was only a proof of concept and a new version would be deployed in a near future.
 
 ---
 
@@ -1166,7 +1184,7 @@ Collateral and rentableTokens can get stuck in the contract if the contract admi
 
 #### Recommendation
 
-Before transferring `rewardToken`, check if there is enough balance in the contract. If not, instead of reverting, an event should be emitted. Regardless if there are rewards or not, the `collateral` and `rentableToken` should be returned to the rentee.
+Before transferring `rewardToken`, check if there is enough balance in the contract. If not, instead of reverting, an event should be emitted. Regardless if there are rewards or not, the `collateral` and `rentableToken` should be always returned to the rentee.
 
 ```diff
 +   event MissedRewards(uint256 tokenId, address account, uint256 rewardAmount);
@@ -1258,7 +1276,7 @@ Same issue affects the `buySellTax` and `stakingTax` which are set in the `setBu
 If the `transactionTax` is wrongly configured, all token transfers will revert.
 
 - Probability: low, as it requires a mistake or compromised keys
-- Impact: critical, as it will halt all token transfers
+- Impact: high, as it will halt all token transfers
 
 #### Recommendation
 
@@ -1368,11 +1386,13 @@ Consider using `ERC1155Supply.exists(id)` to check if the token exists, instead 
 
 ### [L-2] Different collateral token in `Marketplace.list()` has no effect after first call
 
-When listing a token for the second and subsequent times, the caller might think they can change the collateral token, by specifying a new one, which has no effect.
+When listing a token for the second and subsequent times, the caller might think they can change the collateral token, by specifying a new one in the input argument `collateralToken`. However, this argument has no effect after the first time after a `tokenId` is listed listed.
+
+This could lead the renter to list tokens at a very different price than its real value, as the renter might thing that `collateraPerUnit` is expressed in `collateralToken`, while in reality, it is expressed in the `collateralToken` of the first time it was listed
 
 #### Impact: Low
 
-The collateral token is not changed, and the caller might think it is.
+The collateral token is not changed, and the caller might think it is. He could list the tokens at a much different price than intended. 
 
 #### Recommendation
 
@@ -1436,6 +1456,8 @@ In `PinLink_Staking`, follow the `CEI` pattern in functions `stake()` and `unsta
 
 It is always recommended to functions that interact with external contracts at the end of the function, to avoid reentrancy attacks.
 
+In this particular contract reentrancy is not an issue because it works with known and trusted contracts, but it is generally a good practice that is always recommended. Note that if the transfer fails at the end of the contract, the entire state is reverted anyways to a point before initating the transaction. 
+
 ```diff
     function stake(uint256 amount) external {
         require(_amount > 0, "Amount must be greater than 0");
@@ -1471,12 +1493,11 @@ It is always recommended to functions that interact with external contracts at t
 
 ### [L-5] In `PinLink_Staking.stake()`, consider using `safeTransferFrom`
 
-It is considered best practice to use `safeTransferFrom` instead of `transferFrom` to avoid reentrancy attacks. Under certain conditions, reentrancy attacks are possible for certain tokens.
+Some ERC20 don't follow the standard ERC20 guidelines, like returning a boolean if a transfer fails. This happens with well known tokens as USDC/USDT or others. 
 
 #### Recommendation
 
-Use `safeTransferFrom` to avoid reentrancy attacks.
-
+It is considered best practice to always use OpenZeppelin's library `SafeERC20` for token transfers. 
 ```diff
     function stake(uint256 amount) external {
         require(_amount > 0, "Amount must be greater than 0");
@@ -1545,6 +1566,10 @@ Add the stake index to the events.
 ### [L-8] Incorrect visibility modifier in `PinLink_Staking.calculateTotalRewardAmount()`
 
 If the function `PinLink_Staking.calculateTotalRewardAmount()` is thought to be public, the modifier should be changed to `public`, as it is currently declared as `internal`.
+
+#### Impact: low
+
+Offchain components cannot call this function and cannot read the calculated rewards amount. 
 
 #### Recommendation
 
@@ -1628,95 +1653,28 @@ Change `rentables[tokenId]` to the previously defined `rentable`.
         rentals[tokenId][msg.sender].collateralPerUnit = rentable.collateralPerUnit;
         rentals[tokenId][msg.sender].rewardRate = rentable.rewardRate;
         rentals[tokenId][msg.sender].startTime = block.timestamp;
--        rentables[tokenId].rentedAmount += tokenAmount;
-+        rentable.rentedAmount += tokenAmount;
-        rentableToken.safeTransferFrom(address(this), msg.sender, tokenId, tokenAmount, "");
-
-        emit Rent(msg.sender, tokenId, tokenAmount);
-    }
-```
-
-### [GAS-2] In `Marketplace` store `pauseDuration` in `rentable` instead of each rental to avoid a for loop
-
-In `Marketplace.adjustPauseRewards()`, a much more efficient approach would be to store the `pauseDuration` in the rentable itself, and only adjust it there as "accumulatedPausedDuration".
-
-#### Impact: Gas/optimization
-
-Gas savings when removing a for loop.
-
-#### Recommendation
-
-Store `pauseDuration` in `rentable` instead of each rental.
-
-```diff
-    struct Rentable {
-        address renter;
-        uint256 amount;
-        address collateral;
-        uint256 collateralPerUnit;
-        uint256 rewardRate;
-        uint256 rentedAmount;
-        uint256 pauseTime;
-+        uint256 accummulatedPauseDuration;
-    }
-
-    struct Rental {
-        uint256 amount;
-        uint256 collateralPerUnit;
-        uint256 rewardRate;
-        uint256 startTime;
--        uint256 pauseDuration;
-+       uint256 currentAccumulatedPauseDuration;
-    }
-
-    // ...
-
-    function takeOnRent(uint256 tokenId, uint256 tokenAmount) external {
-
-        // ...
-
-        rentals[tokenId][msg.sender].collateralPerUnit = rentable.collateralPerUnit;
-        rentals[tokenId][msg.sender].rewardRate = rentables[tokenId].rewardRate;
-        rentals[tokenId][msg.sender].startTime = block.timestamp;
-+        rentals[tokenId][msg.sender].currentAccumulatedPauseDuration = rentables[tokenId].accumulatedPauseDuration;
         rentables[tokenId].rentedAmount += tokenAmount;
         rentableToken.safeTransferFrom(address(this), msg.sender, tokenId, tokenAmount, "");
 
         emit Rent(msg.sender, tokenId, tokenAmount);
     }
-
-    // ...
-
-    function calculateReward(address account, uint256 tokenId, uint256 tokenAmount) private view returns (uint256) {
-        Rental memory rental = rentals[tokenId][account];
--        uint256 duration = (block.timestamp - (rental.startTime + rental.pauseDuration)) / 1 hours;
-+        uint256 rentalPauseDuration = rentables[tokenId].accumulatedPauseDuration - rental.currentAccumulatedPauseDuration;
-+        uint256 duration = (block.timestamp - (rental.startTime + rentalPauseDuration)) / 1 hours;
-        uint256 reward = tokenAmount * rental.rewardRate * duration;
-        return reward;
-    }
-
-    // ...
-
-    function adjustAllPauseRewards(uint256 tokenId, uint256 pauseTime, uint256 resumeTime) internal {
--       address[] memory rentees = tokenRentees[tokenId];
--       for (uint256 i = 0; i < rentees.length; i++) {
--           adjustPauseRewards(rentees[i], tokenId, pauseTime, resumeTime);
--        }
-
-+        Rentable storage rentable = rentables[tokenId];
-+        rentable.accumulatedPauseDuration += pauseEndTime - pauseStartTime;
-    }
-
-
--    function adjustPauseRewards(address account, uint256 tokenId, uint256 pauseTime, uint256 resumeTime) internal {
--        Rental storage rental = rentals[tokenId][account];
--        if (rental.startTime < pauseTime) {
--            rental.pauseDuration += (resumeTime - pauseTime);
--        }
--    }
-
 ```
+-----
+
+### [GAS-2] Adjusting rewards for pauses in `Marketplace` is not scalable as the gas cost depends on the number of rentees
+
+The mechanism for adjusting rewards relies heavily on for-loops, which is not scalable. The more rentees, the more expensive it is to adjust rewards for all of them. This can even lead to out of gas reverts (as explained in another issue above). 
+
+#### Recommendation
+
+Not trivial. The changes would affect multiple places of the contract, but the general idea would be to store the `pauseTime` only in the rentable, as a `accumulatedPauses` since the token was first listed, and only increment that value every time a pause is scheduled with start and end times. 
+
+On each rental struct, you would store `accumulatedPausesSnapshot`, with the value of `accumulatedPauses` when the rental started. When rewards are calculated for that particular rental, only the difference from the `accumulatedPauses` and the `accumulatedPausesSnapshot` would apply to that rental. In this way, the calculations are distributed among all rentees, instead being the renter paying for it. 
+
+This lose recomendation has been on purpose not addressed with specific changes, as they could interfere with other recommendations. But I'm happy to discuss them once the other issues are fixed. 
+
+----
+
 
 ### [GAS-3] In `Marketplace.list()`, apply caching in `rentable.renter`
 
@@ -1754,14 +1712,11 @@ Store `rentable.renter` in a local variable.
         emit List(msg.sender, tokenId, tokenAmount, rentable.collateral, collateralPerUnit, rewardRatePerHour);
     }
 ```
+---
 
 ### [GAS-4] In `Marketplace.list()`, apply conditional checks before writing `collateralPerUnit` and `rewardRatePerHour`
 
-In `Marketplace.list()`, apply conditional checks before writing `collateralPerUnit` and `rewardRatePerHour` to storage when the values don't change to save gas. It is likely that in re-listing a token, the collateral and reward rate will not change, in which case writing to storage is unnecessary.
-
-#### Impact: Gas/optimization
-
-Gas savings when avoiding unnecessary writes to storage.
+In `Marketplace.list()`, the values of `collateralPerUnit` and `rewardRatePerHour` are overwriten every time. Writing to storage is one of the most gas-costly operations, and it shoudl be avoided if the value doesn't change. As reading from storage is less expensive, as long as the values don't change, it is worth checking first if they have changed. Only spend gas in writing when they are different. 
 
 #### Recommendation
 
@@ -1794,6 +1749,7 @@ Add a check before writing to storage.
         emit List(msg.sender, tokenId, tokenAmount, rentable.collateral, collateralPerUnit, rewardRatePerHour);
     }
 ```
+----
 
 ### [GAS-5] Redundant renter address check in `Marketplace.delist()` `isValidRenter`
 
@@ -1831,18 +1787,14 @@ Remove the first `require`:
 
 ### [GAS-6] Add indexes to the functions to avoid looping through the same elements
 
-In `PinLink_Staking.unstakeAll()` and `claimReward()`, add indexes to the function to avoid looping through the same elements in every call.
-Batch calling the function will significantly reduce the gas cost by targeting specific elements.
+In `PinLink_Staking.unstakeAll()` and `claimReward()`, the array of unstakes is iterated, even when the stakes have been already processed/withdrawn. Once this happens, no more gas should be spent on iterating them. 
 
 Moreover, the indexes will avoid a possible gas exhaustion in the functions when `userStakes` is not limited.
 
-#### Impact: Gas/optimization
-
-Gas savings when adding indexes to the functions.
-
 #### Recommendation
 
-Add indexes to the functions.
+Add indexes to the function to avoid looping through the same elements in every call.
+Batch calling the function will significantly reduce the gas cost by targeting specific ranges of the array.
 
 ```diff
 -    function unstakeAll() external {
@@ -1852,8 +1804,9 @@ Add indexes to the functions.
 +       require(endIndex <= userStakes[msg.sender].length, "Invalid end index");
 
         Stake[] storage userStakes = stakes[msg.sender];
-
-        for (uint i = startIndex; i < endIndex; i++) {
+        
+-       for (uint i = 0; i < userStakes.length; i++) {
++       for (uint i = startIndex; i < endIndex; i++) {
             if (!userStakes[i].withdrawFlag) {
                 require(
                     token.transfer(msg.sender, userStakes[i].amount),
@@ -1878,8 +1831,9 @@ Add indexes to the functions.
 
         uint allUsersTotalStakedAmount = totalStakedAmount;
         uint totalBalance = token.balanceOf(address(this));
-
-        for (uint i = startIndex; i < endIndex; i++) {
+        
+-       for (uint i = 0; i < userStakes.length; i++) {
++       for (uint i = startIndex; i < endIndex; i++) {
             if (
                 !userStakes[i].withdrawFlag &&
                 userStakes[i].stakedDate + stakingPeriod <= block.timestamp &&
