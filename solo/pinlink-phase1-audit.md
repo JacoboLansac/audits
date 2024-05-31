@@ -7,7 +7,7 @@ A time-boxed security review of the [**PinkLink**](https://pinlink.gitbook.io/pi
 Author: [**Jacopod**](https://twitter.com/jacolansac), independent security researcher.
 Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
 
-## Findings summary
+## Findings summary, so I have updated my recommendations in those. I have changed nothing 
 
 
 | Finding                                                                                                                                                                        | Severity   | Description                                                                                                                                                         | Status   |
@@ -910,7 +910,7 @@ In the reward calculation, exclude the user stakes from the balance to distribut
 
 ### [H-10] Any account with the `RENTER_ROLE` can empty the Marketplace contract from rewards tokens by listing a `tokenId` with a very high `rewardRatePerHour`
 
-The reward rate is set by the renter, while the reward token is expected to be funded by the contract owner. The fact that the renter and the funder are not the same entity, incentives the renter to set a high reward rate and rent it to itself to steal all the reward tokens.
+The reward rate is set by the renter, while the reward token is expected to be funded by the contract owner. The fact that the renter and the funder are not the same entity, incentivizes the renter to set a high reward rate and rent it to itself to steal all the reward tokens.
 
 Since `rewardRatePerHour` is not capped, a renter can list with a very high `rewardRatePerHour` and call `takeOnRent()` to empty the contract from reward tokens.
 
@@ -948,7 +948,7 @@ The reward calculation reverts if the `rental.pauseDuration` is longer than the 
 This can easily happen in the following scenario:
 
 - The rental starts now.
-- 2 h later, renter schedules 24h of downtime starting in 1h.
+- 2 h later, the renter schedules 24h of downtime starting in 1h.
 - The `rental.pauseDuration` is now 24h, and `block.timestamp - rental.start = 3 hours`
 - Therefore, `calculateReward()` will revert with underflow, as the `startime + pauseDuration` is larger than the `block.timestamp`
 
@@ -1038,7 +1038,7 @@ Require that only positive `tokenAmount` can be listed. This also ensures that t
 
 ### [M-3] Any account can start a new rent on delisted tokens when they are delisted without being withdrawn
 
-When a rentable is delisted, a `withdraw` boolean allows to withdraw the rentable tokens from the contract if set to `true`. Otherwise they are "delisted", but they stay in the Marketplace contract balance:
+When a rentable is delisted, a `withdraw` boolean allows to withdrawal of the rentable tokens from the contract if set to `true`. Otherwise, they are "delisted", but they stay in the Marketplace contract balance:
 
 ```javascript
     function delist(uint256 tokenId, bool withdraw) external isValidRenter(tokenId) {
@@ -1079,7 +1079,7 @@ However, if `withdraw=false`, there is no registry that the tokens are actually 
     }
 ```
 
-Fortunately, there is no funds lost as the renter can call `delist()` again. However, it can be considered as a temporal loss of funds, as the renter is expecting them to be in the contract (but delisted).
+Fortunately, there are no funds lost as the renter can call `delist()` again. However, it can be considered as a temporal loss of funds, as the renter is expecting them to be in the contract (but delisted).
 
 #### Impact: Medium
 
@@ -1090,7 +1090,7 @@ The rentable can still be rented even after being delisted.
 One of the following:
 
 - Store the delisted state in the rentable and revert `takeOnRent()` for delisted tokens.
-- Remove the `witdraw` parameter from the `delist()` function, allowing for only two states: 'listed' (in the contract) and 'delisted' (not in the contract).
+- Remove the `withdraw` parameter from the `delist()` function, allowing for only two states: 'listed' (in the contract) and 'delisted' (not in the contract).
 - When delisting with `withdraw=false`, automatically pause the rentals for that `tokenId`.
 
 #### Proof of concept
@@ -1269,7 +1269,7 @@ The parameter `transactionTax` is meant to be a percentage, which uses `TAX_DIVI
 
 #### Other instances of the issue
 
-Same issue affects the `buySellTax` and `stakingTax` which are set in the `setBuySellTax()` and `setStakingTax()` functions.
+The same issue affects the `buySellTax` and `stakingTax` which are set in the `setBuySellTax()` and `setStakingTax()` functions.
 
 #### Impact: medium
 
@@ -1456,7 +1456,7 @@ In `PinLink_Staking`, follow the `CEI` pattern in functions `stake()` and `unsta
 
 It is always recommended to functions that interact with external contracts at the end of the function, to avoid reentrancy attacks.
 
-In this particular contract reentrancy is not an issue because it works with known and trusted contracts, but it is generally a good practice that is always recommended. Note that if the transfer fails at the end of the contract, the entire state is reverted anyways to a point before initating the transaction. 
+In this particular contract reentrancy is not an issue because it works with known and trusted contracts, but it is generally a good practice that is always recommended. Note that if the transfer fails at the end of the contract, the entire state is reverted anyway to a point before initiating the transaction. 
 
 ```diff
     function stake(uint256 amount) external {
@@ -1569,7 +1569,7 @@ If the function `PinLink_Staking.calculateTotalRewardAmount()` is thought to be 
 
 #### Impact: low
 
-Offchain components cannot call this function and cannot read the calculated rewards amount. 
+Offchain components cannot call this function and cannot read the amount of the calculated rewards. 
 
 #### Recommendation
 
@@ -1663,15 +1663,15 @@ Change `rentables[tokenId]` to the previously defined `rentable`.
 
 ### [GAS-2] Adjusting rewards for pauses in `Marketplace` is not scalable as the gas cost depends on the number of rentees
 
-The mechanism for adjusting rewards relies heavily on for-loops, which is not scalable. The more rentees, the more expensive it is to adjust rewards for all of them. This can even lead to out of gas reverts (as explained in another issue above). 
+The mechanism for adjusting rewards relies heavily on for-loops, which is not scalable. The more rentees, the more expensive it is to adjust rewards for all of them. This can even lead to out-of-gas reverts (as explained in another issue above). 
 
 #### Recommendation
 
-Not trivial. The changes would affect multiple places of the contract, but the general idea would be to store the `pauseTime` only in the rentable, as a `accumulatedPauses` since the token was first listed, and only increment that value every time a pause is scheduled with start and end times. 
+Not trivial. The changes would affect multiple places of the contract, but the general idea would be to store the `pauseTime` only in the rentable, as an `accumulatedPauses` since the token was first listed, and only increment that value every time a pause is scheduled with start and end times. 
 
-On each rental struct, you would store `accumulatedPausesSnapshot`, with the value of `accumulatedPauses` when the rental started. When rewards are calculated for that particular rental, only the difference from the `accumulatedPauses` and the `accumulatedPausesSnapshot` would apply to that rental. In this way, the calculations are distributed among all rentees, instead being the renter paying for it. 
+On each rental struct, you would store `accumulatedPausesSnapshot`, with the value of `accumulatedPauses` when the rental started. When rewards are calculated for that particular rental, only the difference between the `accumulatedPauses` and the `accumulatedPausesSnapshot` would apply to that rental. In this way, the calculations are distributed among all rentees, instead of being the renter paying for it. 
 
-This lose recomendation has been on purpose not addressed with specific changes, as they could interfere with other recommendations. But I'm happy to discuss them once the other issues are fixed. 
+This loose recommendation has been on purpose not addressed with specific changes, as they could interfere with other recommendations. But I'm happy to discuss them once the other issues are fixed. 
 
 ----
 
@@ -1716,7 +1716,7 @@ Store `rentable.renter` in a local variable.
 
 ### [GAS-4] In `Marketplace.list()`, apply conditional checks before writing `collateralPerUnit` and `rewardRatePerHour`
 
-In `Marketplace.list()`, the values of `collateralPerUnit` and `rewardRatePerHour` are overwriten every time. Writing to storage is one of the most gas-costly operations, and it shoudl be avoided if the value doesn't change. As reading from storage is less expensive, as long as the values don't change, it is worth checking first if they have changed. Only spend gas in writing when they are different. 
+In `Marketplace.list()`, the values of `collateralPerUnit` and `rewardRatePerHour` are overwriten every time. Writing to storage is one of the most gas-costly operations, and it should be avoided if the value doesn't change. As reading from storage is less expensive, as long as the values don't change, it is worth checking first if they have changed. Only spend gas in writing when they are different. 
 
 #### Recommendation
 
@@ -1789,7 +1789,7 @@ Remove the first `require`:
 
 In `PinLink_Staking.unstakeAll()` and `claimReward()`, the array of unstakes is iterated, even when the stakes have been already processed/withdrawn. Once this happens, no more gas should be spent on iterating them. 
 
-Moreover, the indexes will avoid a possible gas exhaustion in the functions when `userStakes` is not limited.
+Moreover, the indexes will avoid possible gas exhaustion in the functions when `userStakes` is not limited.
 
 #### Recommendation
 
