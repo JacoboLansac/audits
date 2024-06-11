@@ -9,7 +9,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-Note: the issues with the *Removed* status is for issues related to the contract `PinLink_staking`, which has been removed from scope because it is being rewritten again from scratch due to the number of high/critical findings found by this audit. 
+Note: The issues related to the `PinLink_staking` contract have been marked as "✔️ *Removed*". This contract was removed from scope to be rewritten from scratch due to the number of high/critical findings found by this audit. 
 
 
 | Finding                                                                                                                                                                        | Severity   | Description                                                                                                                                                         | Status |
