@@ -1,52 +1,55 @@
 # PinLink security review
 
-***Preliminar version, 2024-05-29.***
+***Preliminar version, 2024-06-11***
 
 A time-boxed security review of the [**PinkLink**](https://pinlink.gitbook.io/pinlink) protocol, with a focus on smart contract security and gas optimizations.
 
 Author: [**Jacopod**](https://twitter.com/jacolansac), independent security researcher.
 Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
 
-## Findings summary, so I have updated my recommendations in those. I have changed nothing 
+## Findings Summary
+
+Note: the issues with the *Removed* status is for issues related to the contract `PinLink_staking`, which has been removed from scope because it is being rewritten again from scratch due to the number of high/critical findings found by this audit. 
 
 
-| Finding                                                                                                                                                                        | Severity   | Description                                                                                                                                                         | Status   |
-|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------|
-| [C-1](<#c-1-an-attacker-can-drain-the-pinlink_staking-contract-by-claiming-rewards-multiple-times-as-there-is-no-registry-of-the-last-claimed-timestamp>)                      | Critical   | An attacker can drain the `PinLink_staking` contract by claiming rewards multiple times as there is no registry of the last claimed timestamp                       | -        |
-| [C-2](<#c-2-any-rentee-can-terminate-any-other-rentals-of-the-same-tokenid-stealing-the-collateral-and-rewards-from-all-other-rentees-while-keeping-its-own-rental-untouched>) | Critical   | Any rentee can terminate any other rentals of the same `tokenId`, stealing the collateral and rewards from all other rentees while keeping its own rental untouched | -        |
-| [C-3](<#c-3-the-pinlink_staking-contract-is-insolvent-by-default-because-the-pin-token-is-a-_fee-on-transfer_-token>)                                                          | Critical   | The `PinLink_staking` contract is insolvent by default because the PIN token is a _fee-on-transfer_ token.                                                          | -        |
-| [C-4](<#c-4-the-rentabletoken-is-not-returned-when-a-rental-is-terminated>)                                                                                                    | Critical   | The `rentableToken` is not returned when a rental is terminated                                                                                                     | -        |
-| [H-1](<#h-1-dos-attack-on-the-marketplace-contract-can-make-some-critical-functions-forever-unusable-delist-returnonrent-and-resume>)                                          | High       | DOS attack on the Marketplace contract can make some critical functions forever unusable: `delist()`, `returnOnRent()`, and `resume()`                              | -        |
-| [H-2](<#h-2-the-wrong-tokenidis-minted-when-minting-more-supply-of-an-existing-tokenid-of-fractionaltoken-currenttokenid-instead-of-id>)                                       | High       | The wrong `tokenId`is minted when minting more supply of an existing `tokenId` of FractionalToken (`currentTokenId` instead of `id`)                                | -        |
-| [H-3](<#h-3-the-protocol-can-become-insolvent-when-collateralperunit-is-updated-if-rentees-add-to-existing-rentals-->)                                                         | High       | The protocol can become insolvent when `collateralPerUnit` is updated if rentees add to existing rentals                                                            | -        |
-| [H-4](<#h-4-users-will-lose-all-unclaimed-rewards-when-unstaking-from-pinlink_staking>)                                                                                        | High       | Users will lose all unclaimed rewards when unstaking from `PinLink_Staking`                                                                                         | -        |
-| [H-5](<#h-5-starting-and-ending-rentals-will-revert-for-a-period-of-time-for-rentees-that-have-returned-partial-amounts-of-rentabletoken-to-the-marketplace>)                  | High       | Starting and ending rentals will revert for a period of time for rentees that have returned partial amounts of `rentableToken` to the Marketplace                   | -        |
-| [H-6](<#h-6-users-will-never-get-any-staking-rewards-from-pinlink_staking-because-the-percentage-variable-is-declared-with-a-wrong-data-type>)                                 | High       | Users will never get any staking rewards from `PinLink_Staking` because the `percentage` variable is declared with a wrong data type                                | -        |
-| [H-7](<#h-7-rewards-will-get-locked-in-pinlink_staking-for-users-with-too-many-stakes-because-claimreward-runs-out-of-gas-iterating-the-array-of-stakes>)                      | High       | Rewards will get locked in `PinLink_Staking` for users with too many stakes, because `claimReward()` runs out of gas iterating the array of stakes                  | -        |
-| [H-8](<#h-8-rewards-calculation-pinlink_staking-are-inflated-by-a-factor-of-x86400-because-the-divisor-is-30-seconds-instead-of-30-days>)                                      | High       | Rewards calculation `PinLink_Staking` are inflated by a factor of `x86400` because the divisor is `30 seconds` instead of `30 days`                                 | -        |
-| [H-9](<#h-9-the-pinlink_staking-contract-can-become-insolvent-because-user-staked-tokens-are-also-distributed-as-rewards>)                                                     | High       | The `PinLink_Staking` contract can become insolvent because user-staked tokens are also distributed as rewards                                                      | -        |
-| [H-10](<#h-10-any-account-with-the-renter_role-can-empty-the-marketplace-contract-from-rewards-tokens-by-listing-a-tokenid-with-a-very-high-rewardrateperhour>)                | High       | Any account with the `RENTER_ROLE` can empty the Marketplace contract from rewards tokens by listing a `tokenId` with a very high `rewardRatePerHour`               | -        |
-| [M-1](<#m-1-starting-and-ending-rentals-in-the-marketplace-will-revert-temporarily-if-a-scheduled-pause-starts-shortly-after-the-rental-is-started>)                           | Medium     | Starting and ending rentals in the Marketplace will revert temporarily if a scheduled pause starts shortly after the rental is started                              | -        |
-| [M-2](<#m-2-any-account-with-the-renter_role-can-steal-the-renter-status-from-another-renter-by-listing-with-tokenamount0-before-the-rightful-owner-does-it>)                  | Medium     | Any account with the `RENTER_ROLE` can steal the `renter` status from another renter by listing with `tokenAmount=0` before the rightful owner does it              | -        |
-| [M-3](<#m-3-any-account-can-start-a-new-rent-on-delisted-tokens-when-they-are-delisted-without-being-withdrawn>)                                                               | Medium     | Any account can start a new rent on delisted tokens when they are delisted without being withdrawn                                                                  | -        |
-| [M-4](<#m-4-renters-can-overwrite-by-mistake-an-existing-pausetime-and-shorten-the-pauseduration-changing-the-rewards-calculations-for-the-period>)                            | Medium     | Renters can overwrite by mistake an existing `pauseTime` and shorten the `pauseDuration`, changing the rewards calculations for the period                          | -        |
-| [M-5](<#m-5-collateral-and-rentable-tokens-will-get-stuck-in-the-marketplace-contract-if-not-enough-rewards-tokens-in-the-balance>)                                            | Medium     | Collateral and rentable tokens will get stuck in the Marketplace contract if not enough rewards tokens in the balance                                               | -        |
-| [M-6](<#m-6-lack-of-input-validation-in-pintokensettransactiontax-can-cause-reverts-in-all-token-transfers-if-provided-wrong-inputs>)                                          | Medium     | Lack of input validation in `PinToken.setTransactionTax()` can cause reverts in all token transfers if provided wrong inputs                                        | -        |
-| [L-1](<#l-1-it-is-possible-to-mint-tokens-of-tokenid0-even-though-the-intention-is-to-keep-it-as-a-reserved-tokenid>)                                                          | Low        | It is possible to mint tokens of `tokenId==0` even though the intention is to keep it as a reserved `tokenId`                                                       | -        |
-| [L-2](<#l-2-different-collateral-token-in-marketplacelist-has-no-effect-after-first-call>)                                                                                     | Low        | Different collateral token in `Marketplace.list()` has no effect after first call                                                                                   | -        |
-| [L-3](<#l-3-in-fractionaltokenmint-consider-moving-the-uri-change-to-a-separate-function-instead-of-mint>)                                                                     | Low        | In `FractionalToken.mint()`, consider moving the URI change to a separate function instead of `mint`                                                                | -        |
-| [L-4](<#l-4-follow-cei-pattern-in-pinlink_staking-functions-stake-and-unstake>)                                                                                                | Low        | Follow `CEI` pattern in `PinLink_Staking`, functions `stake()` and `unstake()`                                                                                      | -        |
-| [L-5](<#l-5-in-pinlink_stakingstake-consider-using-safetransferfrom>)                                                                                                          | Low        | In `PinLink_Staking.stake()`, consider using `safeTransferFrom`                                                                                                     | -        |
-| [L-6](<#l-6-in-pinlink_stakingstake-consider-using-stakingperiod-instead-of-hardcoding-7-days>)                                                                                | Low        | In `PinLink_Staking.stake()`, consider using `stakingPeriod` instead of hardcoding 7 days                                                                           | -        |
-| [L-7](<#l-7-in-pinlink_stakingstake-and-unstake-consider-adding-the-stake-index-to-the-event>)                                                                                 | Low        | In `PinLink_Staking.stake()` and `unstake()`, consider adding the stake index to the event                                                                          | -        |
-| [L-8](<#l-8-incorrect-visibility-modifier-in-pinlink_stakingcalculatetotalrewardamount>)                                                                                       | Low        | Incorrect visibility modifier in `PinLink_Staking.calculateTotalRewardAmount()`                                                                                     | -        |
-| [L-9](<#l-9-in-pinlink_staking-missing-events-for-updatestakingperiod-and-updatepercentage-and-claimreward>)                                                                   | Low        | In `PinLink_Staking`, missing events for `updateStakingPeriod()` and `updatePercentage()` and `claimReward()`                                                       | -        |
-| [GAS-1](<#gas-1-use-rentable-from-memory-instead-of-accessing-the-rentablestokenid-array>)                                                                                     | Gas        | Use rentable from memory instead of accessing the `rentables[tokenId]` array                                                                                        | -        |
-| [GAS-2](<#gas-2-adjusting-rewards-for-pauses-in-marketplace-is-not-scalable-as-the-gas-cost-depends-on-the-number-of-rentees>)                                                 | Gas        | Adjusting rewards for pauses in `Marketplace` is not scalable as the gas cost depends on the number of rentees                                                      | -        |
-| [GAS-3](<#gas-3-in-marketplacelist-apply-caching-in-rentablerenter>)                                                                                                           | Gas        | In `Marketplace.list()`, apply caching in `rentable.renter`                                                                                                         | -        |
-| [GAS-4](<#gas-4-in-marketplacelist-apply-conditional-checks-before-writing-collateralperunit-and-rewardrateperhour>)                                                           | Gas        | In `Marketplace.list()`, apply conditional checks before writing `collateralPerUnit` and `rewardRatePerHour`                                                        | -        |
-| [GAS-5](<#gas-5-redundant-renter-address-check-in-marketplacedelist-isvalidrenter>)                                                                                            | Gas        | Redundant renter address check in `Marketplace.delist()` `isValidRenter`                                                                                            | -        |
-| [GAS-6](<#gas-6-add-indexes-to-the-functions-to-avoid-looping-through-the-same-elements>)                                                                                      | Gas        | Add indexes to the functions to avoid looping through the same elements                                                                                             | -        |
+| Finding                                                                                                                                                                        | Severity   | Description                                                                                                                                                         | Status |
+|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------|
+| [C-1](<#c-1-an-attacker-can-drain-the-pinlink_staking-contract-by-claiming-rewards-multiple-times-as-there-is-no-registry-of-the-last-claimed-timestamp>)                      | Critical   | An attacker can drain the `PinLink_staking` contract by claiming rewards multiple times as there is no registry of the last claimed timestamp                       | ✔️ Removed |
+| [C-2](<#c-2-any-rentee-can-terminate-any-other-rentals-of-the-same-tokenid-stealing-the-collateral-and-rewards-from-all-other-rentees-while-keeping-its-own-rental-untouched>) | Critical   | Any rentee can terminate any other rentals of the same `tokenId`, stealing the collateral and rewards from all other rentees while keeping its own rental untouched | ✅ Fixed      |
+| [C-3](<#c-3-the-pinlink_staking-contract-is-insolvent-by-default-because-the-pin-token-is-a-_fee-on-transfer_-token>)                                                          | Critical   | The `PinLink_staking` contract is insolvent by default because the PIN token is a _fee-on-transfer_ token.                                                          | ✔️ Removed      |
+| [C-4](<#c-4-the-rentabletoken-is-not-returned-when-a-rental-is-terminated>)                                                                                                    | Critical   | The `rentableToken` is not returned when a rental is terminated                                                                                                     | ✅ Fixed      |
+| [H-1](<#h-1-dos-attack-on-the-marketplace-contract-can-make-some-critical-functions-forever-unusable-delist-returnonrent-and-resume>)                                          | High       | DOS attack on the Marketplace contract can make some critical functions forever unusable: `delist()`, `returnOnRent()`, and `resume()`                              | ❌ Partially fixed      |
+| [H-2](<#h-2-the-wrong-tokenidis-minted-when-minting-more-supply-of-an-existing-tokenid-of-fractionaltoken-currenttokenid-instead-of-id>)                                       | High       | The wrong `tokenId`is minted when minting more supply of an existing `tokenId` of FractionalToken (`currentTokenId` instead of `id`)                                | ✅ Fixed  |
+| [H-3](<#h-3-the-protocol-can-become-insolvent-when-collateralperunit-is-updated-if-rentees-add-to-existing-rentals>)                                                         | High       | The protocol can become insolvent when `collateralPerUnit` is updated if rentees add to existing rentals                                                            | ✅ Fixed     |
+| [H-4](<#h-4-users-will-lose-all-unclaimed-rewards-when-unstaking-from-pinlink_staking>)                                                                                        | High       | Users will lose all unclaimed rewards when unstaking from `PinLink_Staking`                                                                                         | ✔️ Removed      |
+| [H-5](<#h-5-starting-and-ending-rentals-will-revert-for-a-period-of-time-for-rentees-that-have-returned-partial-amounts-of-rentabletoken-to-the-marketplace>)                  | High       | Starting and ending rentals will revert for a period of time for rentees that have returned partial amounts of `rentableToken` to the Marketplace                   | ✅ Fixed      |
+| [H-6](<#h-6-users-will-never-get-any-staking-rewards-from-pinlink_staking-because-the-percentage-variable-is-declared-with-a-wrong-data-type>)                                 | High       | Users will never get any staking rewards from `PinLink_Staking` because the `percentage` variable is declared with a wrong data type                                | ✔️ Removed      |
+| [H-7](<#h-7-rewards-will-get-locked-in-pinlink_staking-for-users-with-too-many-stakes-because-claimreward-runs-out-of-gas-iterating-the-array-of-stakes>)                      | High       | Rewards will get locked in `PinLink_Staking` for users with too many stakes, because `claimReward()` runs out of gas iterating the array of stakes                  | ✔️ Removed      |
+| [H-8](<#h-8-rewards-calculation-pinlink_staking-are-inflated-by-a-factor-of-x86400-because-the-divisor-is-30-seconds-instead-of-30-days>)                                      | High       | Rewards calculation `PinLink_Staking` are inflated by a factor of `x86400` because the divisor is `30 seconds` instead of `30 days`                                 | ✔️ Removed      |
+| [H-9](<#h-9-the-pinlink_staking-contract-can-become-insolvent-because-user-staked-tokens-are-also-distributed-as-rewards>)                                                     | High       | The `PinLink_Staking` contract can become insolvent because user-staked tokens are also distributed as rewards                                                      | ✔️ Removed      |
+| [H-10](<#h-10-any-account-with-the-renter_role-can-empty-the-marketplace-contract-from-rewards-tokens-by-listing-a-tokenid-with-a-very-high-rewardrateperhour>)                | High       | Any account with the `RENTER_ROLE` can empty the Marketplace contract from rewards tokens by listing a `tokenId` with a very high `rewardRatePerHour`               | ✅ Fixed      |
+| [M-1](<#m-1-starting-and-ending-rentals-in-the-marketplace-will-revert-temporarily-if-a-scheduled-pause-starts-shortly-after-the-rental-is-started>)                           | Medium     | Starting and ending rentals in the Marketplace will revert temporarily if a scheduled pause starts shortly after the rental is started                              | ✅ Fixed    |
+| [M-2](<#m-2-any-account-with-the-renter_role-can-steal-the-renter-status-from-another-renter-by-listing-with-tokenamount0-before-the-rightful-owner-does-it>)                  | Medium     | Any account with the `RENTER_ROLE` can steal the `renter` status from another renter by listing with `tokenAmount=0` before the rightful owner does it              | ✅ Fixed      |
+| [M-3](<#m-3-any-account-can-start-a-new-rent-on-delisted-tokens-when-they-are-delisted-without-being-withdrawn>)                                                               | Medium     | Any account can start a new rent on delisted tokens when they are delisted without being withdrawn                                                                  | ❌ Not fixed (new issue introduced)      |
+| [M-4](<#m-4-renters-can-overwrite-by-mistake-an-existing-pausetime-and-shorten-the-pauseduration-changing-the-rewards-calculations-for-the-period>)                            | Medium     | Renters can overwrite by mistake an existing `pauseTime` and shorten the `pauseDuration`, changing the rewards calculations for the period                          | ✅ Fixed      |
+| [M-5](<#m-5-collateral-and-rentable-tokens-will-get-stuck-in-the-marketplace-contract-if-not-enough-rewards-tokens-in-the-balance>)                                            | Medium     | Collateral and rentable tokens will get stuck in the Marketplace contract if not enough rewards tokens in the balance                                               | ✖️ Acknowledged      |
+| [M-6](<#m-6-lack-of-input-validation-in-pintokensettransactiontax-can-cause-reverts-in-all-token-transfers-if-provided-wrong-inputs>)                                          | Medium     | Lack of input validation in `PinToken.setTransactionTax()` can cause reverts in all token transfers if provided wrong inputs                                        | ✅ Fixed      |
+| [M-7](<#m-7-admins-can-rug-all-pin-tokens-by-setting-100-transfer-fees>)                                          | Medium     | Admins can rug all PIN tokens by setting 100% transfer fees                                        | ❌ Acknowledged (not in original summary table)      |
+| [L-1](<#l-1-it-is-possible-to-mint-tokens-of-tokenid0-even-though-the-intention-is-to-keep-it-as-a-reserved-tokenid>)                                                          | Low        | It is possible to mint tokens of `tokenId==0` even though the intention is to keep it as a reserved `tokenId`                                                       | ✖️ Acknowledged      |
+| [L-2](<#l-2-different-collateral-token-in-marketplacelist-has-no-effect-after-first-call>)                                                                                     | Low        | Different collateral token in `Marketplace.list()` has no effect after first call                                                                                   | ✖️ Acknowledged      |
+| [L-3](<#l-3-in-fractionaltokenmint-consider-moving-the-uri-change-to-a-separate-function-instead-of-mint>)                                                                     | Low        | In `FractionalToken.mint()`, consider moving the URI change to a separate function instead of `mint`                                                                | ✖️ Acknowledged      |
+| [L-4](<#l-4-follow-cei-pattern-in-pinlink_staking-functions-stake-and-unstake>)                                                                                                | Low        | Follow `CEI` pattern in `PinLink_Staking`, functions `stake()` and `unstake()`                                                                                      | ✔️ Removed      |
+| [L-5](<#l-5-in-pinlink_stakingstake-consider-using-safetransferfrom>)                                                                                                          | Low        | In `PinLink_Staking.stake()`, consider using `safeTransferFrom`                                                                                                     | ✔️ Removed      |
+| [L-6](<#l-6-in-pinlink_stakingstake-consider-using-stakingperiod-instead-of-hardcoding-7-days>)                                                                                | Low        | In `PinLink_Staking.stake()`, consider using `stakingPeriod` instead of hardcoding 7 days                                                                           | ✔️ Removed      |
+| [L-7](<#l-7-in-pinlink_stakingstake-and-unstake-consider-adding-the-stake-index-to-the-event>)                                                                                 | Low        | In `PinLink_Staking.stake()` and `unstake()`, consider adding the stake index to the event                                                                          | ✔️ Removed      |
+| [L-8](<#l-8-incorrect-visibility-modifier-in-pinlink_stakingcalculatetotalrewardamount>)                                                                                       | Low        | Incorrect visibility modifier in `PinLink_Staking.calculateTotalRewardAmount()`                                                                                     | ✔️ Removed      |
+| [L-9](<#l-9-in-pinlink_staking-missing-events-for-updatestakingperiod-and-updatepercentage-and-claimreward>)                                                                   | Low        | In `PinLink_Staking`, missing events for `updateStakingPeriod()` and `updatePercentage()` and `claimReward()`                                                       | ✔️ Removed      |
+| [GAS-1](<#gas-1-use-rentable-from-memory-instead-of-accessing-the-rentablestokenid-array>)                                                                                     | Gas        | Use rentable from memory instead of accessing the `rentables[tokenId]` array                                                                                        | ✅ Fixed      |
+| [GAS-2](<#gas-2-adjusting-rewards-for-pauses-in-marketplace-is-not-scalable-as-the-gas-cost-depends-on-the-number-of-rentees>)                                                 | Gas        | Adjusting rewards for pauses in `Marketplace` is not scalable as the gas cost depends on the number of rentees                                                      | ✖️ Acknowledged      |
+| [GAS-3](<#gas-3-in-marketplacelist-apply-caching-in-rentablerenter>)                                                                                                           | Gas        | In `Marketplace.list()`, apply caching in `rentable.renter`                                                                                                         | ✅ Fixed      |
+| [GAS-4](<#gas-4-in-marketplacelist-apply-conditional-checks-before-writing-collateralperunit-and-rewardrateperhour>)                                                           | Gas        | In `Marketplace.list()`, apply conditional checks before writing `collateralPerUnit` and `rewardRatePerHour`                                                        | ✅ Fixed      |
+| [GAS-5](<#gas-5-redundant-renter-address-check-in-marketplacedelist-isvalidrenter>)                                                                                            | Gas        | Redundant renter address check in `Marketplace.delist()` `isValidRenter`                                                                                            | ✅ Fixed      |
+| [GAS-6](<#gas-6-add-indexes-to-the-functions-to-avoid-looping-through-the-same-elements>)                                                                                      | Gas        | Add indexes to the functions to avoid looping through the same elements                                                                                             | ✔️ Removed      |
 
 
 
@@ -97,9 +100,11 @@ focus, but significant inefficiencies will also be reported.
 - Delivery date: `2024-05-30`
 - Duration of the audit: 12 days
 - Commit hashes in scope:
-  - Staking repo: [6a410ebf0f3577248ea98b7be408fb3811bbbf8c](https://github.com/PinLinkNetwork/PinLink_SmartContract_Staking/commit/6a410ebf0f3577248ea98b7be408fb3811bbbf8c)
   - Token repo: [7ac1f68c418c5a62d446566daeb4ee8ad05f3844](https://github.com/PinLinkNetwork/PinLink_SmartContract_Token/commit/7ac1f68c418c5a62d446566daeb4ee8ad05f3844)
-- Review Commit hash: [ ... ]
+  - Staking repo: [6a410ebf0f3577248ea98b7be408fb3811bbbf8c](https://github.com/PinLinkNetwork/PinLink_SmartContract_Staking/commit/6a410ebf0f3577248ea98b7be408fb3811bbbf8c)
+- Review Commit hash: 
+  - Token repo: [dcac2887a87bcb498a8e557ba342a4755378dba5](https://github.com/PinLinkNetwork/PinLink_SmartContract_Token/commit/dcac2887a87bcb498a8e557ba342a4755378dba5)
+  - Staking repo: *This repository was removed from scope due to a large number of issues found*
 
 ### Files in scope
 
@@ -137,8 +142,8 @@ Delivering The First RWA-Tokenized DePIN Protocol, Driving Down Cost For AI Deve
 ### Architecture high level review
 
 - The architecture of Marketplace and Staking contract are not efficient from a gas point of view, as they rely heavily on for-loops. Alternative implementations using "defi-math" are recommended. Feel free to reach out for further advice in this regard
-- The mechanics for adjsuting rewards in pauses of the Marketplaces have multuple issues and are not gas-efficient. A different approach should studied, also using "defi-math", not relying on less for-loops. As the team will be the only renter for this Proof of concept phase, it is recommended that they don't pause the contract at all even after issues have been fixed.
-- It is a common practice to request another audit even after the mitigation review, if there is more than 1 high per 100 lines of code. Here we have 15 crit/high for 434 lines of code, so it would be strongly recommended to get the code reviewed again. Especially if some architectural changes are done following the proposal of the previous point.
+- The mechanics for adjusting rewards in pauses of the Marketplaces have multiple issues and are not gas-efficient. A different approach should studied, also using "defi-math", not relying on less for-loops. As the team will be the only renter for this Proof of concept phase, it is recommended that they don't pause the contract at all even after issues have been fixed.
+- It is a common practice to request another audit even after the mitigation review if there is more than 1 high per 100 lines of code. Here we have 15 crit/high for 434 lines of code, so it would be strongly recommended to get the code reviewed again. Especially if some architectural changes are done following the proposal of the previous point.
 
 # Findings
 
@@ -198,11 +203,11 @@ A staker can drain all funds in the `PinLink_staking` contract after 7 days of s
 Instead of keeping track of the `claimRewardDate`, keep track of the last time rewards were claimed, and only accrue rewards for that period and update the
 time when the claim happened.
 
+#### Team response: rewrite contract
+
 ---
 
 ### [C-2] Any rentee can terminate any other rentals of the same `tokenId`, stealing the collateral and rewards from all other rentees while keeping its own rental untouched
-
-<a id="any-rentee-terminates-other-rental"></a>
 
 In `Marketplace.returnOnRent()` the `msg.sender` is not checked against `account`.
 Moreover, the collateral and rewards are sent to `msg.sender` and not to `account`.
@@ -302,6 +307,19 @@ which would call an internal function `_finishRental(account)`. The new flow wou
 - `returnOnRent()`, which calls `_finishRental(msg.sender)`.
 - `forceReturn(address rentee)` (that can only be called by renters), which would call `_finishRental(rentee)`.
 
+#### Team response: fixed
+
+The team implemented a requirement so that only the renter or the `account` can terminate the renal. 
+
+```javascript
+    function returnOnRent(address account, uint256 tokenId, uint256 tokenAmount) public {
+        // ...
+        require(msg.sender == rentable.renter || msg.sender == account, "invalid request"); // C2
+        // ...
+```
+
+Also, all relevant instances of `msg.sender` were substituted with `account`.
+
 ---
 
 ### [C-3] The `PinLink_staking` contract is insolvent by default because the PIN token is a _fee-on-transfer_ token.
@@ -399,6 +417,8 @@ Only register in the stake struct the amount that actually reaches the contract 
     }
 ```
 
+#### Team response: rewrite contract
+
 ---
 
 ### [C-4] The `rentableToken` is not returned when a rental is terminated
@@ -436,6 +456,10 @@ Also, the FractionalToken.sol needs the following changes:
 - By default, the Marketplace contract should always be an approved handler of the rentableToken. Implement overriding `isApprovedForAll()`.
 
 Please reach out if more guidance is needed.
+
+#### Team response: fixed
+
+Fixed with the suggested mitigation above. 
 
 ---
 
@@ -523,11 +547,40 @@ Also, limit the size of the array: `require(tokenRentees[tokenId].length < MAX_R
     }
 ```
 
+#### Team response: partially fixed
+
+- The team added a minimum-token-amount requirement to prevent the DoS attack.
+- However, there is no limit to the number of rentees per `tokenId` (the array of rentees is unbound, and therefore running out of gas is still possible).
+
+The DoS can still be performed but at a higher cost. The attacker must attack with multiple wallets (more gas) and from each wallet he needs to at least rent the `MIN_TOKEN_AMOUNT`. If the attacker decides to DoS the Marketplace contract and can bear the costs of the attack, it is still possible to halt three functions, out of which two are critical: `delist()` and `returnOnRent()`.
+
+The likelihood of the attack is low because the attacker would also harm himself as he could not recover the collateral deposited in the attack when renting the tokens. 
+
+However, the running-out-of gas scenario can also happen without any attacker being involved. If a particular rentable token is very popular and enough rentees rent it, the array of rentees can also become large enough to halt the three functions above. 
+
+**Recommendation:**
+
+It is still recommended to limit cap the number of rentees for each `tokenId` with the suggested requirement in the original description of the issue. 
+
+**Note:**
+
+Note: since the minimum is 1 token, and the new condition requires that the minted amount is *strictly greater than* that,
+the effecitve minimum valid amount to mint is 2 tokens. 
+
+```javascript
+    uint256 public constant MIN_TOKEN_AMOUNT = 1; // H1
+    
+    // ...
+    function takeOnRent(uint256 tokenId, uint256 tokenAmount) external {
+        // ...
+        require(tokenAmount > MIN_TOKEN_AMOUNT, "invalid tokenAmount"); // H1
+```
+
 ---
 
 ### [H-2] The wrong `tokenId`is minted when minting more supply of an existing `tokenId` of FractionalToken (`currentTokenId` instead of `id`)
 
-There are two `mint()` functions in `FractionalToken`. One of them allows passing an `id` parameter to mint more of an existing `tokenId`. The issue is that the `_mint()` function does not mint tokens of `id`, but of `currentTokenId`:
+There is two `mint()` functions in `FractionalToken`. One of them allows passing an `id` parameter to mint more of an existing `tokenId`. The issue is that the `_mint()` function does not mint tokens of `id`, but of `currentTokenId`:
 
 ```javascript
     function mint(uint256 id, uint256 amount, string memory tokenURI) public onlyRole(MINTER_ROLE) {
@@ -554,7 +607,9 @@ Change `currentTokenId` to `id` in the `_mint()` call.
         _setURI(tokenURI);
     }
 ```
+#### Team response: fixed
 
+Fixed following the above recommendation. 
 
 ### [H-3] The protocol can become insolvent when `collateralPerUnit` is updated if rentees add to existing rentals  
 
@@ -615,6 +670,17 @@ Therefore, when a rentee calls `takeOnRent()` on an existing rental, the calcula
 - fix 2 (more complexity): Instead of keeping track of `collateralPerUnit` in the rental struct, store the full amount of collateral deposited from all calls to `takeOnRent()`. This makes the `returnOnRent()` more complicated, as it is not trivial to calculate how much collateral to return if not all tokens are returned. 
 
 Fix 1 is recommended.
+
+#### Team response: fixed (with comments)
+
+The team decided to implement the second fix. If partial amounts are returned, then the collateral returned is proportional to the amount of tokens returned.
+This disregards if the collateral deposited per token had changed at any point in time. Example:
+- collateralPerUnit=10, and the user takes on a rent for 1 token, paying 10 tokens of collateral. 
+- collateralPerUnit changes to 20 and and the user takes on a new rent for 1 more token, paying 20 tokens of collateral. 
+- The user has deposited in total 30 of collateral, 10 for the first token, and 20 for the second.
+- If the user terminates the rental of one token, he receives back 15 tokens (half of his collateral).
+
+The solution is **good enough**, but users must be made aware of these mechanics. 
 
 ---
 
@@ -683,6 +749,7 @@ Users who withdraw before claiming rewards will lose their rewards.
 - Force-claim the rewards before unstaking an index. 
 - If there are no reward funds, the function should not revert but simply emit an event for traceability.
 
+#### Team response: rewrite contract
 
 ### [H-5] Starting and ending rentals will revert for a period of time for rentees that have returned partial amounts of `rentableToken` to the Marketplace
 
@@ -753,6 +820,10 @@ Reset `rental.pauseDuration = 0`; here when `startTime` is set to `block.timesta
     }
 ```
 
+#### Team response: fixed
+
+Fixed following the above-recommended mitigation. 
+
 ---
 
 
@@ -806,6 +877,8 @@ Use a `PRECISION` constant to multiply the percentage to achieve the effect of f
 
 ```
 
+#### Team response: rewrite contract
+
 ---
 
 ### [H-7] Rewards will get locked in `PinLink_Staking` for users with too many stakes, because `claimReward()` runs out of gas iterating the array of stakes
@@ -850,6 +923,8 @@ If the number of stakes in the array is large enough, both `unstakeAll()` and `c
 - Limit the size of `userStakes` to avoid gas exhaustion 
 - Add start and end indexes to the functions that need to iterate an array so that all user stakes can be processed in batches.
 
+#### Team response: rewrite contract
+
 ---
 
 ### [H-8] Rewards calculation `PinLink_Staking` are inflated by a factor of `x86400` because the divisor is `30 seconds` instead of `30 days`
@@ -880,6 +955,8 @@ Divide by `30 days` instead of `30` in the rewards calculations.
     }
 ```
 
+#### Team response: rewrite contract
+
 ---
 
 ### [H-9] The `PinLink_Staking` contract can become insolvent because user-staked tokens are also distributed as rewards
@@ -908,6 +985,9 @@ In the reward calculation, exclude the user stakes from the balance to distribut
     }
 ```
 
+#### Team response: rewrite contract
+
+
 ### [H-10] Any account with the `RENTER_ROLE` can empty the Marketplace contract from rewards tokens by listing a `tokenId` with a very high `rewardRatePerHour`
 
 The reward rate is set by the renter, while the reward token is expected to be funded by the contract owner. The fact that the renter and the funder are not the same entity, incentivizes the renter to set a high reward rate and rent it to itself to steal all the reward tokens.
@@ -922,9 +1002,12 @@ The contract can be emptied from reward tokens, halting the execution of further
 
 The fix is non-trivial. As long as the _funder_ is a different agent than the _renter_, the renter will always have a strong incentive to set the rewards as high as possible profit from it. An alternative architecture would require the renter to fund the rewards himself, but this might not be aligned with the protocol's intention.
 
-#### Team response
+#### Team response: fixed
 
-The current version is only a proof of concept in which the only renter is also the funder of the contract (contract admins). The issue will become relevant in the next version of the Marketplace when the `RENTER_ROLE` is given to arbitrary untrusted addresses.
+The current version is only a proof of concept in which the only renter is also the funder of the contract (contract admins). 
+The team solution for this version will be to only allow the contract admin to have the `RENTER_ROLE`.
+
+The issue can become relevant again in the next version of the Marketplace when the `RENTER_ROLE` is given to arbitrary untrusted addresses.
 
 ---
 
@@ -971,6 +1054,10 @@ Properly fixing this issue would require redesigning the pause logic. The easies
 ```
 
 However, note that this would be slightly unfair, as no rewards are given for the short period before the pause starts, but it is a good compromise compared to the alternative, which is having two critical functions reverting. 
+
+#### Team response: fixed
+
+Fixed with the suggested mitigation above. 
 
 ---
 
@@ -1032,6 +1119,10 @@ Require that only positive `tokenAmount` can be listed. This also ensures that t
         emit List(msg.sender, tokenId, tokenAmount, rentable.collateral, collateralPerUnit, rewardRatePerHour);
     }
 ```
+
+#### Team response: fixed
+
+Fixed following the recommended mitigation.
 
 ---
 
@@ -1121,6 +1212,60 @@ One of the following:
 
     }
 ```
+#### Team response: partially fixed (introducing a new issue)
+
+The team implemented a version of the third suggestion:
+- on `list()`, it sets `pauseTime=0`
+- on `delist()`, it sets `pauseTime=block.timestamp`
+
+However, both of those operations are done regardless of the previous value of `pauseTime`. 
+
+
+It also bypasses an existing requirement in `resume()`:
+
+```javascript
+        require(rentable.pauseTime > 0 && rentable.pauseTime <= resumeTime, "invalid resume time");
+```
+
+##### Bypassing pause() requirements:
+
+If `pauseTime>0` the renter cannot call `pause()` because of the newly added requirement below, to mitigate M4. 
+However, he can call `list()`, which will set `pauseTime=0` just as if he was calling `pause()`, but bypassing the requirement.
+
+```javascript
+    function pause(uint256 tokenId, uint256 pauseTime) external isValidRenter(tokenId) {
+        // ...
+        require(rentables[tokenId].pauseTime == 0, "already paused"); // M4
+        // ...
+```
+
+**Impact:**
+
+M4 is still not resolved, as `pauseTime` can still be overwriten with this change.
+
+##### Bypassing resume() requirements:
+
+If `pauseTime == 0`, a renter cannot call `resume()` because of the requirement below. However, he can still call `delist()`, 
+which will also set `pauseTime==block.timestamp`, bypassing the requirement. 
+
+```javascript
+    function resume(uint256 tokenId, uint256 resumeTime) external isValidRenter(tokenId) {
+        // ...
+        require(rentable.pauseTime > 0 && rentable.pauseTime <= resumeTime, "invalid resume time");
+        // ...
+```
+
+**Impact:**
+Calling `delist()` when a pause is already ongoing, will overwrite `pauseTime`, making the pause shorter than it really is, affecting the rewards. 
+
+##### Suggested solution
+
+Due to the extra complexity added from pausing automatically when delisting, I suggest using the second initial suggested fix: remove the `withdraw` argument, and only allow two states:
+- Listed: the rentable token is in the contract
+- Delisted: the rentable token is in the owners wallet. 
+
+This is by far the simplest way of fixing it, as far as I can see. 
+
 
 ---
 
@@ -1146,7 +1291,7 @@ There is no requirement in the `pause()` function that stops from pausing again 
 
 #### Impact: Medium
 
-The rewards calculated for all rentees will be higher than they should, as the duration of the pause is shorted when overwritten.
+The rewards calculated for all rentees will be higher than they should be, as the duration of the pause is shorted when overwritten.
 
 #### Recommendation
 
@@ -1155,9 +1300,9 @@ A better approach would be to store the pauseTime in the rental, and only adjust
 
 Generally, the pause dynamics could be rewritten in a better way.
 
-#### Team response:
+#### Team response: fixed
 
-The team said this was only a proof of concept and a new version would be deployed in a near future.
+The team decided to add the requirement `require(rental.pauseTime == 0)`. Moreover, the `resume()` function resets `rental.pauseTime` to `0`.
 
 ---
 
@@ -1225,6 +1370,11 @@ Before transferring `rewardToken`, check if there is enough balance in the contr
     }
 
 ```
+
+#### Team response: acknowledged
+
+The team decided to not implement any fix, and only committed to have the contract always funded with rewards. 
+Therefore, the collateral is still at risk of getting stuck in the contract if there are not enough reward tokens in the contract's balance. 
 
 ### [M-6] Lack of input validation in `PinToken.setTransactionTax()` can cause reverts in all token transfers if provided wrong inputs
 
@@ -1302,9 +1452,13 @@ None of the tax parameters should be higher than the `TAX_DIVISOR`:
     }
 ```
 
+#### Team response: fixed
+
+Fixed with the above recommendation.
+
 ---
 
-### [M-7][centralization] Admins can rug all PIN tokens by setting 100% transfer fees
+### [M-7] Admins can rug all PIN tokens by setting 100% transfer fees
 
 The tax setter functions have no limit to the value they are set to. The contract admin can set the value to 100%, and cash out all tokens as fees.
 
@@ -1341,6 +1495,11 @@ None of the tax parameters should be higher than the `TAX_DIVISOR`:
         emit SetStakingTax(stakingTax_);
     }
 ```
+
+#### Team response: acknowledged
+
+The auditor made a mistake and forgot to include this finding in the summary table. Perhaps the team missed the issue and didn't apply any mitigation for that reason.
+
 
 ## Low risk / Informational
 
@@ -1384,6 +1543,8 @@ Consider using `ERC1155Supply.exists(id)` to check if the token exists, instead 
     }
 ```
 
+#### Team response: Acknowledged
+
 ### [L-2] Different collateral token in `Marketplace.list()` has no effect after first call
 
 When listing a token for the second and subsequent times, the caller might think they can change the collateral token, by specifying a new one in the input argument `collateralToken`. However, this argument has no effect after the first time after a `tokenId` is listed listed.
@@ -1423,6 +1584,10 @@ function list(uint256 tokenId, uint256 tokenAmount, address collateralToken, uin
         emit List(msg.sender, tokenId, tokenAmount, rentable.collateral, collateralPerUnit, rewardRatePerHour);
     }
 ```
+
+#### Team response: Acknowledged
+
+Acknowledged. Only the protocol owners are renters and they are expected to know this feature.
 
 ### [L-3] In `FractionalToken.mint()`, consider moving the URI change to a separate function instead of `mint`
 
@@ -1491,9 +1656,12 @@ In this particular contract reentrancy is not an issue because it works with kno
     }
 ```
 
+#### Team response: rewrite contract
+
+
 ### [L-5] In `PinLink_Staking.stake()`, consider using `safeTransferFrom`
 
-Some ERC20 don't follow the standard ERC20 guidelines, like returning a boolean if a transfer fails. This happens with well known tokens as USDC/USDT or others. 
+Some ERC20 don't follow the standard ERC20 guidelines, like returning a boolean if a transfer fails. This happens with well-known tokens such as USDC/USDT or others. 
 
 #### Recommendation
 
@@ -1511,6 +1679,8 @@ It is considered best practice to always use OpenZeppelin's library `SafeERC20` 
         // ...
     }
 ```
+
+#### Team response: rewrite contract
 
 ### [L-6] In `PinLink_Staking.stake()`, consider using `stakingPeriod` instead of hardcoding 7 days
 
@@ -1534,6 +1704,8 @@ An already defined variable called `stakingPeriod` should be used instead of har
         // ...
     }
 ```
+
+#### Team response: rewrite contract
 
 ### [L-7] In `PinLink_Staking.stake()` and `unstake()`, consider adding the stake index to the event
 
@@ -1563,6 +1735,8 @@ Add the stake index to the events.
     }
 ```
 
+#### Team response: rewrite contract
+
 ### [L-8] Incorrect visibility modifier in `PinLink_Staking.calculateTotalRewardAmount()`
 
 If the function `PinLink_Staking.calculateTotalRewardAmount()` is thought to be public, the modifier should be changed to `public`, as it is currently declared as `internal`.
@@ -1583,6 +1757,8 @@ Make `calculateTotalRewardAmount()` public.
       // ...
     }
 ```
+
+#### Team response: rewrite contract
 
 ### [L-9] In `PinLink_Staking`, missing events for `updateStakingPeriod()` and `updatePercentage()` and `claimReward()`
 
@@ -1620,6 +1796,7 @@ Add events for `updateStakingPeriod()` and `updatePercentage()` and `claimReward
 +       emit RewardClaimed(msg.sender, rewardAmount);
     }
 ```
+#### Team response: rewrite contract
 
 ## Gas savings
 
