@@ -9,6 +9,8 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
+During the security review, 4 critical, 10 high, 7 medium and 9 low severity issues were found. 
+
 Note: The issues related to the `PinLink_staking` contract have been marked as "✔️ *Removed*". This contract was removed from scope to be rewritten from scratch due to the number of high/critical findings found by this audit. 
 
 
@@ -16,7 +18,7 @@ Note: The issues related to the `PinLink_staking` contract have been marked as "
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------|
 | [C-1](<#c-1-an-attacker-can-drain-the-pinlink_staking-contract-by-claiming-rewards-multiple-times-as-there-is-no-registry-of-the-last-claimed-timestamp>)                      | Critical   | An attacker can drain the `PinLink_staking` contract by claiming rewards multiple times as there is no registry of the last claimed timestamp                       | ✔️ Removed |
 | [C-2](<#c-2-any-rentee-can-terminate-any-other-rentals-of-the-same-tokenid-stealing-the-collateral-and-rewards-from-all-other-rentees-while-keeping-its-own-rental-untouched>) | Critical   | Any rentee can terminate any other rentals of the same `tokenId`, stealing the collateral and rewards from all other rentees while keeping its own rental untouched | ✅ Fixed      |
-| [C-3](<#c-3-the-pinlink_staking-contract-is-insolvent-by-default-because-the-pin-token-is-a-_fee-on-transfer_-token>)                                                          | Critical   | The `PinLink_staking` contract is insolvent by default because the PIN token is a _fee-on-transfer_ token.                                                          | ✔️ Removed      |
+| [C-3](<#c-3-the-pinlink_staking-contract-is-insolvent-by-default-because-the-pin-token-is-a-fee-on-transfer-token>)                                                          | Critical   | The `PinLink_staking` contract is insolvent by default because the PIN token is a _fee-on-transfer_ token.                                                          | ✔️ Removed      |
 | [C-4](<#c-4-the-rentabletoken-is-not-returned-when-a-rental-is-terminated>)                                                                                                    | Critical   | The `rentableToken` is not returned when a rental is terminated                                                                                                     | ✅ Fixed      |
 | [H-1](<#h-1-dos-attack-on-the-marketplace-contract-can-make-some-critical-functions-forever-unusable-delist-returnonrent-and-resume>)                                          | High       | DOS attack on the Marketplace contract can make some critical functions forever unusable: `delist()`, `returnOnRent()`, and `resume()`                              | ❌ Partially fixed      |
 | [H-2](<#h-2-the-wrong-tokenidis-minted-when-minting-more-supply-of-an-existing-tokenid-of-fractionaltoken-currenttokenid-instead-of-id>)                                       | High       | The wrong `tokenId`is minted when minting more supply of an existing `tokenId` of FractionalToken (`currentTokenId` instead of `id`)                                | ✅ Fixed  |
