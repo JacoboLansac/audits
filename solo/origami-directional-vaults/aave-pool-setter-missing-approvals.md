@@ -1,4 +1,4 @@
-# `OrigamiAaveV3BorrowAndLend::setAavePool()` does not approve the new pool to use handle `supplyToken` and `borrowToken`. 
+# `OrigamiAaveV3BorrowAndLend::setAavePool()` does not update allowances for the new pool to handle `supplyToken` and `borrowToken` 
 
 The constructor of `OrigamiAaveV3BorrowAndLend` grants max approval to the `aavePool` contract to handle both `supplyToken` and `borrowToken`:
 
