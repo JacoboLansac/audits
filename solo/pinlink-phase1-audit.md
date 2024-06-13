@@ -20,7 +20,7 @@ Note: The issues related to the `PinLink_staking` contract have been marked as "
 | [C-2](<#c-2-any-rentee-can-terminate-any-other-rentals-of-the-same-tokenid-stealing-the-collateral-and-rewards-from-all-other-rentees-while-keeping-its-own-rental-untouched>) | Critical   | Any rentee can terminate any other rentals of the same `tokenId`, stealing the collateral and rewards from all other rentees while keeping its own rental untouched | ✅ Fixed      |
 | [C-3](<#c-3-the-pinlink_staking-contract-is-insolvent-by-default-because-the-pin-token-is-a-fee-on-transfer-token>)                                                          | Critical   | The `PinLink_staking` contract is insolvent by default because the PIN token is a _fee-on-transfer_ token.                                                          | ✔️ Removed      |
 | [C-4](<#c-4-the-rentabletoken-is-not-returned-when-a-rental-is-terminated>)                                                                                                    | Critical   | The `rentableToken` is not returned when a rental is terminated                                                                                                     | ✅ Fixed      |
-| [H-1](<#h-1-dos-attack-on-the-marketplace-contract-can-make-some-critical-functions-forever-unusable-delist-returnonrent-and-resume>)                                          | High       | DOS attack on the Marketplace contract can make some critical functions forever unusable: `delist()`, `returnOnRent()`, and `resume()`                              | ❌ Partially fixed      |
+| [H-1](<#h-1-dos-attack-on-the-marketplace-contract-can-make-some-critical-functions-forever-unusable-delist-returnonrent-and-resume>)                                          | High       | DOS attack on the Marketplace contract can make some critical functions forever unusable: `delist()`, `returnOnRent()`, and `resume()`                              | ✅ Partially fixed      |
 | [H-2](<#h-2-the-wrong-tokenidis-minted-when-minting-more-supply-of-an-existing-tokenid-of-fractionaltoken-currenttokenid-instead-of-id>)                                       | High       | The wrong `tokenId`is minted when minting more supply of an existing `tokenId` of FractionalToken (`currentTokenId` instead of `id`)                                | ✅ Fixed  |
 | [H-3](<#h-3-the-protocol-can-become-insolvent-when-collateralperunit-is-updated-if-rentees-add-to-existing-rentals>)                                                         | High       | The protocol can become insolvent when `collateralPerUnit` is updated if rentees add to existing rentals                                                            | ✅ Fixed     |
 | [H-4](<#h-4-users-will-lose-all-unclaimed-rewards-when-unstaking-from-pinlink_staking>)                                                                                        | High       | Users will lose all unclaimed rewards when unstaking from `PinLink_Staking`                                                                                         | ✔️ Removed      |
@@ -559,6 +559,10 @@ The DoS can still be performed but at a higher cost. The attacker must attack wi
 The likelihood of the attack is low because the attacker would also harm himself as he could not recover the collateral deposited in the attack when renting the tokens. 
 
 However, the running-out-of gas scenario can also happen without any attacker being involved. If a particular rentable token is very popular and enough rentees rent it, the array of rentees can also become large enough to halt the three functions above. 
+
+**Impact:**
+
+The function `returnOnRent()` can still be called for all rentees one by one. Even though this will incurr a much higher gas cost, it is a valid solution in the case when there is no malicious attacker growing the array. 
 
 **Recommendation:**
 
