@@ -32,12 +32,12 @@ Note: The issues related to the `PinLink_staking` contract have been marked as "
 | [H-10](<#h-10-any-account-with-the-renter_role-can-empty-the-marketplace-contract-from-rewards-tokens-by-listing-a-tokenid-with-a-very-high-rewardrateperhour>)                | High       | Any account with the `RENTER_ROLE` can empty the Marketplace contract from rewards tokens by listing a `tokenId` with a very high `rewardRatePerHour`               | ✅ Fixed      |
 | [M-1](<#m-1-starting-and-ending-rentals-in-the-marketplace-will-revert-temporarily-if-a-scheduled-pause-starts-shortly-after-the-rental-is-started>)                           | Medium     | Starting and ending rentals in the Marketplace will revert temporarily if a scheduled pause starts shortly after the rental is started                              | ✅ Fixed    |
 | [M-2](<#m-2-any-account-with-the-renter_role-can-steal-the-renter-status-from-another-renter-by-listing-with-tokenamount0-before-the-rightful-owner-does-it>)                  | Medium     | Any account with the `RENTER_ROLE` can steal the `renter` status from another renter by listing with `tokenAmount=0` before the rightful owner does it              | ✅ Fixed      |
-| [M-3](<#m-3-any-account-can-start-a-new-rent-on-delisted-tokens-when-they-are-delisted-without-being-withdrawn>)                                                               | Medium     | Any account can start a new rent on delisted tokens when they are delisted without being withdrawn                                                                  | ❌ Not fixed (new issue introduced)      |
+| [M-3](<#m-3-any-account-can-start-a-new-rent-on-delisted-tokens-when-they-are-delisted-without-being-withdrawn>)                                                               | Medium     | Any account can start a new rent on delisted tokens when they are delisted without being withdrawn                                                                  | ✅ Fixed     |
 | [M-4](<#m-4-renters-can-overwrite-by-mistake-an-existing-pausetime-and-shorten-the-pauseduration-changing-the-rewards-calculations-for-the-period>)                            | Medium     | Renters can overwrite by mistake an existing `pauseTime` and shorten the `pauseDuration`, changing the rewards calculations for the period                          | ✅ Fixed      |
 | [M-5](<#m-5-collateral-and-rentable-tokens-will-get-stuck-in-the-marketplace-contract-if-not-enough-rewards-tokens-in-the-balance>)                                            | Medium     | Collateral and rentable tokens will get stuck in the Marketplace contract if not enough rewards tokens in the balance                                               | ✖️ Acknowledged      |
 | [M-6](<#m-6-lack-of-input-validation-in-pintokensettransactiontax-can-cause-reverts-in-all-token-transfers-if-provided-wrong-inputs>)                                          | Medium     | Lack of input validation in `PinToken.setTransactionTax()` can cause reverts in all token transfers if provided wrong inputs                                        | ✅ Fixed      |
-| [M-7](<#m-7-admins-can-rug-all-pin-tokens-by-setting-100-transfer-fees>)                                          | Medium     | Admins can rug all PIN tokens by setting 100% transfer fees                                        | ❌ Acknowledged (not in original summary table)      |
-| [L-1](<#l-1-it-is-possible-to-mint-tokens-of-tokenid0-even-though-the-intention-is-to-keep-it-as-a-reserved-tokenid>)                                                          | Low        | It is possible to mint tokens of `tokenId==0` even though the intention is to keep it as a reserved `tokenId`                                                       | ✖️ Acknowledged      |
+| [M-7](<#m-7-admins-can-rug-all-pin-tokens-by-setting-100-transfer-fees>)                                          | Medium     | Admins can rug all PIN tokens by setting 100% transfer fees                                        | ✅ Fixed       |
+| [L-1](<#l-1-it-is-possible-to-mint-tokens-of-tokenid0-even-though-the-intention-is-to-keep-it-as-a-reserved-tokenid>)                                                          | Low        | It is possible to mint tokens of `tokenId==0` even though the intention is to keep it as a reserved `tokenId`                                                       | ✅ Fixed      |
 | [L-2](<#l-2-different-collateral-token-in-marketplacelist-has-no-effect-after-first-call>)                                                                                     | Low        | Different collateral token in `Marketplace.list()` has no effect after first call                                                                                   | ✖️ Acknowledged      |
 | [L-3](<#l-3-in-fractionaltokenmint-consider-moving-the-uri-change-to-a-separate-function-instead-of-mint>)                                                                     | Low        | In `FractionalToken.mint()`, consider moving the URI change to a separate function instead of `mint`                                                                | ✖️ Acknowledged      |
 | [L-4](<#l-4-follow-cei-pattern-in-pinlink_staking-functions-stake-and-unstake>)                                                                                                | Low        | Follow `CEI` pattern in `PinLink_Staking`, functions `stake()` and `unstake()`                                                                                      | ✔️ Removed      |
@@ -99,16 +99,20 @@ focus, but significant inefficiencies will also be reported.
 
 ## Scope
 
-- Delivery date: `2024-05-30`
+- Draft delivery date: `2024-05-30`
 - Duration of the audit: 12 days
 - Commit hashes in scope:
   - Token repo: [7ac1f68c418c5a62d446566daeb4ee8ad05f3844](https://github.com/PinLinkNetwork/PinLink_SmartContract_Token/commit/7ac1f68c418c5a62d446566daeb4ee8ad05f3844)
   - Staking repo: [6a410ebf0f3577248ea98b7be408fb3811bbbf8c](https://github.com/PinLinkNetwork/PinLink_SmartContract_Staking/commit/6a410ebf0f3577248ea98b7be408fb3811bbbf8c)
-- Review Commit hash: 
-  - Token repo: [dcac2887a87bcb498a8e557ba342a4755378dba5](https://github.com/PinLinkNetwork/PinLink_SmartContract_Token/commit/dcac2887a87bcb498a8e557ba342a4755378dba5)
-  - Staking repo: *This repository was removed from scope due to a large number of issues found*
 
-### Files in scope
+### Mitigation review
+- Mitigation report delivery date: `2024-06-16`
+- Review Commit hashes: 
+  - Staking repo: *This repository was removed from scope due to a large number of issues found*
+  - Token repo, review 1: [dcac2887a87bcb498a8e557ba342a4755378dba5](https://github.com/PinLinkNetwork/PinLink_SmartContract_Token/commit/dcac2887a87bcb498a8e557ba342a4755378dba5)
+  - Token repo, review 2: [6792173b851dc4b8c28f4ed2d262e920a51b7cd2](https://github.com/PinLinkNetwork/PinLink_SmartContract_Token/commit/6792173b851dc4b8c28f4ed2d262e920a51b7cd2)
+
+### Files in original scope
 
 | File                                                             | nSLOC   |
 | ---------------------------------------------------------------- | ------- |
@@ -1218,59 +1222,13 @@ One of the following:
 
     }
 ```
-#### Team response: partially fixed (introducing a new issue)
+#### Team response: Fixed
 
-The team implemented a version of the third suggestion:
-- on `list()`, it sets `pauseTime=0`
-- on `delist()`, it sets `pauseTime=block.timestamp`
+The optional `withdraw` input argument has been removed from the `delist()` function.
 
-However, both of those operations are done regardless of the previous value of `pauseTime`. 
-
-
-It also bypasses an existing requirement in `resume()`:
-
-```javascript
-        require(rentable.pauseTime > 0 && rentable.pauseTime <= resumeTime, "invalid resume time");
-```
-
-##### Bypassing pause() requirements:
-
-If `pauseTime>0` the renter cannot call `pause()` because of the newly added requirement below, to mitigate M4. 
-However, he can call `list()`, which will set `pauseTime=0` just as if he was calling `pause()`, but bypassing the requirement.
-
-```javascript
-    function pause(uint256 tokenId, uint256 pauseTime) external isValidRenter(tokenId) {
-        // ...
-        require(rentables[tokenId].pauseTime == 0, "already paused"); // M4
-        // ...
-```
-
-**Impact:**
-
-M4 is still not resolved, as `pauseTime` can still be overwriten with this change.
-
-##### Bypassing resume() requirements:
-
-If `pauseTime == 0`, a renter cannot call `resume()` because of the requirement below. However, he can still call `delist()`, 
-which will also set `pauseTime==block.timestamp`, bypassing the requirement. 
-
-```javascript
-    function resume(uint256 tokenId, uint256 resumeTime) external isValidRenter(tokenId) {
-        // ...
-        require(rentable.pauseTime > 0 && rentable.pauseTime <= resumeTime, "invalid resume time");
-        // ...
-```
-
-**Impact:**
-Calling `delist()` when a pause is already ongoing, will overwrite `pauseTime`, making the pause shorter than it really is, affecting the rewards. 
-
-##### Suggested solution
-
-Due to the extra complexity added from pausing automatically when delisting, I suggest using the second initial suggested fix: remove the `withdraw` argument, and only allow two states:
-- Listed: the rentable token is in the contract
-- Delisted: the rentable token is in the owners wallet. 
-
-This is by far the simplest way of fixing it, as far as I can see. 
+When tokens are delisetd, they are automatically withdrawn, so there are two valid states for rentable tokens:
+- listed (held in the Marketplace contract)
+- delisted (held in the owner's wallet)
 
 
 ---
@@ -1495,17 +1453,11 @@ None of the tax parameters should be higher than the `TAX_DIVISOR`:
         emit SetBuySellTax(buySellTax_);
     }
 
-    function setStakingTax(uint256 stakingTax_) external onlyOwner {
-+       require(stakingTax_ <= MAX_TAX_BASIS_POINTS, "Invalid tax");
-        stakingTax = stakingTax_;
-        emit SetStakingTax(stakingTax_);
-    }
 ```
 
-#### Team response: acknowledged
+#### Team response: Fixed
 
-The auditor made a mistake and forgot to include this finding in the summary table. Perhaps the team missed the issue and didn't apply any mitigation for that reason.
-
+Fixed following the above recommendation.
 
 ## Low risk / Informational
 
@@ -1549,7 +1501,16 @@ Consider using `ERC1155Supply.exists(id)` to check if the token exists, instead 
     }
 ```
 
-#### Team response: Acknowledged
+#### Team response: Fixed
+
+The existing requirement doesn't allow now `tokenId==0`. 
+
+```diff
+    function mint(uint256 id, uint256 amount, string memory tokenURI) public onlyRole(MINTER_ROLE) {
+-        require(id <= currentTokenId && balanceOf(msg.sender, id) == totalSupply(id), "Missing complete ownership");
++        require(id > 0 && id <= currentTokenId && balanceOf(msg.sender, id) == totalSupply(id), "Missing complete ownership"); // L1
+```
+
 
 ### [L-2] Different collateral token in `Marketplace.list()` has no effect after first call
 
