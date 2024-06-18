@@ -2,7 +2,7 @@
 
 When a liquidation occurs in `TempleLineOfCredit`, the collateral (Temple tokens) goes to the `treasuryReservesVault`. This offers no incentive to the caller of the `batchLiquidate()` function (used to liquidate unhealthy accounts) which leads me to believe that the protocol admins are the intended liquidators (even though any account can liquidate any position).
 
-If the collateral of a liquidated position was smaller than the gas cost of executing the liquidation transaction, the difference would be paid by the protocol. To prevent such scenario, there is a `minBorrowAmount` parameter that is used in the `borrow()` so that borrowing small amounts is disallowed. Small borrows would allow small collaterals, which could lead to situations in which the gas cost of liquidation is larger than the seized collateral:
+If the collateral of a liquidated position was smaller than the gas cost of executing the liquidation transaction, the protocol would pay the difference. To prevent such a scenario, there is a `minBorrowAmount` parameter that is used in the `borrow()` so that borrowing small amounts is disallowed. Small borrows would allow small collaterals, which could lead to situations in which the gas cost of liquidation is higher than the seized collateral:
 ```javascript
     /**
      * @notice The minimum borrow amount per transaction
@@ -24,11 +24,11 @@ We can translate the intention of the above logic into a protocol invariant:
 
 > Contract invariant: An account's debt should never be below `minBorrowAmount`.
 
-However, an account's debt is not checked in the `repay()` function. This makes it trivial for any account to break the invariant above by borrowing the `minBorrowAmount` and then repaying part of it The remaining debt would be obviously smaller than `minBorrowAmount`.
+However, the `repay()` function does not check an account's debt. This makes it trivial for any account to break the invariant above by borrowing the `minBorrowAmount` and then repaying part of it. Then the remaining debt would be smaller than `minBorrowAmount`.
 
 This simple action invalidates the `minBorrowAmount` parameter, as an account could call sequentially `borrow()` and `repay()` in the same block to reach any desired amount of debt below the `minBorrowAmount`.
 
-Furthermore, besides lacking minimum-debt requirements in the `repay()` function, there isn't either any debt requirements in `removeCollateral()`. Therefore, reaching a state with a lower collateral value than the liquidation gas cost is trivial. Note that `removeCollateral()` does require a healthy LTV ratio, but that has nothing to do with the size of the debt and collateral, only the ratio between them. 
+Furthermore, besides lacking minimum-debt requirements in the `repay()` function, there aren't either any debt requirements in `removeCollateral()`. Therefore, reaching a state with a lower collateral value than the liquidation gas cost is trivial. Note that `removeCollateral()` does require a healthy LTV ratio, but that has nothing to do with the size of the debt and collateral, only the ratio between them. 
 
 ## Aditional context
 
