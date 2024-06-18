@@ -34,7 +34,7 @@ Furthermore, besides lacking minimum-debt requirements in the `repay()` function
 
 The parameter `minBorrowAmount` was introduced as a response to [this issue reported by yAudits](https://reports.yaudit.dev/reports/07-2023-TempleDAO-Lending/#5-low---weak-liquidation-incentives-can-result-in-unliquidated-bad-debt), which includes a great detailed description of the impact. 
 
-### Attack scenario
+## Attack scenario
 
 This `batchLiquidate()` [transaction](https://etherscan.io/tx/0x5f77af23cf44869a547798e4b8ae7bef1f99be426995b913a2de61b3d3cfe855) is an example of `batchLiquidate()`, which can be used to quantify the impact in different scenarios. The liquidation transaction fee is 0.0011265713955 ETH, which (assuming an ETH price of 3000$) is:
 - $67 if the gas price was 100 gwei
