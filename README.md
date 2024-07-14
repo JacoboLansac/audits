@@ -1,8 +1,8 @@
 # Security-reviews
 
 ## 2024 - May
-- [TaiNet Protocol](solo/tai-net-ytao.md). Full security review
 - [PinLink protocol](solo/pinlink-phase1-audit.md). Full security review
+- [TaiNet Protocol](solo/tai-net-ytao.md). Full security review
 
 ## 2024 - April
 - [TempleDAO - Morpho Integration & Ethena Lov Tokens](solo/temple-origami-morpho-integration-review.md). Extension on existing codebase
