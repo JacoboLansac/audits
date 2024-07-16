@@ -1,0 +1,736 @@
+# PinLink security review
+
+***Preliminar version, 2024-07-15***
+
+A time-boxed security review of the [**Soar(no-link)**](nolink) protocol, with a focus on smart contract security and gas optimizations.
+
+Author: [**Jacopod**](https://twitter.com/jacolansac), independent security researcher.
+Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
+
+## Findings Summary
+
+During the security review, ________________________________ issues were found. 
+
+
+
+## Introduction
+
+## Disclaimer
+
+A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
+resource-bound effort to find as many vulnerabilities as possible, but there is no guarantee that all issues will be
+found.
+A security researcher holds no
+responsibility for the findings provided in this document. A security review is not an endorsement of the underlying
+business or product and can never be taken as a guarantee that the protocol is bug-free. This security review is focused
+solely on the security aspects of the Solidity implementation of the contracts. Gas optimizations are not the main
+focus, but significant inefficiencies will also be reported.
+
+## Risk classification
+
+| Severity           | Impact: High | Impact: Medium | Impact: Low |
+| :----------------- | :----------: | :------------: | :---------: |
+| Likelihood: High   |   Critical   |      High      |   Medium    |
+| Likelihood: Medium |     High     |     Medium     |     Low     |
+| Likelihood: Low    |    Medium    |      Low       |     Low     |
+
+### Likelihood
+
+- **High** - attack path is possible with reasonable assumptions that mimic on-chain conditions and the cost of the
+  attack is relatively low to the amount of funds that can be stolen or lost.
+- **Medium** - only conditionally incentivized attack vector, but still relatively likely.
+- **Low** - has too many or too unlikely assumptions or requires a huge stake by the attacker with little or no
+  incentive.
+
+### Impact
+
+- **High** - leads to a significant material loss of assets in the protocol or significantly harms a group of users.
+- **Medium** - only a small amount of funds can be lost (such as leakage of value) or a core functionality of the
+  protocol is affected.
+- **Low** - can lead to unexpected behavior with some of the protocol's functionalities that are not so critical.
+
+### Actions required by severity level
+
+- **High/Critical** - client **must** fix the issue.
+- **Medium** - client **should** fix the issue.
+- **Low** - client **could** fix the issue.
+
+## Scope
+
+- Draft delivery date: `2024-07-17`
+- Duration of the audit: 7 days
+- Commit hashes in scope:
+  - [d0b28c1d2bf20cd2ca1e3493f6ebada0c3fde4e1](https://github.com/meegalaxy/SoarContract/commit/d0b28c1d2bf20cd2ca1e3493f6ebada0c3fde4e1) (initial commit).
+  - [e976d0d69a7dafdf516f4fdc49225538020e4b06](https://github.com/meegalaxy/SoarContract/commit/e976d0d69a7dafdf516f4fdc49225538020e4b06) (updates in `Minter.sol`).
+
+### Mitigation review
+- **TBD**
+
+### Files in original scope
+
+| File                        | nSLOC    | Notes                                                    |
+| --------------------------- | -------- | -------------------------------------------------------- |
+| `contracts/Minter.sol`      | 38 -> 57 | Upgradeable, Ownable.                                    |
+| `contracts/Soar.sol`        | 138      | Taxable ERC20, Ownable, reads price from oracle          |
+| `contracts/SoarStaking.sol` | 182      | Upgradeable, Ownable. Handles native eth.                |
+| `contracts/Liquidity.sol`   | 178      | Integrates with UniswapV3 liquidity positions and swaps. |
+| **Total**                   | **555**  |                                                          |
+
+
+### Libraries / standards
+| Dependency / Import Path                                                 | Count |
+| ------------------------------------------------------------------------ | ----- |
+| @openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol        | 2     |
+| @openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol     | 2     |
+| @openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol        | 1     |
+| @openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol | 1     |
+| @openzeppelin/contracts/access/Ownable.sol                               | 2     |
+| @openzeppelin/contracts/token/ERC20/ERC20.sol                            | 2     |
+| @openzeppelin/contracts/token/ERC20/IERC20.sol                           | 1     |
+| @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol                  | 1     |
+| @openzeppelin/contracts/token/ERC721/IERC721.sol                         | 1     |
+| @openzeppelin/contracts/token/ERC721/IERC721Receiver.sol                 | 1     |
+| @uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol               | 1     |
+| @uniswap/v3-periphery/contracts/libraries/TransferHelper.sol             | 1     |
+
+
+## Protocol Overview
+
+Team description of each contract:
+
+- Soar.sol: It's a token contract with max tx limit and tax.
+- SoarStaking.sol: It's Soar Staking and ETH reward contract.
+- Minter.sol: Users can purchase soar tokens with USDC based on Soar/ETH price. We transfer tokens to the minter contract and if users purchase, they get from the contract. 
+- Liquidity.sol: If users purchase tokens, we will have USDC. We swap some USDC to ETH and other tokens and add liquidity to the uniswap v3 to get fees. We add these fees to the staking contract as a rewards.
+
+### Minter oracle
+
+- The Minter contract relies on an `oracle` contract, providing the SOAR price denominated in USD. 
+- This oracle bases the price in the ETH/USD price feed and the price from the liquidity pair SOAR/ETH
+
+### General info:
+
+- Deploy chain: ethereum mainnet
+- which addresses will be excluded from the transfer fees of Soar.sol ?
+    - owner
+    - pair address (uniswap V2)
+    - Soar staking
+    - Minter contract
+- Which tokens can be purchaseToken in Minter?
+  - only USDC
+
+
+### Architecture high level review
+
+- The architecture is well organized, and generally gas-efficient
+- Contracts are with an acceptable level of inline comments, although some function doc-strings are missing
+- The `Minter.sol` and `SoarStaknig.sol` are upgradeable contracts. However, **I do not endorse upgradeability on a staking contract holding user funds**, as it is an important centralization risk: rugpull of all staked tokens in case of malicious owner or compromised private keys. 
+
+
+# Findings
+
+## Critical risk
+
+### [C-] Users can claim multiple times, draining the Minter contract of SOAR tokens
+
+When a user claims the purchased SOAR tokens in the Minter contract, there is no check or registry that the user has claimed them. 
+This allows any user to call the `claim()` function for as long as there are SOAR tokens in the Minter's balance.
+
+```javascript
+    function claim() external {
+        Recipient memory _recipient = recipients[_msgSender()];
+        require(
+            block.timestamp >= _recipient.claimTime,
+            "Claim: Locked for now"
+        );
+        require(_recipient.amount > 0, "Claim: Nothing to claim");
+        
+        SafeERC20.safeTransfer(soarToken, _msgSender(), _recipient.amount);
+    }
+```
+
+#### Impact
+
+Any user that has purchased an amount of SOAR tokens, can drain the entire SOAR balance by calling `claim()` multiple times. 
+
+#### Proof of concept
+- Admin transfers 100.000 SOAR tokens to the MInter contract 
+- User purchases 1000 SOAR tokens
+- User waits for the locking period
+- User calls `claim()` 100 times, stealing the 100.000 SOAR tokens from other buyers
+
+#### Mitigation
+
+When a user claims, the entry of `msg.sender` in the `recipients` mapping should be deleted. Note that `_recipients.amount` is not deleted because it has been buffered into memory.
+
+```diff
+    function claim() external {
+        Recipient memory _recipient = recipients[_msgSender()];
+        require(
+            block.timestamp >= _recipient.claimTime,
+            "Claim: Locked for now"
+        );
+        require(_recipient.amount > 0, "Claim: Nothing to claim");
+
++       delete recipients[_msgSender()];
+        
+        SafeERC20.safeTransfer(soarToken, _msgSender(), _recipient.amount);
+    }
+```
+
+
+#### Team Response
+TBC
+--------------
+
+-------------
+
+### [C-] Wrong decimals scaling in `Minter.sol` when reading the oracle price
+
+The Minter contract exposes a `mint()` function where users can purchase SOAR tokens, paying the corresponding value in USDC. 
+To calculate the amount of USDC that should be charged, the Minter contract reads the price of soar in USD from `oracle.viewPriceInUSD()`, and then scales it up with the purchase token decimals. 
+
+However, this scaling is wrong, as it multiplies times `decimals`, instead of `10 ** decimals`:
+
+```javascript
+function mint(uint256 _amountSOAR) external {
+        require(_amountSOAR > 0, "Buying: cant buy 0 tokens");
+
+        uint256 tokenPrice = oracle.viewPriceInUSD();
+        require(tokenPrice > 0, "Buying: invalid price");
+
+        uint256 totalPrice = (_amountSOAR *
+            tokenPrice *
+@>          ERC20Upgradeable(purchaseToken).decimals()) /
+            1e18 /
+            1e6;
+
+        // ...
+    }
+```
+
+#### Impact
+
+The `totalPrice` charged to the buyer will be wrong by a factor of `x166666`.
+So if the actual price charged to the buyer should be 1000 USDC (1000 * 1e6), users will only be charged 0.006 USDC (1000 * 6 USDC)
+which is about x166666 times less than the actual price.
+
+The firs user realizing about this would take the chance and purchase all available tokens in the contract's balance. 
+
+#### Mitigation
+
+```diff
+    function mint(uint256 _amountSOAR) external {
+        require(_amountSOAR > 0, "Buying: cant buy 0 tokens");
+
+        uint256 tokenPrice = oracle.viewPriceInUSD();
+        require(tokenPrice > 0, "Buying: invalid price");
+
+        uint256 totalPrice = (_amountSOAR *
+            tokenPrice *
+-           ERC20Upgradeable(purchaseToken).decimals()) /
++           10 ** ERC20Upgradeable(purchaseToken).decimals()) /
+            1e18 /
+            1e6;
+
+        // ...
+    }
+```
+
+#### Team Response
+TBC
+--------------
+
+## High risk
+
+### [H-] The Minter contract cannot guarantee because purchases are allowed even if SOAR is not in the contract's balance
+
+When users purchase tokens in the Minter contract, they spend USDC, hoping that they will be able to claim the same value in SOAR tokens, with a certain delay. However, the `Minter.mint()` function has does not verify that there are enough tokens in balance to be purchased. 
+
+If the `claim()` function is called when there are not enough SOAR tokens in balance, the transaction will revert:
+
+```javascript
+    function claim() external {
+        Recipient memory _recipient = recipients[_msgSender()];
+        require(
+            block.timestamp >= _recipient.claimTime,
+            "Claim: Locked for now"
+        );
+        require(_recipient.amount > 0, "Claim: Nothing to claim");
+
+@>      SafeERC20.safeTransfer(soarToken, _msgSender(), _recipient.amount);
+    }
+```
+
+The root cause is that there is no mechanism to control how many tokens a user can purchase. These control should be based on the amount of tokens in balance (subtracting the ones that have been already purchased). 
+
+Note that the `Minter.recoverERC20()` is also affected by this issue, as the admins can withdraw already purchased SOAR tokens. 
+
+#### Impact
+
+Inability for the protocol to control how many tokens are being purchased. 
+
+Users unable to claim their SOAR tokens if they are not in the contract's balance at the moment of calling `claim()`. 
+This can happen in the following situations:
+- The team forgets to fund the Minter contract with SOAR tokens
+- There are no more SOAR tokens in circulation, and therefore the Minter contract cannot be funded (but users can still purchase)
+- A user purchases more tokens than the remaining circulating supply
+
+#### Proof of concept
+
+- User purchases $10000 worth of SOAR
+- The Minter contract only has 9000 worth of SOAR in balance
+- The locking period passes
+- The user attempts to claim his $10000 worth of SOAR, but transaction reverts
+
+#### Mitigation
+
+- A state variable should keep track of the amount of SOAR purchased. `reservedSoar`
+- Any action that changes the balance of SOAR or the `reservedSoar`, (`mint()`, `claim()`, `recoverERC20()`), should check that the balance is enough to cover the `reservedSoar` after modifying the balance. 
+
+```diff
++   // keeps track of how much SOAR has been purchased and already has an owner
++   uint256 reservedSoar;
+
+    // ...
+
+    function mint(uint256 _amountSOAR) external {
+        require(_amountSOAR > 0, "Buying: cant buy 0 tokens");
++       require(reservedSoar + _amountSOAR<= soarToken.balanceOf(address(this)), "Minter: Insufficient SOAR balance");
+        
+        //...
+    }
+
+    function claim() external {
+        Recipient memory _recipient = recipients[_msgSender()];
+        require(
+            block.timestamp >= _recipient.claimTime,
+            "Claim: Locked for now"
+        );
+        
++       reservedSoar -= _recipient.amount;
+
+        // ...
+
+    }
+
+    function recoverERC20(
+        ERC20Upgradeable token,
+        address _strategy
+    ) external onlyOwner {
++       uint256 amount = token == soarToken ? 
++           token.balanceOf(address(this)) - reservedSoar : 
++           token.balanceOf(address(this));
+
+        SafeERC20.safeTransfer(
+            token,
+            _strategy, 
+-           token.balanceOf(address(this))
++           amount
+        );
+    }
+
+```
+
+#### Team Response
+TBD
+
+
+## Medium risk
+
+### [M-] Pending claims in the Minter will become blocked again if new purchases are made before claiming
+
+In the Minter, there is a `lockingPeriod` which is a delay between the purchase time and the moment when the SOAR tokens become available. 
+Each account has a single `lockingPeriod` which is overwritten every time a new purchase is made. 
+
+Therefore, if a has purchased SOAR tokens but hasn't claimed them yet, and makes a new purchase before claiming, the original purchased tokens will be subject to the new `lockingPeriod` again. 
+
+```javascript
+    function mint(uint256 _amountSOAR) external {
+        require(_amountSOAR > 0, "Buying: cant buy 0 tokens");
+
+        // ...
+
+        recipients[_msgSender()].amount += _amountSOAR;
+@>      recipients[_msgSender()].claimTime = block.timestamp + lockingPeriod;
+    }
+
+```
+
+#### Impact
+
+Users will experience unfair delays in claiming tokens if they make new purchases before claiming the already purchased tokens. 
+
+#### Proof of concept
+
+- Let's assume `lockingPeriod = 7 days`
+- Bob purchases $10000 worth of SOAR
+- Bob waits 10 days. He is entitled to claim his $10000 worth of SOAR now
+- However, Bob makes a new purchase of $1000 before claiming
+- Now bob has to wait another 7 days before claiming the full $11000 worth of SOAR tokens
+
+#### Mitigation
+
+There are different approaches to mitigate this:
+- Store each purchase in a different struct like `Purchase(amount, lockingPeriod)`, and allow each purchase to be claimable independently. Each user would have an array of Purchases instead of a single `amount` and `lockingPeriod`. This brings a bit more complexity to the UI
+- Don't allow new purchases if previously purchased amounts are available for claim. This will fail to protect users in the scenario of purchasing before the current `lockingPeriod` is over. 
+- Be very explicit in the frontend about the consequences of a given purchase (and warn them to claim before making new purchases)
+
+#### Team Response
+TBC
+--------------
+
+### [M-] The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract
+
+The `Soar` and `Liquidity` contracts implement the payable `receive()` function, which allows ether transfers into the contract:
+
+```javascript
+    receive() external payable {
+```
+
+However, once the ether arrives to both contracts, there is no way for the ether to leave them. Therefore, any ether arriving will be forever lost. 
+
+Note: the `Soar.openTrading()` function transfers ether to the Uniswap pool. However, this ether doesn't come from the Soar token contract, but from the `msg.value` of the caller of `openTrading()`. So the ether in the contract balance is still stuck. 
+
+#### Impact
+
+Any ether received by the `Soar.sol` or `Liquidity.sol` contracts will be forever lost, stuck in the contract's balance.
+
+#### Mitigation
+
+I would remove the `receive()` function from both contracts as there is no need to handle ether, besides the `Soar.openTrading()` function, which is already payable.
+
+```diff
+contract Soar is ERC20, Ownable {
+    // ...
+-   receive() external payable {
+```
+
+```diff
+contract Liquidity is IERC721Receiver, Ownable {
+    // ...
+-   receive() external payable {
+```
+
+#### Team Response
+TBC
+--------------
+
+
+### [M-] Soar token will cannot be integrated with lending/borrowing platforms because malicious actors can make themselves non-liquidatable
+
+Every token transfer that is not excluded from fees calls the internal function `_shouldTakeTax()`:
+
+```javascript
+    function _transferWithTax(
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
+        if (isExcludedFromFee[from] || isExcludedFromFee[to]) {
+            _transfer(from, to, amount);
+            return;
+        }
+
+        if (_shouldTakeTax(to) || _shouldTakeTax(from)) {
+@>          uint256 _tax = (amount * taxFee) / MULTIPLIER;
+@>          amount -= _tax;
+            _transfer(from, taxReceiver, _tax);
+        }
+        // ...
+```
+
+which performs an external call to both sender and receiver (`from` and `to`) addresses, which are arbitrary addresses that could act maliciously:
+
+```javascript
+    function _shouldTakeTax(address to) internal returns (bool) {
+        address token0 = _getPoolToken(
+            to,
+            "token0()",
+            IUniswapV2Pair(to).token0
+        );
+        address token1 = _getPoolToken(
+            to,
+            "token1()",
+            IUniswapV2Pair(to).token1
+        );
+
+        return token0 == address(this) || token1 == address(this);
+    }
+```
+
+Note that the third input argument of `_getPoolToken()` is a `view` function. This means that if a state change is made when calling `token0()`, the whole transaction will revert with a message like *state change not allowed during static calls*.
+
+```javascript
+    function _getPoolToken(
+        address pool,
+        string memory signature,
+@>      function() external view returns (address) getter
+    ) internal returns (address) {
+        // ...
+    }
+```
+
+This means, that if `from` or `to` expose a malicious function called `token0()` or `token1()` that attempts a state change (of its own state for instance), the whole token transfer will revert when attempting to transfer to or from that address. Note that this is true regardless if the transaction is a trade or a transfer, because the external call is precisely made to discern if it is a trade or a transfer.
+
+#### Impact
+
+When integrating in other protocols that attempt to move tokens for a certain account, these account can block their transfers if it is beneficial for them. This becomes specially relevant in the case of liquidations, which a malicious account can block.
+
+Note that this could also affect other future SOAR contracts that integrate with this SOAR token contract, not only lending/borrowing. But the existing contracts do not have this issue.  
+
+#### Proof of concept
+
+- An attacker deploys a malicious contract exposing a state changing `token0()` function
+- The attacker deposits USDC token in a lending/borrowing platform as collateral, in the name of the malicious contract
+- The attacker borrows SOAR against that collateral
+- SOAR price goes surges, growing the debt, and making his position liquidatable
+- A liquidator attempts to liquidate the position and seizing the SOAR tokens, however, the transfer from the malicious contract reverts due to the state-changing `token0()` call. 
+
+#### Mitigation
+
+A mapping of blacklisted pool addresses to decide if trading tax should be applicable or not would not have this issue. However, if the team has no intentions of integrating with lending / borrowing platforms, this issue is less concerning. 
+
+#### Team Response
+TBC
+--------------
+
+
+
+### [M-] Lack of input validation in tax setter functions can halt SOAR token transfers
+
+In the Soar contract, the `taxFee` state variable is used to subtract the fee from the `amount` to be transferred. The `taxFee` is expected to be a percentage, expressed with `MULTIPLIER` as a base (so if `taxFee == MULTIPLIER`, then there is 100% tax). 
+
+If the `taxFee > MULTIPLIER`, then the `amount -= _tax` will revert with an underflow:
+
+```javascript
+    function _transferWithTax(
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
+        if (isExcludedFromFee[from] || isExcludedFromFee[to]) {
+            _transfer(from, to, amount);
+            return;
+        }
+
+        if (_shouldTakeTax(to) || _shouldTakeTax(from)) {
+@>          uint256 _tax = (amount * taxFee) / MULTIPLIER;
+@>          amount -= _tax;
+            _transfer(from, taxReceiver, _tax);
+        }
+        // ...
+```
+
+However, there is no input validation in `setTaxFee()`, which means that the `taxFee` can potentially be set higher than `MULTIPLIER`.
+The probability of this happening is low, as it requires a mistake from the contract owner or compromised private keys, but the implications are that all taxed transactions (buys and sells) will revert. This will effectively halt trading activity of the SOAR token. 
+
+```javascript
+    function setTaxFee(uint256 _tax) external onlyOwner {
+        taxFee = _tax;
+    }
+```
+
+#### Impact
+
+If the `taxFee` is set to a higher value than `MULTIPLIER`, trading operations will be halted. 
+
+#### Mitigation
+
+```diff
+    function setTaxFee(uint256 _tax) external onlyOwner {
++       require(_tax < MULTIPLIER, "_tax is too high");
+        taxFee = _tax;
+    }
+```
+
+#### Team Response
+TBC
+--------------
+
+
+### [M-] Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%
+
+In the Soar contract, the `taxFee` state variable is used to subtract the fee from the `amount` to be transferred. The `taxFee` is a percentage of `MULTIPLIER` (if `taxFee == MULTIPLIER`, then there is 100% tax). 
+
+The `setTaxFee()` function has no limits, and the owner is allowed to set a tax as high as 100%:
+```javascript
+    function setTaxFee(uint256 _tax) external onlyOwner {
+        taxFee = _tax;
+    }
+```
+
+#### Impact
+
+The owner can set the trading tax to as high as 100%. 
+This is not likely, as it requires either a malicious owner or compromised private keys, but it is worth mitigating it.
+
+#### Mitigation
+
+Establish a maximum tax and don't allow a higher `taxFee` than that:
+
+```diff
++   uint256 public constant MAX_TAX = MULTIPLIER / 10; // MAX TAX = 10%
+
+    function setTaxFee(uint256 _tax) external onlyOwner {
++       require(_tax < MAX_TAX, "_tax is too high");
+        taxFee = _tax;
+    }
+```
+#### Team Response
+TBC
+--------------
+
+
+## Low risk
+
+### [L-] Soar.OpenTrading could be frontrun affecting the launching price
+
+The starting price in the UniswapV2 pool is determined by the ratio SOAR:ETH when the liquidity is added in `openTrading()`. 
+This initial ratio is determined by the amount of ETHER and SOAR in the `addLiquidityETH()` function. These amounts are:
+- ETHER: the `msg.value` when executing to `openTrading()`
+- SOAR: the balance of SOAR tokens in the SOAR contract when calling `openTrading()`
+
+```javascript
+    function openTrading() external payable onlyOwner {
+        // add liquidity
+        ROUTER.addLiquidityETH{value: msg.value}(
+            address(this),
+            balanceOf(address(this)),
+            0,
+            0,
+            msg.sender,
+            block.timestamp
+        );
+
+        IUniswapV2Pair pair = IUniswapV2Pair(
+            IUniswapV2Factory(ROUTER.factory()).getPair(
+                address(this),
+                ROUTER.WETH()
+            )
+        );
+
+        setMaxWallet(INITIAL_SUPPLY / 100);
+        excludeFromMaxTx(address(pair), true);
+    }
+```
+
+The issue is that potential donations to the SOAR contract right before liquidity is added would decrease the ratio ETH:SOAR, diminishing the starting price in the pool. However, such scenario is unlikely due to the following reasons:
+- It is probably a non-profitable attack, because the donation would need to be large in order to significantly affect the price
+- Presumably, nobody besides the `owner` and seed investors will have SOAR tokens before adding the liquidity
+
+However, if there is such a wallet, with a large amount of tokens, and incentives to have a smaller starting price, performing the attack is rather trivial: frontrun the `openTrading()` function by donating a large amount of SOAR tokens. 
+
+#### Impact
+
+The launch price in the liquidity pool can be diminished by an interested frontrunner that has enough SOAR tokens to be donated for such purpose. 
+
+#### Proof of concept
+
+- SOAR token is distributed among seed investors
+- SOAR contract has 0 SOAR tokens in balance
+- admin transfers 100.000 SOAR tokens to the SOAR contract
+- admin calls `openTrading()` with msg.value = 100 ether, expecting that the starting price is `1 ETH : 1000 SOAR` so, `1 SOAR = 0.001 ETHER`. 
+- however, a malicious seed investor frontruns `openTrading()` donating 10.000 SOAR tokens, changing the ratio to `1 ETH = 1100 SOAR`, `1 SOAR = 0.000909091 ETHER`
+
+#### Mitigation
+
+Instead of relying in the `balanceOf(address(this))` to decide how much SOAR are deployed as liquidity, enable an input argument, and transfer the amount from the `msg.sender` in the same call as `openTrading()`. This will give much more control of the exact liquidity that is added.
+
+```diff
+-   function openTrading() external payable onlyOwner {
++   function openTrading(uint256 amountSoar) external payable onlyOwner {
+
++       transferFrom(msg.sender, address(this), amountSoar);
+
+        ROUTER.addLiquidityETH{value: msg.value}(
+            address(this), 
+-           balanceOf(address(this)),
++           amountSoar,
+            0,
+            0,
+            msg.sender,
+            block.timestamp
+        );
+
+        // ...
+
+    }
+```
+
+
+
+#### Team Response
+TBC
+--------------
+
+
+
+### [L-] SOAR tokens traded in UniswapV3 and certain other pools will evade the trading tax
+
+On the SOAR token, normal transfers are not taxed, only trading transactions (buys or sells). The way the SOAR contract distinguish between a trade or a normal transfer is by checking if the sender or receiver are a DEX pool. This is done with function `_shouldTakeTax()`, which checks if the `token0()` or `token1()` is the SOAR token. For normal transfers where none of them have such function, no tax will be applied:
+
+```javascript
+    function _shouldTakeTax(address to) internal returns (bool) {
+        address token0 = _getPoolToken(
+            to,
+            "token0()",
+            IUniswapV2Pair(to).token0
+        );
+        address token1 = _getPoolToken(
+            to,
+            "token1()",
+            IUniswapV2Pair(to).token1
+        );
+
+        return token0 == address(this) || token1 == address(this);
+    }
+```
+
+#### Impact
+
+This mechanism will only work for DEX pools that expose `token0()` and `token1()` view functions. As an example, UniswapV2, UniswapV3 and Sushiswap do expose such functions, and therefore this methodology will work. However, I'm unaware if all DEX pools do that as well. 
+
+#### Mitigation
+
+A simpler alternative is to keep track of the DEX pool addresses in a mapping, and blacklist DEX pools as they become relevant based on trading volume with an onlyOwner function. However, I don't think it is such an issue, because most of the trading volume will be where the team adds liquidity, and that is UniswapV2. 
+
+Note that this approach consumes way less gas as it only requires a single storage read, instead of multiple external calls with multiple storage reads. 
+
+#### Team Response
+TBC
+
+--------------
+
+
+## Gas optimizations
+
+### [G-] Soar._shouldTakeTax() makes multiple external calls and storage reads, making the token transfers unnecessarily expensive
+
+```javascript
+    function _shouldTakeTax(address to) internal returns (bool) {
+        address token0 = _getPoolToken(
+            to,
+            "token0()",
+            IUniswapV2Pair(to).token0
+        );
+        address token1 = _getPoolToken(
+            to,
+            "token1()",
+            IUniswapV2Pair(to).token1
+        );
+
+        return token0 == address(this) || token1 == address(this);
+    }
+```
+
+#### Optimization
+
+Having a blacklist of pool addresses, that is configured via onlyOwner functions will require a single storage read for every token trade, making the trades significantly cheaper in terms of gas. 
+
+--------------
+
+## Informational
+
+A branch with `@audit-info` tags has been pushed to the repo. The developers can explore the tags and decide which suggestions to follow. 
+
