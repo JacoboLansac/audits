@@ -243,6 +243,21 @@ TBC
 
 ## High risk
 
+### [H-] Prices in Minter depend on a single oracle, which makes it vulnerable to price-manipulation attacks
+
+The `Minter.mint()` function reads the SOAR price in USD from the `oracle`, which is a single instance of `UniswapV2Oracle.sol`. This constitutes a risk, as a single liquidity pool to be used as an oracle is vulnerable to price-manipulation attacks. 
+
+Luckily, the oracle uses a 1h-average prices which makes the manipulation less likely, but it is still a single source of truth. 
+
+EDIT: This issue has been paused, because the `UniswapV2Oracle.sol` is undergoing some updates. This issue will be reviewed in the mitigation phase.
+
+#### Impact
+#### Proof of concept
+#### Mitigation
+#### Team Response
+TBC
+--------------
+
 ### [H-] The Minter contract cannot guarantee because purchases are allowed even if SOAR is not in the contract's balance
 
 When users purchase tokens in the Minter contract, they spend USDC, hoping that they will be able to claim the same value in SOAR tokens, with a certain delay. However, the `Minter.mint()` function has does not verify that there are enough tokens in balance to be purchased. 
@@ -335,6 +350,166 @@ This can happen in the following situations:
 #### Team Response
 TBD
 
+-------------
+
+### [H-] The staking contract will become insolvent if `recoverNonLockedRewardTokens()` is called
+
+The function `recoverNonLockedRewardTokens()` allows the owner to recover the reward tokens in balance that are not locked for rewards. 
+If the `rewardsToken` is an ERC20, the accounting is handled properly, by excluding the `rewardTokensLocked` and the `totalStaked` from the amount that can be recovered. 
+
+However, if the rewards token is ether (represented by `rewardsToken == address(0)`), the `rewardTokensLocked` is ignored, as the entire ether balance can be recovered:
+
+```javascript
+    function recoverNonLockedRewardTokens() external onlyOwner {
+        uint256 nonLockedTokens;
+        if (address(rewardsToken) != address(0)) {
+            nonLockedTokens = address(stakingToken) != address(rewardsToken)
+                ? rewardsToken.balanceOf(address(this)) - rewardTokensLocked
+                : rewardsToken.balanceOf(address(this)) -
+                    rewardTokensLocked -
+                    totalStaked;
+
+            rewardsToken.transfer(owner(), nonLockedTokens);
+        } else {
+@>          nonLockedTokens = address(this).balance;
+
+            (bool sent, ) = payable(owner()).call{value: nonLockedTokens}("");
+            require(sent, "Failed to send Ether");
+        }
+        emit RewardTokensRecovered(nonLockedTokens);
+    }
+```
+
+This means that when recovering "non-locked-reward-tokens", the function will actually recover **all** reward tokens, leaving the staking contract insolvent and incapable to payout rewards to all users. 
+
+#### Impact
+
+If the `recoverNonLockedRewardTokens()` when ether is the reward token, the staking contract becomes insolvent, and all `claim()` transactions will revert with *Not enough ether in balance* error message. 
+
+#### Proof of concept
+
+TODO
+
+#### Mitigation
+
+Subtract the `rewardTokensLocked` before sending non-locked reward tokens:
+
+```diff
+    function recoverNonLockedRewardTokens() external onlyOwner {
+        uint256 nonLockedTokens;
+        if (address(rewardsToken) != address(0)) {
+            nonLockedTokens = address(stakingToken) != address(rewardsToken)
+                ? rewardsToken.balanceOf(address(this)) - rewardTokensLocked
+                : rewardsToken.balanceOf(address(this)) -
+                    rewardTokensLocked -
+                    totalStaked;
+
+            rewardsToken.transfer(owner(), nonLockedTokens);
+        } else {
+-           nonLockedTokens = address(this).balance;
++           nonLockedTokens = address(this).balance - rewardTokensLocked;
+
+            (bool sent, ) = payable(owner()).call{value: nonLockedTokens}("");
+            require(sent, "Failed to send Ether");
+        }
+        emit RewardTokensRecovered(nonLockedTokens);
+    }
+```
+#### Team Response
+TBC
+
+--------------
+
+
+### [H-] Lack of slippage protection in `Liquidity.swap()` can result in significant loss of value
+
+The Liquidity contract can perform a swap between the assets  `_tokenIn` and `_tokenOut`. However, some of the parameters of the swap are hardcoded: 
+- `amountOutMinimum`: this protects against slippage, by declaring the minimum acceptable amount of `_tokenOut`. If set to 0, there is no slippage protection and a sandwich attack can literally steal 100% of the traded value, as we accept 0 as the amount out. 
+- `sqrtPriceLimitX96`: another protection mechanism, this one to regulate the accepted price impact. 
+
+```javascript
+    function swap(
+        address _tokenIn,
+        address _tokenOut,
+        uint256 amountIn,
+        uint24 _fee
+    ) external onlyOwner returns (uint256) {
+        TransferHelper.safeApprove(_tokenIn, address(swapRouter), amountIn);
+
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
+            .ExactInputSingleParams({
+                tokenIn: _tokenIn,
+                tokenOut: _tokenOut,
+                fee: _fee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: amountIn,
+@>              amountOutMinimum: 0, // no slippage protection
+@>              sqrtPriceLimitX96: 0  // no price-impact protection
+            });
+
+        uint256 amountOut = ISwapRouter(swapRouter).exactInputSingle(params);
+        return amountOut;
+    }
+```
+
+By setting `amountOutMinimum = 0`, the slippage tolerance is hardcoded to 100%, meaning there is no slippage protection at all. 
+
+Note that sandwhich attacks usually affect DEX users that set a relaxed slippage tolerance (1%, 2%, etc). In those cases, the value that the MEV actor can extract is not so large: only a small percentage of the traded volume. However, in this case, the slippage tolerance is virtually 100%, so the frontrunner could virtually steal close to 100% of the traded value if he had enough wealth to push the price enough in the sandwhich. 
+
+#### Impact
+
+Due to a complete lack of slippage protection, the trades done with `Liquidity.swap()` can be sandwhiched and a very significant portion of the traded value can be stolen. The magnitude of the loss will be determined by how wealthy the frontrunner is, as the slippage tolerance is hardcoded to 100%. 
+
+#### Proof of concept
+
+- The contract operator initiates a swap of 10.000 USDC for 100.000 SOAR using the `Liquidity.swap()` function
+- A wealthy front-runner sandwhiches the transaction, by purchasing first with 100.000 USDC. This increases the price of SOAR significantly
+- The Liquidity.swap() transaction goes through, but the swap happens at a much higher price
+- The front-runner backruns the transaction, selling all the purchased soar, receiving a net profit 
+- The `Liquidity.swap()` suffers by receiving much less SOAR than he should. 
+
+#### Mitigation
+
+Enable extra input arguments that enable slippage and price impact protection. The caller of `swap()` is now responsible of configuring those parameters by calculating max slippage and price impact off-chain. 
+
+```diff
+    function swap(
+        address _tokenIn,
+        address _tokenOut,
+        uint256 amountIn,
++       uint256 _amountOutMinimum,
++       uint160 _sqrtPriceLimitX96
+        uint24 _fee
+    ) external onlyOwner returns (uint256) {
+        TransferHelper.safeApprove(_tokenIn, address(swapRouter), amountIn);
+
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
+            .ExactInputSingleParams({
+                tokenIn: _tokenIn,
+                tokenOut: _tokenOut,
+                fee: _fee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: amountIn,
+-               amountOutMinimum: 0,
++               amountOutMinimum: _amountOutMinimum,
+-               sqrtPriceLimitX96: 0
++               sqrtPriceLimitX96: _sqrtPriceLimitX96
+            });
+
+        uint256 amountOut = ISwapRouter(swapRouter).exactInputSingle(params);
+        return amountOut;
+    }
+```
+
+#### Team Response
+TBC
+--------------
+
+
+
+finding
 
 ## Medium risk
 
@@ -496,6 +671,114 @@ TBC
 --------------
 
 
+### [M-] The deadline of `Liquidity.mintNewPosition()` has no effect
+
+When minting a new position via the `Liquidity` contract, the deadline is hardcoded to `block.timestamp + 100`:
+
+```javascript
+    function mintNewPosition(
+        address token0,
+        address token1,
+        uint24 poolFee,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 amount0ToMint,
+        uint256 amount1ToMint
+    )
+        external
+        onlyOwner
+        returns (
+            uint256 tokenId,
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+        // ...
+
+        INonfungiblePositionManager.MintParams
+            memory params = INonfungiblePositionManager.MintParams({
+                token0: token0,
+                token1: token1,
+                fee: poolFee,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                amount0Desired: amount0ToMint,
+                amount1Desired: amount1ToMint,
+                amount0Min: 0,
+                amount1Min: 0,
+                recipient: address(this),
+@>              deadline: block.timestamp + 100
+            });
+
+        // ...
+
+    }
+```
+
+That deadline has no effect, because the `block.timestamp` is set by the miner in whatever block this transaction is mined, so regardless of when the transaction is minted, the deadline will always be met. 
+
+The intention of the developer is to stablish a max time in which this position can be created, and therefore, the deadline should be *the timestamp when the transaction is **broadcasted** + 100 seconds*, instead of *timestamp when the transaction is **mined** + 100 seconds*. The way to do so is to pass an extra argument to the function, with the deadline calculated off-chain. 
+
+#### Impact
+
+The hardcoded deadline will have no effect, and the position can be minted at any later time with no restrictions. 
+
+#### Proof of concept
+
+- The contract admin calls `Liquidity.mintNewPosition()` at 16:00. The intention is that the tx is only valid if executed before 16:00 + 100 seconds. 
+- 2 h pass, `block.timestamp` is now 18:00. The transaction is executed, and the configured to `block.timestamp` + 100 seconds, which is 18:00+100 instead of 16:00+100 (as the dev intended). Therefore, the transaction goes through, and the deadline was pretty much useless. 
+
+#### Mitigation
+
+```diff
+    function mintNewPosition(
+        address token0,
+        address token1,
+        uint24 poolFee,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 amount0ToMint,
+        uint256 amount1ToMint
++       uint256 deadline
+    )
+        external
+        onlyOwner
+        returns (
+            uint256 tokenId,
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+        // ...
+
+        INonfungiblePositionManager.MintParams
+            memory params = INonfungiblePositionManager.MintParams({
+                token0: token0,
+                token1: token1,
+                fee: poolFee,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                amount0Desired: amount0ToMint,
+                amount1Desired: amount1ToMint,
+                amount0Min: 0,
+                amount1Min: 0,
+                recipient: address(this),
+-               deadline: block.timestamp + 100
++               deadline: deadline
+            });
+
+        // ...
+
+    }
+```
+
+
+#### Team Response
+TBC
+--------------
+
 
 ### [M-] Lack of input validation in tax setter functions can halt SOAR token transfers
 
@@ -549,6 +832,93 @@ TBC
 --------------
 
 
+### [M-] SoarStaking can revert, blocking the admin from setting new reward periods due to a wrong order of operands
+
+In the `setRewards()` function, there is an operation to update the tokens that are reserved for rewards, `rewardTokensLocked`:
+
+```javascript
+    function setRewards(
+        uint256 _rewardPerBlock,
+        uint256 _startingBlock,
+        uint256 _blocksAmount
+    ) external onlyOwner updateReward(address(0)) {
+        uint256 unlockedTokens = _getFutureRewardTokens();
+
+        rewardPerBlock = _rewardPerBlock;
+        firstBlockWithReward = _startingBlock;
+        lastBlockWithReward = firstBlockWithReward + _blocksAmount - 1;
+
+        uint256 lockedTokens = _getFutureRewardTokens();
+        uint256 rewardBalance;
+        if (address(rewardsToken) != address(0)) {
+            rewardBalance = address(stakingToken) != address(rewardsToken)
+                ? rewardsToken.balanceOf(address(this))
+                : stakingToken.balanceOf(address(this)) - totalStaked;
+        } else {
+            rewardBalance = address(this).balance;
+        }
+
+        // this subtraction can revert if rewardTokensLocked < unlockedTokens
+@>      rewardTokensLocked = rewardTokensLocked - unlockedTokens + lockedTokens;
+
+        // ...
+    }
+```
+
+However, the subtraction can revert due to an underflow if the current `rewardTokensLocked` is smaller than the `unlockedTokens`. This is possible, because the unlocked tokens is proportional to the remaining blocks left in the current rewards period:
+
+```javascript
+    function _getFutureRewardTokens() internal view returns (uint256) {
+@>      return _calculateBlocksLeft() * rewardPerBlock;
+    }
+```
+
+#### Impact
+
+When the current `rewardTokensLocked` is greater than the `unlockedTokens`, the `setRewards()` function will revert, stopping the contract admin from setting a new reward period.  
+
+Even though the necessary condition `rewardTokensLocked < unlockedTokens`  is an edge case and will not normally occur, the solution is trivial, so it is an easy win.
+
+#### Mitigation
+
+Invert the order of operands so that the subtraction is only done at the end:
+
+```diff
+    function setRewards(
+        uint256 _rewardPerBlock,
+        uint256 _startingBlock,
+        uint256 _blocksAmount
+    ) external onlyOwner updateReward(address(0)) {
+        uint256 unlockedTokens = _getFutureRewardTokens();
+
+        rewardPerBlock = _rewardPerBlock;
+        firstBlockWithReward = _startingBlock;
+        lastBlockWithReward = firstBlockWithReward + _blocksAmount - 1;
+
+        uint256 lockedTokens = _getFutureRewardTokens();
+        uint256 rewardBalance;
+        if (address(rewardsToken) != address(0)) {
+            rewardBalance = address(stakingToken) != address(rewardsToken)
+                ? rewardsToken.balanceOf(address(this))
+                : stakingToken.balanceOf(address(this)) - totalStaked;
+        } else {
+            rewardBalance = address(this).balance;
+        }
+
+        // this subtraction can revert if rewardTokensLocked < unlockedTokens
+-       rewardTokensLocked = rewardTokensLocked - unlockedTokens + lockedTokens;
++       rewardTokensLocked = rewardTokensLocked + lockedTokens - unlockedTokens;
+
+        // ...
+    }
+```
+
+#### Team Response
+TBC
+--------------
+
+
+
 ### [M-] Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%
 
 In the Soar contract, the `taxFee` state variable is used to subtract the fee from the `amount` to be transferred. The `taxFee` is a percentage of `MULTIPLIER` (if `taxFee == MULTIPLIER`, then there is 100% tax). 
@@ -581,10 +951,169 @@ Establish a maximum tax and don't allow a higher `taxFee` than that:
 TBC
 --------------
 
+### [M-] Lack of slippage protection in liquidity management functions can result in lost value for the protocol when adding/removing liquidity
+
+The functions `increaseLiquidityCurrentRange()` and `decreaseLiquidity()` add and remove liquidity **in the current range**. However, they are performed without any slippage protection, i.e., without any control of how much of each token is actually deposited/removed. 
+
+```javascript
+
+    function increaseLiquidityCurrentRange(
+        uint256 tokenId,
+        uint256 amountAdd0,
+        uint256 amountAdd1
+    )
+        external
+        onlyOwner
+        returns (uint128 liquidity, uint256 amount0, uint256 amount1)
+    {
+        TransferHelper.safeApprove(
+            deposits[tokenId].token0,
+            address(nonfungiblePositionManager),
+            amountAdd0
+        );
+        TransferHelper.safeApprove(
+            deposits[tokenId].token1,
+            address(nonfungiblePositionManager),
+            amountAdd1
+        );
+
+        INonfungiblePositionManager.IncreaseLiquidityParams
+            memory params = INonfungiblePositionManager
+                .IncreaseLiquidityParams({
+                    tokenId: tokenId,
+                    amount0Desired: amountAdd0,
+                    amount1Desired: amountAdd1,
+@>                  amount0Min: 0, // no slippage protection
+@>                  amount1Min: 0, // no slippage protection
+                    deadline: block.timestamp
+                });
+
+        (liquidity, amount0, amount1) = nonfungiblePositionManager
+            .increaseLiquidity(params);
+    }
+```
+
+```javascript
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 _amount
+    ) external onlyOwner returns (uint256 amount0, uint256 amount1) {
+        // get liquidity data for tokenId
+        uint128 liquidity = deposits[tokenId].liquidity;
+
+        // amount0Min and amount1Min are price slippage checks
+        // if the amount received after burning is not greater than these minimums, transaction will fail
+        INonfungiblePositionManager.DecreaseLiquidityParams
+            memory params = INonfungiblePositionManager
+                .DecreaseLiquidityParams({
+                    tokenId: tokenId,
+                    liquidity: _amount,
+@>                  amount0Min: 0,  // no slippage protection 
+@>                  amount1Min: 0,  // no slippage protection 
+                    deadline: block.timestamp
+                });
+
+        (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(
+            params
+        );
+    }
+
+```
+
+Therefore, the operations for adding/removing liquidity can be frontrun, changing the *current range*. 
+- In liquidity additions, the liquidity will be added to a different range than the current one, which in terms of strategy might not be ideal
+- In liquidity removals, the position might not have liquidity in the new *current range* after the frontrun, leading to a revert, and therefore enabling DOS attack to this functionality. 
+
+#### Impact
+
+Due to the lack of slippage protection in liquidity additions and removals, MEV actors can force liquidity to be added to the wrong range, or deny liquidity removals. 
+
+The likelihood is low, because it won't usually be a profitable attack, but solving it is trivial, so it is recommended. The team can still pass 0 to the newly added arguments, but still have the possibility of using the protection later on. 
+
+#### Mitigation
+
+Allow input arguments to regulate slippage in the liquidity operations. The accepted values should be calculated by offchain components
+
+```diff
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 _amount,
++       uint256 _amount0Min,
++       uint256 _amount1Min
+    ) external onlyOwner returns (uint256 amount0, uint256 amount1) {
+        // get liquidity data for tokenId
+        uint128 liquidity = deposits[tokenId].liquidity;
+
+        // amount0Min and amount1Min are price slippage checks
+        // if the amount received after burning is not greater than these minimums, transaction will fail
+        INonfungiblePositionManager.DecreaseLiquidityParams
+            memory params = INonfungiblePositionManager
+                .DecreaseLiquidityParams({
+                    tokenId: tokenId,
+                    liquidity: _amount,
+-                   amount0Min: 0,
+-                   amount1Min: 0,
++                   amount0Min: _amount0Min,
++                   amount1Min: _amount1Min,
+                    deadline: block.timestamp
+                });
+
+        (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(
+            params
+        );
+    }
+```
+
+```diff
+    function increaseLiquidityCurrentRange(
+        uint256 tokenId,
+        uint256 amountAdd0,
+        uint256 amountAdd1,
++       uint256 _amount0Min,
++       uint256 _amount1Min
+    )
+        external
+        onlyOwner
+        returns (uint128 liquidity, uint256 amount0, uint256 amount1)
+    {
+        TransferHelper.safeApprove(
+            deposits[tokenId].token0,
+            address(nonfungiblePositionManager),
+            amountAdd0
+        );
+        TransferHelper.safeApprove(
+            deposits[tokenId].token1,
+            address(nonfungiblePositionManager),
+            amountAdd1
+        );
+
+        INonfungiblePositionManager.IncreaseLiquidityParams
+            memory params = INonfungiblePositionManager
+                .IncreaseLiquidityParams({
+                    tokenId: tokenId,
+                    amount0Desired: amountAdd0,
+                    amount1Desired: amountAdd1,
+-                   amount0Min: 0,
+-                   amount1Min: 0,
++                   amount0Min: _amount0Min,
++                   amount1Min: _amount1Min,
+                    deadline: block.timestamp
+                });
+
+        (liquidity, amount0, amount1) = nonfungiblePositionManager
+            .increaseLiquidity(params);
+    }
+
+```
+
+#### Team Response
+TBC
+--------------
+
 
 ## Low risk
 
-### [L-] Soar.OpenTrading could be frontrun affecting the launching price
+### [L-] Soar.OpenTrading could be frontrun to alter the launching price
 
 The starting price in the UniswapV2 pool is determined by the ratio SOAR:ETH when the liquidity is added in `openTrading()`. 
 This initial ratio is determined by the amount of ETHER and SOAR in the `addLiquidityETH()` function. These amounts are:
@@ -658,12 +1187,70 @@ Instead of relying in the `balanceOf(address(this))` to decide how much SOAR are
     }
 ```
 
+### [L-] Liquidity addition can be frontrun by another SOAR holder setting the launch price
 
+#### Impact
+
+A variant of the previous attack is that another holder of SOAR tokens can frontrun `openTrading()` by adding liquidity at a different ratio, also affecting the launch price. A particularly annoying attack would be if the liquidity is added with such a high price that the aspect of the graph right after the `openTrading()` is a massive price dump in the first block. 
+
+#### Mitigation
+
+The best mitigation is to ensure nobody has SOAR tokens before adding liquidity. Therefore the Minter contract should not be launched until that happens, and the TGE should not distribute SOAR tokens until liquidity is added. 
 
 #### Team Response
 TBC
 --------------
 
+#### Team Response
+TBC
+--------------
+
+### [L-] Lack of input validation in `SoarStaking.setRewards()` allows an already finished rewards period to be configured
+
+When a user stakes, a requirement is that the rewards period is not over yet, to save users from staking for no rewards:
+
+```javascript
+    function stake(
+        uint256 _amount
+    ) external whenNotPaused nonReentrant updateReward(msg.sender) {
+        require(_amount > 0, "Stake: can't stake 0");
+        require(
+@>          block.number < lastBlockWithReward,
+            "Stake: staking  period is over"
+        );
+        // ...
+```
+
+However, when the rewards period is set, there is no validation that the resulting `lastBlockWithReward` is valid:
+
+#### Impact
+
+If the rewards are wrongly configured, users won't be able to stake, because the transaction will revert. Moreover, all configured rewards would be delivered all at once, without vesting.
+
+The issue has low likelihood as it requires a mistake by the contract operator, but it is an easy win to fix it.
+
+#### Mitigation
+
+```diff
+
+    function setRewards(
+        uint256 _rewardPerBlock,
+        uint256 _startingBlock,
+        uint256 _blocksAmount
+    ) external onlyOwner updateReward(address(0)) {
+        uint256 unlockedTokens = _getFutureRewardTokens();
+
+        rewardPerBlock = _rewardPerBlock;
+        firstBlockWithReward = _startingBlock;
+        lastBlockWithReward = firstBlockWithReward + _blocksAmount - 1;
+
++       require(block.number < firstBlockWithReward + _blocksAmount - 1, "reward period already finished");        
+```
+
+#### Team Response
+TBC
+
+--------------
 
 
 ### [L-] SOAR tokens traded in UniswapV3 and certain other pools will evade the trading tax
@@ -700,6 +1287,172 @@ Note that this approach consumes way less gas as it only requires a single stora
 #### Team Response
 TBC
 
+### [L-] Lack of deadlines allows Liquidity management operations to be postponed indefinitely
+
+Some liquidity management operations have `deadline = block.tiemstamp`. This is equivalent to having no deadline. 
+
+```javascript
+
+    function increaseLiquidityCurrentRange(
+        uint256 tokenId,
+        uint256 amountAdd0,
+        uint256 amountAdd1
+    )
+        external
+        onlyOwner
+        returns (uint128 liquidity, uint256 amount0, uint256 amount1)
+    {
+
+        // ...
+
+        INonfungiblePositionManager.IncreaseLiquidityParams
+            memory params = INonfungiblePositionManager
+                .IncreaseLiquidityParams({
+                    tokenId: tokenId,
+                    amount0Desired: amountAdd0,
+                    amount1Desired: amountAdd1,
+                    amount0Min: 0,
+                    amount1Min: 0,
+@>                  deadline: block.timestamp
+                });
+
+        (liquidity, amount0, amount1) = nonfungiblePositionManager
+            .increaseLiquidity(params);
+    }
+```
+
+#### Impact
+
+Without a deadline, transactions can be executed at a much later time, perhaps not aligning with the strategy of the contract operator. 
+
+#### Mitigation
+
+Pass a deadline as an input argument if the time of execution is important. The issue is present in the following functions:
+- `increaseLiquidityCurrentRange()` 
+- `decreaseLiquidity()`
+- `swap()`
+
+Below is an example change for one of the functions above:
+
+```diff
+    function increaseLiquidityCurrentRange(
+        uint256 tokenId,
+        uint256 amountAdd0,
+        uint256 amountAdd1,
+        uint256 deadline
+    )
+        external
+        onlyOwner
+        returns (uint128 liquidity, uint256 amount0, uint256 amount1)
+    {
+
+        // ...
+
+        INonfungiblePositionManager.IncreaseLiquidityParams
+            memory params = INonfungiblePositionManager
+                .IncreaseLiquidityParams({
+                    tokenId: tokenId,
+                    amount0Desired: amountAdd0,
+                    amount1Desired: amountAdd1,
+                    amount0Min: 0,
+                    amount1Min: 0,
+-                   deadline: block.timestamp
++                   deadline: deadline
+                });
+
+        (liquidity, amount0, amount1) = nonfungiblePositionManager
+            .increaseLiquidity(params);
+    }
+
+```
+
+#### Team Response
+TBC
+--------------
+
+### [L-] In the Minter contract, `totalPrice` can be 0 even if `tokenPrice` is not 0
+
+The Minter contract requires that `tokenPrice > 0` when reading from the oracle. However, due to rounding issues, the `totalPrice` could still result in being zero, especially for tokens with few decimal points like USDC. 
+
+The likelihood is low, and it is most likely not profitable accounting for gas, but the solution is trivial, so it is an easy win.
+
+```javascript
+    function mint(uint256 _amountSOAR) external {
+        require(_amountSOAR > 0, "Buying: cant buy 0 tokens");
+
+        uint256 tokenPrice = oracle.viewPriceInUSD();
+@>      require(tokenPrice > 0, "Buying: invalid price");
+
+        // ...
+    }
+```
+
+#### Impact
+
+The `totalPrice` asked could be zero when purchasing SOAR tokens in the Minter contract.
+
+#### Mitigation
+
+Apply the requirement to `totalPrice` instead of `tokenPrice`:
+
+```diff
+    function mint(uint256 _amountSOAR) external {
+        require(_amountSOAR > 0, "Buying: cant buy 0 tokens");
+
+        uint256 tokenPrice = oracle.viewPriceInUSD();
+-       require(tokenPrice > 0, "Buying: invalid price");
+
+        uint256 totalPrice = (_amountSOAR *
+            tokenPrice *
+            ERC20Upgradeable(purchaseToken).decimals()) /
+            1e18 /
+            1e6;
+
++       require(totalPrice > 0, "Buying: invalid totalPrice");
+
+        // ...
+    }
+```
+
+#### Team Response
+TBC
+--------------
+
+### [L-] Some state-changing functions do not emit events
+
+It is a best practice to emit events in all external/public state changing functions. 
+
+Affected functions:
+- `Soar.setTaxReceiver()`
+- `Soar.setTaxFee()`
+- `Soar.setMaxWallet()`
+- `Soar.excludeFromMaxTx()`
+
+#### Team Response
+TBC
+--------------
+
+
+### [L-] Soar.openTrading() can be call before the `taxReceiver` is set, sending fees to the zero address
+
+When `openTrading()` is call, there is no requirement so that the `taxReceiver` has already been set. All fees from trades until `taxReceiver` is set will end in the zero address. 
+
+#### Impact
+
+Potential loss of trading fees if `taxReceiver` not properly configured. Requires a mistake of the contract operator.
+It is an easy fix, so an easy win. 
+
+#### Mitigation
+
+```diff
+    function openTrading() external payable onlyOwner {
++       require(taxReceiver != address(0), "taxReceiver not set");
+
+        // ...
+    }
+```
+#### Team Response
+TBC
 --------------
 
 
@@ -730,7 +1483,283 @@ Having a blacklist of pool addresses, that is configured via onlyOwner functions
 
 --------------
 
-## Informational
+### [G-] `Liquidity.createNewPosition()` makes unnecessary external calls to read values that are already in memory
 
-A branch with `@audit-info` tags has been pushed to the repo. The developers can explore the tags and decide which suggestions to follow. 
+There is an internal function called `_createDeposit()` which performs an external call to the `nonfungiblePositionManager` to read certain information about a particular NFT position (`liquidity`,`token0`,`token1`). These parameters are then stored in the `deposits` mapping:
+
+```javascript
+    function _createDeposit(uint256 tokenId) internal {
+        (
+            ,
+            ,
+            address token0,
+            address token1,
+            ,
+            ,
+            ,
+            uint128 liquidity,
+            ,
+            ,
+            ,
+
+@>      ) = nonfungiblePositionManager.positions(tokenId);
+
+        // set the owner and data for position
+        // operator is msg.sender
+@>      deposits[tokenId] = Deposit({
+@>          liquidity: liquidity,
+@>          token0: token0,
+@>          token1: token1
+        });
+    }
+
+```
+
+The internal function `_createDeposit()` is only called in one place: when a new position is minted:
+
+```javascript
+    function mintNewPosition(
+        address token0,
+        address token1,
+        uint24 poolFee,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 amount0ToMint,
+        uint256 amount1ToMint
+    )
+        external
+        onlyOwner
+        returns (
+            uint256 tokenId,
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+
+        // ...
+
+        // Note that the pool defined by DAI/USDC and fee tier 0.3% must already be created and initialized in order to mint
+@>      (tokenId, liquidity, amount0, amount1) = nonfungiblePositionManager
+            .mint(params);
+
+        // Create a deposit
+@>      _createDeposit(tokenId);
+
+        // ...
+
+    }
+```
+
+The redundancy here, is that the information read in the external call to the `nonfungiblePositionManager` is already in memory, so the external call is completely unnecessary. 
+
+#### Optimization
+
+The `deposits` mapping can be filled without the need for an extra external call:
+
+```diff
+    function mintNewPosition(
+        address token0,
+        address token1,
+        uint24 poolFee,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 amount0ToMint,
+        uint256 amount1ToMint
+    )
+        external
+        onlyOwner
+        returns (
+            uint256 tokenId,
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+
+        // ...
+
+        // Note that the pool defined by DAI/USDC and fee tier 0.3% must already be created and initialized in order to mint
+        (tokenId, liquidity, amount0, amount1) = nonfungiblePositionManager
+            .mint(params);
+
+        // Create a deposit
+-       _createDeposit(tokenId);
++       deposits[tokenId] = Deposit({
++           liquidity: liquidity,
++           token0: token0,
++           token1: token1
++       });
+
+        // ...
+
+    }
+```
+
+Then, the `_createDeposit()` can be completely removed as it is only used there:
+
+```diff
+-   function _createDeposit(uint256 tokenId) internal {
+-       (
+-           ,
+-           ,
+-           address token0,
+-           address token1,
+-           ,
+-           ,
+-           ,
+-           uint128 liquidity,
+-           ,
+-           ,
+-           ,
+-
+-       ) = nonfungiblePositionManager.positions(tokenId);
+-
+-       // set the owner and data for position
+-       // operator is msg.sender
+-       deposits[tokenId] = Deposit({
+-           liquidity: liquidity,
+-           token0: token0,
+-           token1: token1
+-       });
+-   }
+
+```
+
+### [G-] Unused variable in `Liquidity.decreaseLiquidity()` wastes gas
+
+The `liquidity` field is read from the `deposits` mapping (storage) but it is not used. 
+
+#### Optimization
+
+Remove it to save gas.
+
+```diff
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 _amount
+    ) external onlyOwner returns (uint256 amount0, uint256 amount1) {
+
+        // unused variable. Save gas by removing this line
+-       uint128 liquidity = deposits[tokenId].liquidity;
+
+        // ...
+
+    }
+
+```
+--------------
+
+### [G-] The `updateReward()` modifier reads `rewardPerTokenStored` storage variable multiple times 
+
+In the modifier, the `rewardPerTokenStored` is updated with the outcome of `rewardPerToken()`. Then, the `earned()` function will call again `rewardPerToken()` even though the value of `rewardPerTokenStored` has just been updated, incurring extra unnecessary gas costs. 
+
+```javascript
+    modifier updateReward(address account) {
+@>      rewardPerTokenStored = rewardPerToken();
+        lastUpdateBlock = block.number;
+        if (account != address(0)) {
+@>          rewards[account] = earned(account);
+            userRewardPerTokenPaid[account] = rewardPerTokenStored;
+        }
+        _;
+    }
+
+    function earned(address _account) public view returns (uint256) {
+@>      uint256 rewardsDifference = rewardPerToken() -
+            userRewardPerTokenPaid[_account];
+        uint256 newlyAccumulated = (staked[_account] * (rewardsDifference)) /
+            1e18;
+        return rewards[_account] + newlyAccumulated;
+    }
+
+```
+
+#### Optimization
+
+Cache the output from `rewardPerToken()` in memory, and pass it as an argument to `earned()`:
+
+```diff
+    modifier updateReward(address account) {
+-        rewardPerTokenStored = rewardPerToken();
++       _rewardPerToken = rewardPerToken();
++       rewardPerTokenStored = _rewardPerToken;
+        lastUpdateBlock = block.number;
+        if (account != address(0)) {
+-           rewards[account] = earned(account);
++           rewards[account] = earned(account, _rewardPerToken);
+            userRewardPerTokenPaid[account] = rewardPerTokenStored;
+        }
+        _;
+    }
+
+-   function earned(address _account) public view returns (uint256) {
++   function earned(address _account, uint256 _rewardPerToken) public view returns (uint256) {
+-       uint256 rewardsDifference = rewardPerToken() -
++       uint256 rewardsDifference = _rewardPerToken_ -
+            userRewardPerTokenPaid[_account];
+        uint256 newlyAccumulated = (staked[_account] * (rewardsDifference)) /
+            1e18;
+        return rewards[_account] + newlyAccumulated;
+    }
+
+```
+--------------
+
+### [G-] `SoarStaking.setReward()` makes an unnecessary storage read of an already in-memory variable
+
+In `setRewards()`, when `lastBlockWithReward` is set, it reads `firstBlockWithReward` from storage. Reading from storage is a costly operation, and the value is already in one of the calldata arguments, `_startingBlock`. 
+
+Also, the storage variables are read to emit the event, but the values can be deducted from in-memory variables.
+
+```javascript
+    function setRewards(
+        uint256 _rewardPerBlock,
+        uint256 _startingBlock,
+        uint256 _blocksAmount
+    ) external onlyOwner updateReward(address(0)) {
+        uint256 unlockedTokens = _getFutureRewardTokens();
+
+        rewardPerBlock = _rewardPerBlock;
+        firstBlockWithReward = _startingBlock;
+@>      lastBlockWithReward = firstBlockWithReward + _blocksAmount - 1;
+
+        // ...
+
+        emit RewardsSet(
+            _rewardPerBlock,
+@>          firstBlockWithReward,
+@>          lastBlockWithReward
+        );
+    }
+```
+
+#### Optimization
+
+```diff
+    function setRewards(
+        uint256 _rewardPerBlock,
+        uint256 _startingBlock,
+        uint256 _blocksAmount
+    ) external onlyOwner updateReward(address(0)) {
+        uint256 unlockedTokens = _getFutureRewardTokens();
+
+        rewardPerBlock = _rewardPerBlock;
+        firstBlockWithReward = _startingBlock;
+-       lastBlockWithReward = firstBlockWithReward + _blocksAmount - 1;
++       lastBlockWithReward = _startingBlock + _blocksAmount - 1;
+
+        // ...
+
+        emit RewardsSet(
+            _rewardPerBlock,
+-           firstBlockWithReward,
++           _startingBlock,
+-           lastBlockWithReward
++           _startingBlock + _blocksAmount - 1
+        );
+
+    }
+```
+--------------
 
