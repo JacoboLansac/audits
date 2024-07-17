@@ -9,7 +9,11 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-During the security review, 2 critical, 4 high, and 8 medium risk issues were found. Some low-risk findings and gas optimizations were also identified
+During the security review, 2 critical, 4 high, and 8 medium risk issues were found. Some low-risk findings and gas optimizations were also identified.
+
+
+
+
 
 
 | Finding                                                                                                                                                                  | Severity | Description                                                                                                                                                    | Status |
@@ -36,11 +40,17 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [L-6](<#l-6-in-the-minter-contract-totalprice-can-be-0-even-if-tokenprice-is-not-0>)                                                                                     | Low      | In the Minter contract, `totalPrice` can be 0 even if `tokenPrice` is not 0                                                                                    | -      |
 | [L-7](<#l-7-some-state-changing-functions-do-not-emit-events>)                                                                                                           | Low      | Some state-changing functions do not emit events                                                                                                               | -      |
 | [L-8](<#l-8-soaropentrading-can-be-call-before-the-taxreceiver-is-set-sending-fees-to-the-zero-address>)                                                                 | Low      | Soar.openTrading() can be call before the `taxReceiver` is set, sending fees to the zero address                                                               | -      |
+| [L-9](<#l-9-potential-reentrancy-attack-as-state-is-modified-after-an-external-call-in-soarstakinggetrewards>)                                                           | Low      | Potential reentrancy attack as state is modified after an external call in `SoarStaking.getRewards()`                                                          | -      |
 | [G-1](<#g-1-the-updatereward-modifier-reads-rewardpertokenstored-storage-variable-multiple-times->)                                                                      | Gas      | The `updateReward()` modifier reads `rewardPerTokenStored` storage variable multiple times                                                                     | -      |
 | [G-2](<#g-2-soar_shouldtaketax-makes-multiple-external-calls-and-storage-reads-making-the-token-transfers-unnecessarily-expensive>)                                      | Gas      | Soar._shouldTakeTax() makes multiple external calls and storage reads, making the token transfers unnecessarily expensive                                      | -      |
 | [G-3](<#g-3-liquiditycreatenewposition-makes-unnecessary-external-calls-to-read-values-that-are-already-in-memory>)                                                      | Gas      | `Liquidity.createNewPosition()` makes unnecessary external calls to read values that are already in memory                                                     | -      |
 | [G-4](<#g-4-unused-variable-in-liquiditydecreaseliquidity-wastes-gas>)                                                                                                   | Gas      | Unused variable in `Liquidity.decreaseLiquidity()` wastes gas                                                                                                  | -      |
 | [G-5](<#g-5-soarstakingsetreward-makes-an-unnecessary-storage-read-of-an-already-in-memory-variable>)                                                                    | Gas      | `SoarStaking.setReward()` makes an unnecessary storage read of an already in-memory variable                                                                   | -      |
+
+
+
+
+
 
 ## Introduction
 
@@ -1619,6 +1629,67 @@ It is an easy fix, so an easy win.
 #### Team Response
 TBC
 
+--------------
+
+
+
+
+### [L-9] Potential reentrancy attack as state is modified after an external call in `SoarStaking.getRewards()`
+
+The `getReward()` function performs updates the storage variable `rewardTokensLocked` after making an external call:
+
+```javascript
+    function getReward() public nonReentrant updateReward(msg.sender) {
+        uint256 reward = rewards[msg.sender];
+        if (reward > 0) {
+            rewards[msg.sender] = 0;
+
+            if (address(rewardsToken) != address(0)) {
+                rewardsToken.transfer(msg.sender, reward);
+            } else {
+@>              (bool sent, ) = payable(msg.sender).call{value: reward}("");
+                require(sent, "Failed to send Ether");
+            }
+
+@>          rewardTokensLocked = rewardTokensLocked - reward;
+
+            emit RewardPaid(msg.sender, reward);
+        }
+    }
+```
+
+This is generally bad practice and heavily non-recommended as it is an open door for reentrancy attacks. The `nonReentrant` modifier only acts at a contract level, but if other functions read the state from this contract, it would be possible to perform a *cross-contract reentrancy* or a *read-only reentrancy*. 
+
+Luckily, there is no such risk in this case, because the `rewardTokensLocked` is not used outside this contract. However, imagine a scenario in which other contract from the protocol read this variable for a critical calculation. It would be possible for the attacker to call `getReward()`, and in the external call made to `msg.sender`, he could make another call where `rewardTokensLocked` was read, **before the state was updated** in the last line of `getReward()`. 
+
+#### Impact
+
+A valid attack path has not been found. So low risk. However, following the [CEI pattern](https://fravoll.github.io/solidity-patterns/checks_effects_interactions.html) is the true protection against re-entrancy attacks. 
+
+#### Mitigation
+
+Never make external calls before all state variables of the current contract have been updated. In this particular case, update `rewardTokensLocked` before the external call. 
+```diff
+    function getReward() public nonReentrant updateReward(msg.sender) {
+        uint256 reward = rewards[msg.sender];
+        if (reward > 0) {
+            rewards[msg.sender] = 0;
+
++           rewardTokensLocked = rewardTokensLocked - reward;
+
+            if (address(rewardsToken) != address(0)) {
+                rewardsToken.transfer(msg.sender, reward);
+            } else {
+                (bool sent, ) = payable(msg.sender).call{value: reward}("");
+                require(sent, "Failed to send Ether");
+            }
+
+-           rewardTokensLocked = rewardTokensLocked - reward;
+
+            emit RewardPaid(msg.sender, reward);
+        }
+    }
+```
 --------------
 
 
