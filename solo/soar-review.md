@@ -18,34 +18,34 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 
 | Finding                                                                                                                                                                  | Severity | Description                                                                                                                                                    | Status |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----- |
-| [C-1](<#c-1-users-can-claim-from-the-minter-multiple-times-draining-the-contract-of-soar-tokens>)                                                                        | Critical | Users can claim from the Minter multiple times, draining the contract of SOAR tokens                                                                           | -      |
-| [C-2](<#c-2-wrong-decimals-scaling-of-oracle-price-allows-users-to-purchase-soar-from-in-mintersol-almost-for-free>)                                                     | Critical | Wrong decimals scaling of oracle price allows users to purchase SOAR from in `Minter.sol` almost for free                                                      | -      |
-| [H-1](<#h-1-the-staking-contract-will-become-insolvent-if-recovernonlockedrewardtokens-is-called>)                                                                       | High     | The staking contract will become insolvent if `recoverNonLockedRewardTokens()` is called                                                                       | -      |
-| [H-2](<#h-2-lack-of-slippage-protection-in-liquidityswap-can-result-in-significant-loss-of-value>)                                                                       | High     | Lack of slippage protection in `Liquidity.swap()` can result in significant loss of value                                                                      | -      |
-| [H-3](<#h-3-the-minter-contract-cannot-guarantee-solvency-because-purchases-are-allowed-regardless-of-the-soar-tokens-in-the-contracts-balance>)                         | High     | The Minter contract cannot guarantee solvency because purchases are allowed regardless of the SOAR tokens in the contract's balance                            | -      |
+| [C-1](<#c-1-users-can-claim-from-the-minter-multiple-times-draining-the-contract-of-soar-tokens>)                                                                        | Critical | Users can claim from the Minter multiple times, draining the contract of SOAR tokens                                                                           | ✅ Resolved      |
+| [C-2](<#c-2-wrong-decimals-scaling-of-oracle-price-allows-users-to-purchase-soar-from-in-mintersol-almost-for-free>)                                                     | Critical | Wrong decimals scaling of oracle price allows users to purchase SOAR from in `Minter.sol` almost for free                                                      | ✅ Resolved      |
+| [H-1](<#h-1-the-staking-contract-will-become-insolvent-if-recovernonlockedrewardtokens-is-called>)                                                                       | High     | The staking contract will become insolvent if `recoverNonLockedRewardTokens()` is called                                                                       | ✅ Resolved      |
+| [H-2](<#h-2-lack-of-slippage-protection-in-liquidityswap-can-result-in-significant-loss-of-value>)                                                                       | High     | Lack of slippage protection in `Liquidity.swap()` can result in significant loss of value                                                                      | ✅ Resolved      |
+| [H-3](<#h-3-the-minter-contract-cannot-guarantee-solvency-because-purchases-are-allowed-regardless-of-the-soar-tokens-in-the-contracts-balance>)                         | High     | The Minter contract cannot guarantee solvency because purchases are allowed regardless of the SOAR tokens in the contract's balance                            | ✅ Resolved     |
 | [H-4](<#h-4-prices-in-minter-depend-on-a-single-oracle-which-makes-it-vulnerable-to-price-manipulation-attacks-incomplete-finding-until-oracle-integration-is-finished>) | High     | Prices in Minter depend on a single oracle, which makes it vulnerable to price-manipulation attacks* (incomplete finding until oracle integration is finished) | -      |
-| [M-1](<#m-1-pending-claims-in-the-minter-will-become-blocked-again-if-new-purchases-are-made-before-claiming>)                                                           | Medium   | Pending claims in the Minter will become blocked again if new purchases are made before claiming                                                               | -      |
-| [M-2](<#m-2-the-soarsol-and-liquiditysol-contracts-can-receive-eth-but-cannot-send-it-so-it-will-get-stuck-in-the-contract>)                                             | Medium   | The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract                                          | -      |
-| [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-a-wrong-order-of-operands>)           | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to a wrong order of operands         | -      |
-| [M-4](<#m-4-the-deadline-of-liquiditymintnewposition-has-no-effect>)                                                                                                     | Medium   | The deadline of `Liquidity.mintNewPosition()` has no effect                                                                                                    | -      |
-| [M-5](<#m-5-lack-of-input-validation-in-tax-setter-functions-can-halt-soar-token-transfers>)                                                                             | Medium   | Lack of input validation in tax setter functions can halt SOAR token transfers                                                                                 | -      |
-| [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-set-as-high-tax-as-100>)                                                          | Medium   | Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%                                                             | -      |
-| [M-7](<#m-7-lack-of-slippage-protection-in-liquidity-management-functions-can-result-in-lost-value-for-the-protocol-when-addingremoving-liquidity>)                      | Medium   | Lack of slippage protection in liquidity management functions can result in lost value for the protocol when adding/removing liquidity                         | -      |
+| [M-1](<#m-1-pending-claims-in-the-minter-will-become-blocked-again-if-new-purchases-are-made-before-claiming>)                                                           | Medium   | Pending claims in the Minter will become blocked again if new purchases are made before claiming                                                               | ✅ Resolved      |
+| [M-2](<#m-2-the-soarsol-and-liquiditysol-contracts-can-receive-eth-but-cannot-send-it-so-it-will-get-stuck-in-the-contract>)                                             | Medium   | The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract                                          | ❌ Partially resolved      |
+| [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-a-wrong-order-of-operands>)           | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to a wrong order of operands         | ✅ Resolved      |
+| [M-4](<#m-4-the-deadline-of-liquiditymintnewposition-has-no-effect>)                                                                                                     | Medium   | The deadline of `Liquidity.mintNewPosition()` has no effect                                                                                                    | ✅ Resolved      |
+| [M-5](<#m-5-lack-of-input-validation-in-tax-setter-functions-can-halt-soar-token-transfers>)                                                                             | Medium   | Lack of input validation in tax setter functions can halt SOAR token transfers                                                                                 | ✅ Resolved      |
+| [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-set-as-high-tax-as-100>)                                                          | Medium   | Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%                                                             | ✅ Resolved      |
+| [M-7](<#m-7-lack-of-slippage-protection-in-liquidity-management-functions-can-result-in-lost-value-for-the-protocol-when-addingremoving-liquidity>)                      | Medium   | Lack of slippage protection in liquidity management functions can result in lost value for the protocol when adding/removing liquidity                         | ✅ Resolved      |
 | [M-8](<#m-8-soar-token-will-have-integration-issues-with-lendingborrowing-platforms-because-malicious-actors-can-make-themselves-non-liquidatable>)                      | Medium   | Soar token will have integration issues with lending/borrowing platforms because malicious actors can make themselves non-liquidatable                         | -      |
-| [L-1](<#l-1-soaropentrading-could-be-frontrun-to-alter-the-launching-price>)                                                                                             | Low      | Soar.OpenTrading could be frontrun to alter the launching price                                                                                                | -      |
-| [L-2](<#l-2-liquidity-addition-can-be-frontrun-by-another-soar-holder-setting-the-launch-price>)                                                                         | Low      | Liquidity addition can be frontrun by another SOAR holder setting the launch price                                                                             | -      |
-| [L-3](<#l-3-lack-of-input-validation-in-soarstakingsetrewards-allows-configuring-an-already-finished-period>)                                                            | Low      | Lack of input validation in `SoarStaking.setRewards()` allows configuring an already finished period                                                           | -      |
-| [L-4](<#l-4-soar-tokens-traded-in-uniswapv3-and-certain-other-pools-will-evade-the-trading-tax>)                                                                         | Low      | SOAR tokens traded in UniswapV3 and certain other pools will evade the trading tax                                                                             | -      |
-| [L-5](<#l-5-lack-of-deadlines-allows-liquidity-management-operations-to-be-postponed-indefinitely>)                                                                      | Low      | Lack of deadlines allows Liquidity management operations to be postponed indefinitely                                                                          | -      |
-| [L-6](<#l-6-in-the-minter-contract-totalprice-can-be-0-even-if-tokenprice-is-not-0>)                                                                                     | Low      | In the Minter contract, `totalPrice` can be 0 even if `tokenPrice` is not 0                                                                                    | -      |
-| [L-7](<#l-7-some-state-changing-functions-do-not-emit-events>)                                                                                                           | Low      | Some state-changing functions do not emit events                                                                                                               | -      |
-| [L-8](<#l-8-soaropentrading-can-be-called-before-the-taxreceiver-is-set-sending-fees-to-the-zero-address>)                                                                 | Low      | Soar.openTrading() can be called before the `taxReceiver` is set, sending fees to the zero address                                                               | -      |
-| [L-9](<#l-9-potential-reentrancy-attack-as-the-state-is-modified-after-an-external-call-in-soarstakinggetrewards>)                                                           | Low      | Potential reentrancy attack as the state is modified after an external call in `SoarStaking.getRewards()`                                                          | -      |
-| [G-1](<#g-1-the-updatereward-modifier-reads-rewardpertokenstored-storage-variable-multiple-times->)                                                                      | Gas      | The `updateReward()` modifier reads `rewardPerTokenStored` storage variable multiple times                                                                     | -      |
-| [G-2](<#g-2-soar_shouldtaketax-makes-multiple-external-calls-and-storage-reads-making-the-token-transfers-unnecessarily-expensive>)                                      | Gas      | Soar._shouldTakeTax() makes multiple external calls and storage reads, making the token transfers unnecessarily expensive                                      | -      |
-| [G-3](<#g-3-liquiditycreatenewposition-makes-unnecessary-external-calls-to-read-values-that-are-already-in-memory>)                                                      | Gas      | `Liquidity.createNewPosition()` makes unnecessary external calls to read values that are already in memory                                                     | -      |
-| [G-4](<#g-4-unused-variable-in-liquiditydecreaseliquidity-wastes-gas>)                                                                                                   | Gas      | Unused variable in `Liquidity.decreaseLiquidity()` wastes gas                                                                                                  | -      |
-| [G-5](<#g-5-soarstakingsetreward-makes-an-unnecessary-storage-read-of-an-already-in-memory-variable>)                                                                    | Gas      | `SoarStaking.setReward()` makes an unnecessary storage read of an already in-memory variable                                                                   | -      |
+| [L-1](<#l-1-soaropentrading-could-be-frontrun-to-alter-the-launching-price>)                                                                                             | Low      | Soar.OpenTrading could be frontrun to alter the launching price                                                                                                | ✅ Resolved      |
+| [L-2](<#l-2-liquidity-addition-can-be-frontrun-by-another-soar-holder-setting-the-launch-price>)                                                                         | Low      | Liquidity addition can be frontrun by another SOAR holder setting the launch price                                                                             | ✅ Resolved      |
+| [L-3](<#l-3-lack-of-input-validation-in-soarstakingsetrewards-allows-configuring-an-already-finished-period>)                                                            | Low      | Lack of input validation in `SoarStaking.setRewards()` allows configuring an already finished period                                                           | Acknowledged      |
+| [L-4](<#l-4-renamed-some-dex-could-evade-the-trading-tax-if-the-pool-contract-does-not-expose-token0-and-token1-functions>)                                              | Low        | (Renamed) Some DEX could evade the trading tax if the pool contract does not expose `token0()` and `token1()` functions                                        | Acknowledged        |
+| [L-5](<#l-5-lack-of-deadlines-allows-liquidity-management-operations-to-be-postponed-indefinitely>)                                                                      | Low      | Lack of deadlines allows Liquidity management operations to be postponed indefinitely                                                                          | Acknowledged      |
+| [L-6](<#l-6-in-the-minter-contract-totalprice-can-be-0-even-if-tokenprice-is-not-0>)                                                                                     | Low      | In the Minter contract, `totalPrice` can be 0 even if `tokenPrice` is not 0                                                                                    | ✅ Resolved      |
+| [L-7](<#l-7-some-state-changing-functions-do-not-emit-events>)                                                                                                           | Low      | Some state-changing functions do not emit events                                                                                                               | ✅ Resolved      |
+| [L-8](<#l-8-soaropentrading-can-be-called-before-the-taxreceiver-is-set-sending-fees-to-the-zero-address>)                                                                 | Low      | Soar.openTrading() can be called before the `taxReceiver` is set, sending fees to the zero address                                                               | ✅ Resolved      |
+| [L-9](<#l-9-potential-reentrancy-attack-as-the-state-is-modified-after-an-external-call-in-soarstakinggetrewards>)                                                           | Low      | Potential reentrancy attack as the state is modified after an external call in `SoarStaking.getRewards()`                                                          | ✅ Resolved      |
+| [G-1](<#g-1-the-updatereward-modifier-reads-rewardpertokenstored-storage-variable-multiple-times->)                                                                      | Gas      | The `updateReward()` modifier reads `rewardPerTokenStored` storage variable multiple times                                                                     | ✅ Resolved      |
+| [G-2](<#g-2-soar_shouldtaketax-makes-multiple-external-calls-and-storage-reads-making-the-token-transfers-unnecessarily-expensive>)                                      | Gas      | Soar._shouldTakeTax() makes multiple external calls and storage reads, making the token transfers unnecessarily expensive                                      | ✅ Resolved      |
+| [G-3](<#g-3-liquiditycreatenewposition-makes-unnecessary-external-calls-to-read-values-that-are-already-in-memory>)                                                      | Gas      | `Liquidity.createNewPosition()` makes unnecessary external calls to read values that are already in memory                                                     | ✅ Resolved      |
+| [G-4](<#g-4-unused-variable-in-liquiditydecreaseliquidity-wastes-gas>)                                                                                                   | Gas      | Unused variable in `Liquidity.decreaseLiquidity()` wastes gas                                                                                                  | ✅ Resolved |
+| [G-5](<#g-5-soarstakingsetreward-makes-an-unnecessary-storage-read-of-an-already-in-memory-variable>)                                                                    | Gas      | `SoarStaking.setReward()` makes an unnecessary storage read of an already in-memory variable                                                                   | ✅ Resolved      |
 
 
 
@@ -103,7 +103,7 @@ focus, but significant inefficiencies will also be reported.
   - [e976d0d69a7dafdf516f4fdc49225538020e4b06](https://github.com/meegalaxy/SoarContract/commit/e976d0d69a7dafdf516f4fdc49225538020e4b06) (updates in `Minter.sol`).
 
 ### Mitigation review
-- **TBD**
+- [2827fef0d30b1c44dac82f22d233ca8b0fe4a73f](https://github.com/meegalaxy/SoarContract/commit/2827fef0d30b1c44dac82f22d233ca8b0fe4a73f)
 
 ### Files in original scope
 
@@ -218,8 +218,7 @@ When a user claims, the entry of `msg.sender` in the `recipients` mapping should
 ```
 
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -276,8 +275,7 @@ The first user to realize this would take the chance and purchase all available 
     }
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -347,8 +345,8 @@ Subtract the `rewardTokensLocked` before sending non-locked reward tokens:
         emit RewardTokensRecovered(nonLockedTokens);
     }
 ```
-#### Team Response
-TBC
+
+#### Team Response: Resolved
 
 --------------
 
@@ -444,8 +442,7 @@ Enable extra input arguments that enable slippage and price impact protection. T
     }
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -546,8 +543,7 @@ This can happen in the following situations:
 
 ```
 
-#### Team Response
-TBD
+#### Team Response: Resolved
 
 -------------
 
@@ -621,8 +617,9 @@ There are different approaches to mitigate this:
 - Don't allow new purchases if previously purchased amounts are available for claim. This will fail to protect users in the scenario of purchasing before the current `lockingPeriod` is over. 
 - Be very explicit in the front-end about the consequences of a given purchase (and warn them to claim before making new purchases)
 
-#### Team Response
-TBC
+#### Team Response: Resolved (in frontend)
+
+No changes were applied to the smart contracts, but the team will show warnings in the frontend so that the user is very aware of the implications of purchasing again. 
 
 --------------
 
@@ -659,7 +656,9 @@ contract Liquidity is IERC721Receiver, Ownable {
 ```
 
 #### Team Response
-TBC
+
+- `Soar.sol`: resolved
+- `Liquidity.sol`: NOT resolved
 
 --------------
 
@@ -748,8 +747,7 @@ Invert the order of operands so that the subtraction is only done at the end:
     }
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -865,13 +863,9 @@ The hardcoded deadline will have no effect, and the position can be minted at an
     }
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
---------------
-
-
-
+------------------
 
 
 
@@ -924,8 +918,9 @@ If the `taxFee` is set to a higher value than `MULTIPLIER`, trading operations w
     }
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
+
+Resolved by with the same fix as for M-6. 
 
 --------------
 
@@ -966,8 +961,7 @@ Establish a maximum tax and don't allow a higher `taxFee` than that:
         taxFee = _tax;
     }
 ```
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -1064,7 +1058,7 @@ The likelihood is low, because it won't usually be a profitable attack, but solv
 
 #### Mitigation
 
-Allow input arguments to regulate slippage in the liquidity operations. The accepted values should be calculated by offchain components
+Allow input arguments to regulate slippage in the liquidity operations. The accepted values should be calculated by off-chain components
 
 ```diff
     function decreaseLiquidity(
@@ -1138,11 +1132,9 @@ Allow input arguments to regulate slippage in the liquidity operations. The acce
 
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
-
 
 
 
@@ -1313,7 +1305,7 @@ Instead of relying on the `balanceOf(address(this))` to decide how much SOAR is 
     }
 ```
 
-
+#### Team response: Resolved
 
 
 
@@ -1331,8 +1323,7 @@ A variant of the previous attack is that another holder of SOAR tokens can front
 
 The best mitigation is to ensure nobody has SOAR tokens before adding liquidity. Therefore the Minter contract should not be launched until that happens, and the TGE should not distribute SOAR tokens until liquidity is added. 
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -1385,8 +1376,7 @@ The issue has a low likelihood as it requires a mistake by the contract operator
 +       require(block.number < firstBlockWithReward + _blocksAmount - 1, "reward period already finished");        
 ```
 
-#### Team Response
-TBC
+#### Team Response: Acknowledged
 
 --------------
 
@@ -1400,7 +1390,7 @@ TBC
 
 
 
-### [L-4] SOAR tokens traded in UniswapV3 and certain other pools will evade the trading tax
+### [L-4] (Renamed) Some DEX could evade the trading tax if the pool contract does not expose `token0()` and `token1()` functions
 
 On the SOAR token, normal transfers are not taxed, only trading transactions (buys or sells). The way the SOAR contract distinguishes between a trade and a normal transfer is by checking if the sender or receiver is a DEX pool. This is done with function `_shouldTakeTax()`, which checks if the `token0()` or `token1()` is the SOAR token. For normal transfers where none of them have such function, no tax will be applied:
 
@@ -1431,8 +1421,7 @@ A simpler alternative is to keep track of the DEX pool addresses in a mapping, a
 
 Note that this approach consumes way less gas as it only requires a single storage read, instead of multiple external calls with multiple storage reads. 
 
-#### Team Response
-TBC
+#### Team Response: Acknowledged
 
 --------
 
@@ -1524,8 +1513,10 @@ Below is an example change for one of the functions above:
 
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
+
+The suggested mitigation was applied to the two mentioned liquidity management functions. 
+However, the auditor missed to mention the same issue in the `mintNewPosition()` function.
 
 --------------
 
@@ -1579,8 +1570,7 @@ Apply the requirement to `totalPrice` instead of `tokenPrice`:
     }
 ```
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -1594,8 +1584,7 @@ Affected functions:
 - `Soar.setMaxWallet()`
 - `Soar.excludeFromMaxTx()`
 
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -1626,8 +1615,7 @@ It is an easy fix, so an easy win.
         // ...
     }
 ```
-#### Team Response
-TBC
+#### Team Response: Resolved
 
 --------------
 
@@ -1781,6 +1769,10 @@ Cache the output from `rewardPerToken()` in memory, and pass it as an argument t
 #### Optimization
 
 Having a blacklist of pool addresses, that is configured via `onlyOwner` functions will require a single storage read for every token trade, making the trades significantly cheaper in terms of gas. 
+
+##### Team response: Resolved
+
+A hybrid solution was implemented. As soon as `_shouldTakeTax()` function returns true, that is stored in a mapping. This will save gas for future external calls in all future trades with that DEX. Normal transfers will suffer the extra gas costs of the external calls, but trades are expected to be the majority of transfer transactions, so it is a good compromise. 
 
 --------------
 
