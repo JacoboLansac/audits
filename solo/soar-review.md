@@ -9,7 +9,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-During the security review, 2 critical, 4 high, and 8 medium risk issues were found. Some low-risk findings and gas optimizations were also identified.
+During the security review, 2 critical, 3 high, and 8 medium, and 10 low risk issues were found. Some gas optimizations were also identified.
 
 
 
@@ -38,7 +38,7 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [L-5](<#l-5-lack-of-deadlines-allows-liquidity-management-operations-to-be-postponed-indefinitely>)                                                          | Low      | Lack of deadlines allows Liquidity management operations to be postponed indefinitely                                                                | ✅ Resolved   |
 | [L-6](<#l-6-in-the-minter-contract-totalprice-can-be-0-even-if-tokenprice-is-not-0>)                                                                         | Low      | In the Minter contract, `totalPrice` can be 0 even if `tokenPrice` is not 0                                                                          | ✅ Resolved   |
 | [L-7](<#l-7-some-state-changing-functions-do-not-emit-events>)                                                                                               | Low      | Some state-changing functions do not emit events                                                                                                     | ✅ Resolved   |
-| [L-8](<#l-8-soaropentrading-can-be-called-before-the-taxreceiver-is-set-sending-fees-to-the-zero-address>)                                                   | Low        | `Soar.openTrading()` can be called before the `taxReceiver` is set, sending fees to the zero address                                                 | ✅ Resolved       |
+| [L-8](<#l-8-soaropentrading-can-be-called-before-the-taxreceiver-is-set-sending-fees-to-the-zero-address>)                                                   | Low      | `Soar.openTrading()` can be called before the `taxReceiver` is set, sending fees to the zero address                                                 | ✅ Resolved   |
 | [L-9](<#l-9-potential-reentrancy-attack-as-the-state-is-modified-after-an-external-call-in-soarstakinggetrewards>)                                           | Low      | Potential reentrancy attack as the state is modified after an external call in `SoarStaking.getRewards()`                                            | ✅ Resolved   |
 | [L-10](<#l-10-soar-token-might-have-integration-issues-with-other-protocols-because-the-contract-can-make-incomingoutgoing-transfers-revert>)                | Low      | Soar token might have integration issues with other protocols because the contract can make incoming/outgoing transfers revert                       | Acknowledged |
 | [G-1](<#g-1-the-updatereward-modifier-reads-rewardpertokenstored-storage-variable-multiple-times->)                                                          | Gas      | The `updateReward()` modifier reads `rewardPerTokenStored` storage variable multiple times                                                           | ✅ Resolved   |
