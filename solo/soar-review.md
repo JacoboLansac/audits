@@ -23,7 +23,6 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [H-1](<#h-1-the-staking-contract-will-become-insolvent-if-recovernonlockedrewardtokens-is-called>)                                                                       | High     | The staking contract will become insolvent if `recoverNonLockedRewardTokens()` is called                                                                       | ✅ Resolved   |
 | [H-2](<#h-2-lack-of-slippage-protection-in-liquidityswap-can-result-in-significant-loss-of-value>)                                                                       | High     | Lack of slippage protection in `Liquidity.swap()` can result in significant loss of value                                                                      | ✅ Resolved   |
 | [H-3](<#h-3-the-minter-contract-cannot-guarantee-solvency-because-purchases-are-allowed-regardless-of-the-soar-tokens-in-the-contracts-balance>)                         | High     | The Minter contract cannot guarantee solvency because purchases are allowed regardless of the SOAR tokens in the contract's balance                            | ✅ Resolved   |
-| [H-4](<#h-4-prices-in-minter-depend-on-a-single-oracle-which-makes-it-vulnerable-to-price-manipulation-attacks-incomplete-finding-until-oracle-integration-is-finished>) | High     | Prices in Minter depend on a single oracle, which makes it vulnerable to price-manipulation attacks* (incomplete finding until oracle integration is finished) | -            |
 | [M-1](<#m-1-pending-claims-in-the-minter-will-become-blocked-again-if-new-purchases-are-made-before-claiming>)                                                           | Medium   | Pending claims in the Minter will become blocked again if new purchases are made before claiming                                                               | ✅ Resolved   |
 | [M-2](<#m-2-the-soarsol-and-liquiditysol-contracts-can-receive-eth-but-cannot-send-it-so-it-will-get-stuck-in-the-contract>)                                             | Medium   | The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract                                          | ✅ Resolved   |
 | [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-a-wrong-order-of-operands>)           | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to a wrong order of operands         | ✅ Resolved   |
@@ -31,6 +30,7 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [M-5](<#m-5-lack-of-input-validation-in-tax-setter-functions-can-halt-soar-token-transfers>)                                                                             | Medium   | Lack of input validation in tax setter functions can halt SOAR token transfers                                                                                 | ✅ Resolved   |
 | [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-set-as-high-tax-as-100>)                                                          | Medium   | Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%                                                             | ✅ Resolved   |
 | [M-7](<#m-7-lack-of-slippage-protection-in-liquidity-management-functions-can-result-in-lost-value-for-the-protocol-when-addingremoving-liquidity>)                      | Medium   | Lack of slippage protection in liquidity management functions can result in lost value for the protocol when adding/removing liquidity                         | ✅ Resolved   |
+| [M-8](<#m-8-the-minter-contract-could-be-vulnerable-to-a-price-manipulation-attack-allowing-an-attacker-to-purchase-soar-tokens-at-a-discount>)                | Medium     | The Minter contract could be vulnerable to a price-manipulation attack, allowing an attacker to purchase SOAR tokens at a discount                     | ✅ Resolved        |
 | [L-1](<#l-1-soaropentrading-could-be-frontrun-to-alter-the-launching-price>)                                                                                             | Low      | Soar.OpenTrading could be frontrun to alter the launching price                                                                                                | ✅ Resolved   |
 | [L-2](<#l-2-liquidity-addition-can-be-frontrun-by-another-soar-holder-setting-the-launch-price>)                                                                         | Low      | Liquidity addition can be frontrun by another SOAR holder setting the launch price                                                                             | ✅ Resolved   |
 | [L-3](<#l-3-lack-of-input-validation-in-soarstakingsetrewards-allows-configuring-an-already-finished-period>)                                                            | Low      | Lack of input validation in `SoarStaking.setRewards()` allows configuring an already finished period                                                           | Acknowledged |
@@ -551,24 +551,6 @@ This can happen in the following situations:
 
 
 
-
-
-
-### [H-4] Prices in Minter depend on a single oracle, which makes it vulnerable to price-manipulation attacks* (incomplete finding until oracle integration is finished)
-
-The `Minter.mint()` function reads the SOAR price in USD from the `oracle`, which is a single instance of `UniswapV2Oracle.sol`. This constitutes a risk, as a single liquidity pool to be used as an oracle is vulnerable to price manipulation attacks. 
-
-Luckily, the oracle uses a 1h-average price which makes the manipulation less likely, but it is still a single source of truth. 
-
-EDIT: This issue has been paused because the `UniswapV2Oracle.sol` is undergoing some updates. This issue will be reviewed in the mitigation phase.
-
-#### Impact
-#### Proof of concept
-#### Mitigation
-#### Team Response
-TBC
-
---------------
 
 
 
@@ -1143,6 +1125,132 @@ Allow input arguments to regulate slippage in the liquidity operations. The acce
 
 
 
+### [M-8] The Minter contract could be vulnerable to a price-manipulation attack, allowing an attacker to purchase SOAR tokens at a discount
+
+The `Minter.mint()` function reads the SOAR price in USD from the `oracle`, which is a single instance of `UniswapV2Oracle.sol`. This constitutes a risk, as using a single liquidity pool as an oracle is more vulnerable to price manipulation attacks. The `UniswapV2Oracle.update()` enforces that the average prices **always** include minimum one-hour data, which dampens the impact of the price manipulation.
+
+However, the function has no access control:
+
+```javascript
+@>  function update() external {
+        (
+            uint256 price0Cumulative,
+            uint256 price1Cumulative,
+            uint32 blockTimestamp
+        ) = UniswapV2OracleLibrary.currentCumulativePrices(address(pair));
+
+        // overflow is desired
+        uint256 timeElapsed = blockTimestamp > blockTimestampLast
+            ? blockTimestamp - blockTimestampLast
+            : uint256(blockTimestamp) + 2 ** 32 - uint256(blockTimestampLast);
+
+        ///OK at least 1h must pass before prices are updated
+        // Ensure that at least one full period has passed since the last update
+        require(
+@>          timeElapsed >= PERIOD && timeElapsed < 2 ** 32,
+            "UniswapPairOracle: PERIOD_NOT_ELAPSED"
+        );
+
+        // ...
+
+    }
+```
+
+This means that an attacker could potentially manipulate the price in the SOAR pool by using flashloans, then calling `UniswapV2Oracle.update()` to update the oracle price to a discounted price, and then call `Minter.mint()` to purchase SOAR tokens at a discount. 
+
+#### Impact
+
+An attacker can manipulate the oracle price to purchase SOAR at a discount from the Minter contract. Moreover, as the price cannot be upated again until 1h after, there would be a period of 1h where the price would be manipulated, so multiple accounts could potentially benefit from the exploit (if there was any SOAR tokens to steal). 
+
+The likelihood of the attack is quite low for the following reasons:
+- Oracle prices are averaged over a minimum period of 1 hour, which would dampen the price-manipulation by a factor of x3600
+- Crafting the attack requires several assumptions: more than one SOAR liquidity pool, flashloans available in one of them, enough liquidity for these flashloans, etc
+
+
+The exact magnitude of the price-manipulation attack would depend on the SOAR available for flashloan, the liquidity available in the pool and the amount of SOAR that are avaiable for purchase. The attack will not always be profitable. 
+
+#### Mitigation
+
+Apply access control on the `UniswapV2Oracle.update()` function:
+
+```diff
+-   function update() external {
++   function update() external onlyOwner {
+        (
+            uint256 price0Cumulative,
+            uint256 price1Cumulative,
+            uint32 blockTimestamp
+        ) = UniswapV2OracleLibrary.currentCumulativePrices(address(pair));
+
+        // ...
+
+    }
+```
+
+#### Proof of concept
+
+*The below proof of concept is only a draft, because the team decided to apply the recommended mitigation even before finishing the proof of concept.*
+
+**Initial assumptions:**
+- There are two liquidity pools with SOAR:
+  - poolA (SOAR/WETH): the initial one where the oracle takes the price
+  - poolB (SOAR/USDC): another pool
+- SOAR price is well adjusted between both pools by arbitrageurs
+- exactly 1h has passed since the last update of the oracle price
+
+**Exploit escenario:**
+- flashloan SOAR from poolB:
+  - receive SOAR from poolB
+  - during the `uniswapV2Call()` callback:
+    - sell SOAR in poolA, receiving WETH, and dumping SOAR price in oracle price source
+    - call `UniswapV2Oracle.update()`, which unpdates the underlying price of SOAR. **The effect of the price dump will be dampened by the 1h-averaging by a factor of 3600.**
+    - purchase SOAR from the `Minter.mint()`, which reads the price from the oracle, at a **discount**
+  - payback the SOAR to the flashloan (plus fees)
+
+
+```javascript
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
+        require(amount0Out > 0 || amount1Out > 0, 'UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT');
+        (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
+        require(amount0Out < _reserve0 && amount1Out < _reserve1, 'UniswapV2: INSUFFICIENT_LIQUIDITY');
+
+        uint balance0;
+        uint balance1;
+        { // scope for _token{0,1}, avoids stack too deep errors
+        address _token0 = token0;
+        address _token1 = token1;
+        require(to != _token0 && to != _token1, 'UniswapV2: INVALID_TO');
+        if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
+        if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
+@>      if (data.length > 0) IUniswapV2Callee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);
+        balance0 = IERC20(_token0).balanceOf(address(this));
+        balance1 = IERC20(_token1).balanceOf(address(this));
+        }
+        uint amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
+        uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
+        require(amount0In > 0 || amount1In > 0, 'UniswapV2: INSUFFICIENT_INPUT_AMOUNT');
+        { // scope for reserve{0,1}Adjusted, avoids stack too deep errors
+        uint balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(3));
+        uint balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(3));
+        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), 'UniswapV2: K');
+        }
+
+        _update(balance0, balance1, _reserve0, _reserve1);
+        emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
+    }
+
+```
+
+
+#### Team Response: Resolved
+
+--------------
+
+
+
+
+
+
 
 
 ## Low risk
@@ -1204,7 +1312,7 @@ Instead of relying on the `balanceOf(address(this))` to decide how much SOAR is 
 -   function openTrading() external payable onlyOwner {
 +   function openTrading(uint256 amountSoar) external payable onlyOwner {
 
-+       transferFrom(msg.sender, address(this), amountSoar);
++       _transfer(msg.sender, address(this), amountSoar);
 
         ROUTER.addLiquidityETH{value: msg.value}(
             address(this), 
