@@ -1170,9 +1170,9 @@ The exact magnitude of the price-manipulation attack would depend on the SOAR av
 
 #### Mitigation
 
-Since the Minter contract includes now a variable to keep track of the available SOAR to be purchased (`reservedSoar`), the best first mitigation is to keep the amount of SOAR to be purchased low. An attacker cannot steal the SOAR tokens that are not in the Minter contract. 
+1. Since the Minter contract includes now a variable to keep track of the available SOAR to be purchased (`reservedSoar`), the best first mitigation is to keep the amount of SOAR to be purchased low. An attacker cannot steal the SOAR tokens that are not in the Minter contract. 
 
-On top of that, since the attack involves updating the oracle price after manipulating the uniswap pool, the second recommended mitigation is to apply access control on the `UniswapV2Oracle.update()` function:
+2. On top of that, since the attack involves updating the oracle price after manipulating the uniswap pool, the second recommended mitigation is to apply access control on the `UniswapV2Oracle.update()` function:
 
 ```diff
 -   function update() external {
