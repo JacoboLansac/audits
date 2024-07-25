@@ -48,12 +48,6 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [G-5](<#g-5-soarstakingsetreward-makes-an-unnecessary-storage-read-of-an-already-in-memory-variable>)                                                                    | Gas      | `SoarStaking.setReward()` makes an unnecessary storage read of an already in-memory variable                                                                   | ✅ Resolved   |
 
 
-
-
-
-
-## Introduction
-
 ## Disclaimer
 
 A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
@@ -96,15 +90,20 @@ focus, but significant inefficiencies will also be reported.
 
 ## Scope
 
-- Draft delivery date: `2024-07-17`
-- Duration of the audit: 7 days
-- Commit hashes in scope:
-  - [d0b28c1d2bf20cd2ca1e3493f6ebada0c3fde4e1](https://github.com/meegalaxy/SoarContract/commit/d0b28c1d2bf20cd2ca1e3493f6ebada0c3fde4e1) (initial commit).
-  - [e976d0d69a7dafdf516f4fdc49225538020e4b06](https://github.com/meegalaxy/SoarContract/commit/e976d0d69a7dafdf516f4fdc49225538020e4b06) (updates in `Minter.sol`).
+- Main manual review:
+  - Draft delivery date: `2024-07-17`
+  - Duration of the audit: 7 days
+  - Commit hashes in scope:
+    - [d0b28c1d2bf20cd2ca1e3493f6ebada0c3fde4e1](https://github.com/meegalaxy/SoarContract/commit/d0b28c1d2bf20cd2ca1e3493f6ebada0c3fde4e1) (initial commit).
+    - [e976d0d69a7dafdf516f4fdc49225538020e4b06](https://github.com/meegalaxy/SoarContract/commit/e976d0d69a7dafdf516f4fdc49225538020e4b06) (updates in `Minter.sol`).
 
-### Mitigation review
-- [2827fef0d30b1c44dac82f22d233ca8b0fe4a73f](https://github.com/meegalaxy/SoarContract/commit/2827fef0d30b1c44dac82f22d233ca8b0fe4a73f)
-- [e96ee5400ed69ebe73ec76fe899e81cfd0ad56a6](https://github.com/meegalaxy/SoarContract/commit/e96ee5400ed69ebe73ec76fe899e81cfd0ad56a6)
+- Mitigation review
+  - Delivery date after mitigation review: `2024-07-25`
+  - Duration of mitigation review: 3 days
+  - Commit hashes:
+    - [2827fef0d30b1c44dac82f22d233ca8b0fe4a73f](https://github.com/meegalaxy/SoarContract/commit/2827fef0d30b1c44dac82f22d233ca8b0fe4a73f)
+    - [e96ee5400ed69ebe73ec76fe899e81cfd0ad56a6](https://github.com/meegalaxy/SoarContract/commit/e96ee5400ed69ebe73ec76fe899e81cfd0ad56a6)
+    - []() (final)
 
 ### Files in original scope
 
@@ -165,7 +164,7 @@ Team description of each contract:
 - The architecture is well organized and generally gas-efficient
 - Contracts have an acceptable level of inline comments, although some function doc strings are missing
 - The `Minter.sol` and `SoarStaknig.sol` are upgradeable contracts. However, **I do not endorse upgradeability on a staking contract holding user funds**, as it is an important centralization risk: rugpull of all staked tokens in case of malicious owner or compromised private keys. 
-
+- The Minter contract depends on a single oracle (which is TWAPed with 1h average prices). Single oracles are not generally recommended, but a valid attack path was not found after some fixes were implemented.
 
 # Findings
 
@@ -1171,7 +1170,9 @@ The exact magnitude of the price-manipulation attack would depend on the SOAR av
 
 #### Mitigation
 
-Apply access control on the `UniswapV2Oracle.update()` function:
+Since the Minter contract includes now a variable to keep track of the available SOAR to be purchased (`reservedSoar`), the best first mitigation is to keep the amount of SOAR to be purchased low. An attacker cannot steal the SOAR tokens that are not in the Minter contract. 
+
+On top of that, since the attack involves updating the oracle price after manipulating the uniswap pool, the second recommended mitigation is to apply access control on the `UniswapV2Oracle.update()` function:
 
 ```diff
 -   function update() external {
