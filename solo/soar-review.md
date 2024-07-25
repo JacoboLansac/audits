@@ -4,7 +4,7 @@
 
 A time-boxed security review of the [**Soar(no-link)**](nolink) protocol, with a focus on smart contract security and gas optimizations.
 
-Author: [**Jacopod**](https://twitter.com/jacolansac), independent security researcher.
+Author: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
 Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
 
 ## Findings Summary
@@ -25,7 +25,7 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [H-3](<#h-3-the-minter-contract-cannot-guarantee-solvency-because-purchases-are-allowed-regardless-of-the-soar-tokens-in-the-contracts-balance>)                         | High     | The Minter contract cannot guarantee solvency because purchases are allowed regardless of the SOAR tokens in the contract's balance                            | ✅ Resolved   |
 | [M-1](<#m-1-pending-claims-in-the-minter-will-become-blocked-again-if-new-purchases-are-made-before-claiming>)                                                           | Medium   | Pending claims in the Minter will become blocked again if new purchases are made before claiming                                                               | ✅ Resolved   |
 | [M-2](<#m-2-the-soarsol-and-liquiditysol-contracts-can-receive-eth-but-cannot-send-it-so-it-will-get-stuck-in-the-contract>)                                             | Medium   | The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract                                          | ✅ Resolved   |
-| [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-a-wrong-order-of-operands>)           | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to a wrong order of operands         | ✅ Resolved   |
+| [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-wrong-order-of-operands>)           | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to wrong order of operands         | ✅ Resolved   |
 | [M-4](<#m-4-the-deadline-of-liquiditymintnewposition-has-no-effect>)                                                                                                     | Medium   | The deadline of `Liquidity.mintNewPosition()` has no effect                                                                                                    | ✅ Resolved   |
 | [M-5](<#m-5-lack-of-input-validation-in-tax-setter-functions-can-halt-soar-token-transfers>)                                                                             | Medium   | Lack of input validation in tax setter functions can halt SOAR token transfers                                                                                 | ✅ Resolved   |
 | [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-set-as-high-tax-as-100>)                                                          | Medium   | Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%                                                             | ✅ Resolved   |
@@ -40,7 +40,7 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [L-7](<#l-7-some-state-changing-functions-do-not-emit-events>)                                                                                                           | Low      | Some state-changing functions do not emit events                                                                                                               | ✅ Resolved   |
 | [L-8](<#l-8-soaropentrading-can-be-called-before-the-taxreceiver-is-set-sending-fees-to-the-zero-address>)                                                               | Low      | Soar.openTrading() can be called before the `taxReceiver` is set, sending fees to the zero address                                                             | ✅ Resolved   |
 | [L-9](<#l-9-potential-reentrancy-attack-as-the-state-is-modified-after-an-external-call-in-soarstakinggetrewards>)                                                       | Low      | Potential reentrancy attack as the state is modified after an external call in `SoarStaking.getRewards()`                                                      | ✅ Resolved   |
-| [L-10](<#l-10-soar-token-might-have-integration-issues-with-other-protocols-because-contract-can-make-incomingoutgoing-transfers-revert>)                                | Low      | Soar token might have integration issues with other protocols because contract can make incoming/outgoing transfers revert                                     | Acknowledged |
+| [L-10](<#l-10-soar-token-might-have-integration-issues-with-other-protocols-because-the-contract-can-make-incomingoutgoing-transfers-revert>)                                | Low      | Soar token might have integration issues with other protocols because the contract can make incoming/outgoing transfers revert                                     | Acknowledged |
 | [G-1](<#g-1-the-updatereward-modifier-reads-rewardpertokenstored-storage-variable-multiple-times->)                                                                      | Gas      | The `updateReward()` modifier reads `rewardPerTokenStored` storage variable multiple times                                                                     | ✅ Resolved   |
 | [G-2](<#g-2-soar_shouldtaketax-makes-multiple-external-calls-and-storage-reads-making-the-token-transfers-unnecessarily-expensive>)                                      | Gas      | Soar._shouldTakeTax() makes multiple external calls and storage reads, making the token transfers unnecessarily expensive                                      | ✅ Resolved   |
 | [G-3](<#g-3-liquiditycreatenewposition-makes-unnecessary-external-calls-to-read-values-that-are-already-in-memory>)                                                      | Gas      | `Liquidity.createNewPosition()` makes unnecessary external calls to read values that are already in memory                                                     | ✅ Resolved   |
@@ -140,7 +140,7 @@ Team description of each contract:
 - Soar.sol: It's a token contract with max tx limit and tax.
 - SoarStaking.sol: It's Soar Staking and ETH reward contract.
 - Minter.sol: Users can purchase soar tokens with USDC based on Soar/ETH price. We transfer tokens to the minter contract and if users purchase, they get from the contract. 
-- Liquidity.sol: If users purchase tokens, we will have USDC. We swap some USDC to ETH and other tokens and add liquidity to the Uniswap v3 to get fees. We add these fees to the staking contract as a rewards.
+- Liquidity.sol: If users purchase tokens, we will have USDC. We swap some USDC to ETH and other tokens and add liquidity to the Uniswap v3 to get fees. We add these fees to the staking contract as rewards.
 
 ### Minter oracle
 
@@ -163,7 +163,7 @@ Team description of each contract:
 
 - The architecture is well organized and generally gas-efficient
 - Contracts have an acceptable level of inline comments, although some function doc strings are missing
-- The `Minter.sol` and `SoarStaknig.sol` are upgradeable contracts. However, **I do not endorse upgradeability on a staking contract holding user funds**, as it is an important centralization risk: rugpull of all staked tokens in case of malicious owner or compromised private keys. 
+- The `Minter.sol` and `SoarStaknig.sol` are upgradeable contracts. However, **I do not endorse upgradeability on a staking contract holding user funds**, as it is an important centralization risk: rugpull of all staked tokens in case of a malicious owner or compromised private keys. 
 - The Minter contract depends on a single oracle (which is TWAPed with 1h average prices). Single oracles are not generally recommended, but a valid attack path was not found after some fixes were implemented.
 
 # Findings
@@ -394,7 +394,7 @@ The Liquidity contract can swap between the assets  `_tokenIn` and `_tokenOut`. 
 
 By setting `amountOutMinimum = 0`, the slippage tolerance is hardcoded to 100%, meaning there is no slippage protection at all. 
 
-Note that sandwich attacks usually affect DEX users who set a relaxed slippage tolerance (1%, 2%, etc). In those cases, the value that the MEV actor can extract is not so large: only a small percentage of the traded volume. However, in this case, the slippage tolerance is virtually 100%, so the frontrunner could steal close to 100% of the traded value if he had enough wealth to push the price enough in the sandwich. 
+Note that sandwich attacks usually affect DEX users who set a relaxed slippage tolerance (1%, 2%, etc). In those cases, the value that the MEV actor can extract is not so large: only a small percentage of the traded volume. However, in this case, the slippage tolerance is virtually 100%, so the frontrunner could steal close to 100% of the traded value if he had enough wealth to push the price in the sandwich. 
 
 #### Impact
 
@@ -456,7 +456,7 @@ Enable extra input arguments that enable slippage and price impact protection. T
 
 ### [H-3] The Minter contract cannot guarantee solvency because purchases are allowed regardless of the SOAR tokens in the contract's balance
 
-When users purchase tokens in the Minter contract, they spend USDC, hoping that they will be able to claim the same value in SOAR tokens, with a certain delay. However, the `Minter.mint()` function does not verify that there are enough tokens in balance to be purchased. 
+When users purchase tokens in the Minter contract, they spend USDC, hoping that they will be able to claim the same value in SOAR tokens, with a certain delay. However, the `Minter.mint()` function does not verify enough tokens in balance to be purchased. 
 
 If the `claim()` function is called when there are not enough SOAR tokens in balance, the transaction will revert:
 
@@ -473,7 +473,7 @@ If the `claim()` function is called when there are not enough SOAR tokens in bal
     }
 ```
 
-The root cause is that there is no mechanism to control how many tokens a user can purchase. These controls should be based on the amount of tokens in balance (subtracting the ones that have been already purchased). 
+The root cause is that no mechanism controls how many tokens a user can purchase. These controls should be based on the amount of tokens in balance (subtracting the ones already purchased). 
 
 Note that the `Minter.recoverERC20()` is also affected by this issue, as the admins can withdraw already purchased SOAR tokens. 
 
@@ -645,7 +645,7 @@ contract Liquidity is IERC721Receiver, Ownable {
 
 
 
-### [M-3] `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to a wrong order of operands
+### [M-3] `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to wrong order of operands
 
 In the `setRewards()` function, there is an operation to update the tokens that are reserved for rewards, `rewardTokensLocked`:
 
@@ -795,7 +795,7 @@ The hardcoded deadline will have no effect, and the position can be minted at an
 #### Proof of concept
 
 - The contract admin calls `Liquidity.mintNewPosition()` at 16:00. The intention is that the tx is only valid if executed before 16:00 + 100 seconds. 
-- 2 h pass, `block.timestamp` is now 18:00. The transaction is executed, and the configured to `block.timestamp` + 100 seconds, which is 18:00+100 instead of 16:00+100 (as the dev intended). Therefore, the transaction went through, and the deadline was pretty much useless. 
+- 2 h pass, `block.timestamp` is now 18:00. The transaction is executed, and the deadline is configured to `block.timestamp` + 100 seconds, which is 18:00+100 instead of 16:00+100 (as the dev intended). Therefore, the transaction went through, and the deadline was pretty much useless. 
 
 #### Mitigation
 
@@ -899,7 +899,7 @@ If the `taxFee` is set to a higher value than `MULTIPLIER`, trading operations w
 
 #### Team Response: Resolved
 
-Resolved by with the same fix as for M-6. 
+Resolved with the same fix as for M-6. 
 
 --------------
 
@@ -912,7 +912,7 @@ Resolved by with the same fix as for M-6.
 
 
 
-### [M-6] Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%
+### [M-6] Lack of input validation in tax setter functions allows the contract owner to set the transfer fee as high as 100%
 
 In the Soar contract, the `taxFee` state variable is used to subtract the fee from the `amount` to be transferred. The `taxFee` is a percentage of `MULTIPLIER` (if `taxFee == MULTIPLIER`, then there is 100% tax). 
 
@@ -1033,7 +1033,7 @@ Therefore, the operations for adding/removing liquidity can be frontrun, changin
 
 Due to the lack of slippage protection in liquidity additions and removals, MEV actors can force liquidity to be added to the wrong range, or deny liquidity removals. 
 
-The likelihood is low, because it won't usually be a profitable attack, but solving it is trivial, so it is recommended. The team can still pass 0 to the newly added arguments, but still have the possibility of using the protection later on. 
+The likelihood is low because it won't usually be a profitable attack, but solving it is trivial, so it is recommended. The team can still pass 0 to the newly added arguments but still have the possibility of using the protection later on. 
 
 #### Mitigation
 
@@ -1166,7 +1166,7 @@ The likelihood of the attack is quite low for the following reasons:
 - Crafting the attack requires several assumptions: more than one SOAR liquidity pool, flashloans available in one of them, enough liquidity for these flashloans, etc
 
 
-The exact magnitude of the price-manipulation attack would depend on the SOAR available for flashloan, the liquidity available in the pool and the amount of SOAR that are avaiable for purchase. The attack will not always be profitable. 
+The exact magnitude of the price-manipulation attack would depend on the SOAR available for flashloan, the available liquidity in the pool and the amount of SOAR that is available for purchase. The attack will not always be profitable. 
 
 #### Mitigation
 
@@ -1190,7 +1190,7 @@ The exact magnitude of the price-manipulation attack would depend on the SOAR av
 
 #### Proof of concept
 
-*The below proof of concept is only a draft, because the team decided to apply the recommended mitigation even before finishing the proof of concept.*
+*Consider the below proof of concept only a draft because the team decided to apply the recommended mitigation even before finishing the proof of concept.*
 
 **Initial assumptions:**
 - There are two liquidity pools with SOAR:
@@ -1204,9 +1204,9 @@ The exact magnitude of the price-manipulation attack would depend on the SOAR av
   - receive SOAR from poolB
   - during the `uniswapV2Call()` callback:
     - sell SOAR in poolA, receiving WETH, and dumping SOAR price in oracle price source
-    - call `UniswapV2Oracle.update()`, which unpdates the underlying price of SOAR. **The effect of the price dump will be dampened by the 1h-averaging by a factor of 3600.**
+    - call `UniswapV2Oracle.update()`, which updates the underlying price of SOAR. **The effect of the price dump will be dampened by the 1h-averaging by a factor of 3600.**
     - purchase SOAR from the `Minter.mint()`, which reads the price from the oracle, at a **discount**
-  - payback the SOAR to the flashloan (plus fees)
+  - Pay back the SOAR to the flashloan (plus fees)
 
 
 ```javascript
@@ -1291,11 +1291,11 @@ The issue is that potential donations to the SOAR contract right before liquidit
 - It is probably a non-profitable attack because the donation would need to be large to significantly affect the price
 - Presumably, nobody besides the `owner` and seed investors will have SOAR tokens before adding the liquidity
 
-However, if there is such a wallet, with a large amount of tokens, and incentives to have a smaller starting price, performing the attack is rather trivial: frontrun the `openTrading()` function by donating a large amount of SOAR tokens. 
+However, if there is such a wallet, with a large number of tokens, and incentives to have a smaller starting price, performing the attack is rather trivial: frontrun the `openTrading()` function by donating a large amount of SOAR tokens. 
 
 #### Impact
 
-The launch price in the liquidity pool can be diminished by an interested frontrunner that has enough SOAR tokens to be donated for such a purpose. 
+The launch price in the liquidity pool can be diminished by an interested frontrunner who has enough SOAR tokens to be donated for such a purpose. 
 
 #### Proof of concept
 
@@ -1541,7 +1541,7 @@ Below is an example change for one of the functions above:
 #### Team Response: Resolved
 
 The suggested mitigation was applied to the two mentioned liquidity management functions. 
-However, the auditor missed to mention the same issue in the `mintNewPosition()` function.
+However, the auditor failed to mention the same issue in the `mintNewPosition()` function.
 
 Edit: Fully resolved, including the `mintNewPosition()` function. 
 
@@ -1626,7 +1626,7 @@ Affected functions:
 
 ### [L-8] Soar.openTrading() can be called before the `taxReceiver` is set, sending fees to the zero address
 
-When `openTrading()` is called, there is no requirement so that the `taxReceiver` has already been set. All fees from trades until `taxReceiver` is set will end in the zero address. 
+When `openTrading()` is called, there is no requirement that the `taxReceiver` has already been set. All fees from trades until `taxReceiver` is set will end in the zero address. 
 
 #### Impact
 
@@ -1713,7 +1713,7 @@ Never make external calls before all state variables of the current contract hav
 
 
 
-### [L-10] Soar token might have integration issues with other protocols because contract can make incoming/outgoing transfers revert
+### [L-10] Soar token might have integration issues with other protocols because the contract can make incoming/outgoing transfers revert
 
 Every token transfer that is not excluded from fees calls the internal function `_shouldTakeTax()`:
 
@@ -1771,7 +1771,7 @@ This means, that if `from` or `to` expose a malicious function called `token0()`
 
 #### Impact
 
-When integrating in other protocols that attempt to move tokens for a certain account, this account can block their transfers if it is beneficial for them. This becomes especially relevant in the case of liquidations, which a malicious account can block.
+When integrating with other protocols that attempt to move tokens for a certain account, this account can block their transfers if it is beneficial for them. This becomes especially relevant in the case of liquidations, which a malicious account can block.
 
 Note that this could also affect other future SOAR contracts that integrate with this SOAR token contract, not only lending/borrowing. But the existing contracts do not have this issue.  
 
@@ -1918,7 +1918,7 @@ There is an internal function called `_createDeposit()` which performs an extern
 
 @>      ) = nonfungiblePositionManager.positions(tokenId);
 
-        // set the owner and data for position
+        // set the owner and data for the position
         // operator is msg.sender
 @>      deposits[tokenId] = Deposit({
 @>          liquidity: liquidity,
