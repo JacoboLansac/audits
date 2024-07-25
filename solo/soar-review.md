@@ -28,7 +28,7 @@ During the security review, 2 critical, 4 high, and 8 medium risk issues were fo
 | [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-a-wrong-order-of-operands>)           | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to a wrong order of operands         | ✅ Resolved   |
 | [M-4](<#m-4-the-deadline-of-liquiditymintnewposition-has-no-effect>)                                                                                                     | Medium   | The deadline of `Liquidity.mintNewPosition()` has no effect                                                                                                    | ✅ Resolved   |
 | [M-5](<#m-5-lack-of-input-validation-in-tax-setter-functions-can-halt-soar-token-transfers>)                                                                             | Medium   | Lack of input validation in tax setter functions can halt SOAR token transfers                                                                                 | ✅ Resolved   |
-| [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-set-as-high-tax-as-100>)                                                          | Medium   | Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%                                                             | ✅ Resolved   |
+| [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-to-set-the-transfer-fee-as-high-as-100>)                                | Medium     | Lack of input validation in tax setter functions allows the contract owner to set the transfer fee as high as 100%                                     | ✅ Resolved        |
 | [M-7](<#m-7-lack-of-slippage-protection-in-liquidity-management-functions-can-result-in-lost-value-for-the-protocol-when-addingremoving-liquidity>)                      | Medium   | Lack of slippage protection in liquidity management functions can result in lost value for the protocol when adding/removing liquidity                         | ✅ Resolved   |
 | [M-8](<#m-8-the-minter-contract-could-be-vulnerable-to-a-price-manipulation-attack-allowing-an-attacker-to-purchase-soar-tokens-at-a-discount>)                | Medium     | The Minter contract could be vulnerable to a price-manipulation attack, allowing an attacker to purchase SOAR tokens at a discount                     | ✅ Resolved        |
 | [L-1](<#l-1-soaropentrading-could-be-frontrun-to-alter-the-launching-price>)                                                                                             | Low      | Soar.OpenTrading could be frontrun to alter the launching price                                                                                                | ✅ Resolved   |
@@ -911,8 +911,7 @@ Resolved by with the same fix as for M-6.
 
 
 
-
-### [M-6] Lack of input validation in tax setter functions allows the contract owner set as high tax as 100%
+### [M-6] Lack of input validation in tax setter functions allows the contract owner to set the transfer fee as high as 100%
 
 In the Soar contract, the `taxFee` state variable is used to subtract the fee from the `amount` to be transferred. The `taxFee` is a percentage of `MULTIPLIER` (if `taxFee == MULTIPLIER`, then there is 100% tax). 
 
