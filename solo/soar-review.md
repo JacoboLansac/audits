@@ -1,4 +1,4 @@
-# PinLink security review
+# SOAR security review
 
 ***Preliminar version, 2024-07-15***
 
@@ -103,8 +103,8 @@ focus, but significant inefficiencies will also be reported.
   - Commit hashes:
     - [2827fef0d30b1c44dac82f22d233ca8b0fe4a73f](https://github.com/meegalaxy/SoarContract/commit/2827fef0d30b1c44dac82f22d233ca8b0fe4a73f)
     - [e96ee5400ed69ebe73ec76fe899e81cfd0ad56a6](https://github.com/meegalaxy/SoarContract/commit/e96ee5400ed69ebe73ec76fe899e81cfd0ad56a6)
-    - [81277e7ef9903b16ac311a3e3bc05fc351b3a9ff](https://github.com/meegalaxy/SoarContract/commit/81277e7ef9903b16ac311a3e3bc05fc351b3a9ff) '
-    - (final)
+    - [81277e7ef9903b16ac311a3e3bc05fc351b3a9ff](https://github.com/meegalaxy/SoarContract/commit/81277e7ef9903b16ac311a3e3bc05fc351b3a9ff)
+    - [bd267d8306918f0f53b0eeb8dc22622f3f6917eb](https://github.com/meegalaxy/SoarContract/commit/bd267d8306918f0f53b0eeb8dc22622f3f6917eb) (final)
 
 ### Files in original scope
 
