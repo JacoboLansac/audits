@@ -1,8 +1,8 @@
 # SOAR security review
 
-***Preliminar version, 2024-07-15***
+***Preliminary version, 2024-07-15***
 
-A time-boxed security review of the [**Soar(no-link)**](nolink) protocol, with a focus on smart contract security and gas optimizations.
+A time-boxed security review of the **Soar** protocol, with a focus on smart contract security and gas optimizations.
 
 Author: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
 Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
