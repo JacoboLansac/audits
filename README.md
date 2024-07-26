@@ -1,5 +1,8 @@
 # Security-reviews
 
+## 2024 - July
+- [SoarFi protocol](solo/soar-review.md). Full security review
+
 ## 2024 - May
 - [PinLink protocol](solo/pinlink-phase1-audit.md). Full security review
 - [TaiNet Protocol](solo/tai-net-ytao.md). Full security review
