@@ -19,14 +19,14 @@ During the security review, 2 critical, 3 high, and 8 medium, and 10 low risk is
 | Finding                                                                                                                                                      | Severity | Description                                                                                                                                          | Status       |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :----------- |
 | [C-1](<#c-1-users-can-claim-from-the-minter-multiple-times-draining-the-contract-of-soar-tokens>)                                                            | Critical | Users can claim from the Minter multiple times, draining the contract of SOAR tokens                                                                 | ✅ Resolved   |
-| [C-2](<#c-2-wrong-scaling-of-decimals-in-oracle-price-allows-users-to-purchase-soar-for-free-from-the-mintersol>)                                            | Critical | Wrong scaling of decimals in oracle price allows users to purchase SOAR for free from the `Minter.sol                                                | ✅ Resolved   |
+| [C-2](<#c-2-wrong-scaling-of-decimals-in-oracle-price-allows-users-to-purchase-soar-for-free-from-the-mintersol>)                                            | Critical | Wrong scaling of decimals in oracle price allows users to purchase SOAR for free from the `Minter.sol`                                                | ✅ Resolved   |
 | [H-1](<#h-1-the-staking-contract-will-become-insolvent-if-recovernonlockedrewardtokens-is-called>)                                                           | High     | The staking contract will become insolvent if `recoverNonLockedRewardTokens()` is called                                                             | ✅ Resolved   |
 | [H-2](<#h-2-lack-of-slippage-protection-in-liquidityswap-can-result-in-significant-loss-of-value>)                                                           | High     | Lack of slippage protection in `Liquidity.swap()` can result in significant loss of value                                                            | ✅ Resolved   |
 | [H-3](<#h-3-the-minter-contract-cannot-guarantee-solvency-because-purchases-are-allowed-regardless-of-the-soar-tokens-in-the-contracts-balance>)             | High     | The Minter contract cannot guarantee solvency because purchases are allowed regardless of the SOAR tokens in the contract's balance                  | ✅ Resolved   |
 | [M-1](<#m-1-pending-claims-in-the-minter-will-become-blocked-again-if-new-purchases-are-made-before-claiming>)                                               | Medium   | Pending claims in the Minter will become blocked again if new purchases are made before claiming                                                     | ✅ Resolved   |
-| [M-2](<#m-2-the-soarsol-and-liquiditysol-contracts-can-receive-eth-but-cannot-send-it-so-it-will-get-stuck-in-the-contract>)                                 | Medium   | The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract                                | ✅ Resolved   |
-| [M-3](<#m-3-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-wrong-order-of-operands>) | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to wrong order of operands | ✅ Resolved   |
-| [M-4](<#m-4-the-deadline-of-liquiditymintnewposition-has-no-effect>)                                                                                         | Medium   | The deadline of `Liquidity.mintNewPosition()` has no effect                                                                                          | ✅ Resolved   |
+| [M-2](<#m-2-soarstakingsetrewards-can-revert-under-certain-circumstances-blocking-the-admin-from-setting-new-reward-periods-due-to-wrong-order-of-operands>) | Medium   | `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to wrong order of operands | ✅ Resolved   |
+| [M-3](<#m-3-the-deadline-of-liquiditymintnewposition-has-no-effect>)                                                                                         | Medium   | The deadline of `Liquidity.mintNewPosition()` has no effect                                                                                          | ✅ Resolved   |
+| [M-4](<#m-4-the-soarsol-and-liquiditysol-contracts-can-receive-eth-but-cannot-send-it-so-it-will-get-stuck-in-the-contract>)                                 | Medium   | The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract                                | ✅ Resolved   |
 | [M-5](<#m-5-lack-of-input-validation-in-tax-setter-functions-can-halt-soar-token-transfers>)                                                                 | Medium   | Lack of input validation in tax setter functions can halt SOAR token transfers                                                                       | ✅ Resolved   |
 | [M-6](<#m-6-lack-of-input-validation-in-tax-setter-functions-allows-the-contract-owner-to-set-the-transfer-fee-as-high-as-100>)                              | Medium   | Lack of input validation in tax setter functions allows the contract owner to set the transfer fee as high as 100%                                   | ✅ Resolved   |
 | [M-7](<#m-7-lack-of-slippage-protection-in-liquidity-management-functions-can-result-in-lost-value-for-the-protocol-when-addingremoving-liquidity>)          | Medium   | Lack of slippage protection in liquidity management functions can result in lost value for the protocol when adding/removing liquidity               | ✅ Resolved   |
@@ -610,47 +610,9 @@ No changes were applied to the smart contracts, but the team will show warnings 
 
 --------------
 
-### [M-2] The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract
-
-The `Soar` and `Liquidity` contracts implement the payable `receive()` function, which allows ether transfers into the contract:
-
-```javascript
-    receive() external payable {
-```
-
-However, once the ether arrives at both contracts, there is no way for the ether to leave them. Therefore, any ether arriving will be forever lost. 
-
-Note: the `Soar.openTrading()` function transfers ether to the Uniswap pool. However, this ether doesn't come from the Soar token contract, but from the `msg.value` of the caller of `openTrading()`. So the ether in the contract balance is still stuck. 
-
-#### Impact
-
-Any ether received by the `Soar.sol` or `Liquidity.sol` contracts will be forever lost, stuck in the contract's balance.
-
-#### Mitigation
-
-I would remove the `receive()` function from both contracts as there is no need to handle ether, besides the `Soar.openTrading()` function, which is already payable.
-
-```diff
-contract Soar is ERC20, Ownable {
-    // ...
--   receive() external payable {
-```
-
-```diff
-contract Liquidity is IERC721Receiver, Ownable {
-    // ...
--   receive() external payable {
-```
-
-#### Team Response: Resolved
-
---------------
 
 
-
-
-
-### [M-3] `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to wrong order of operands
+### [M-2] `SoarStaking.setRewards()` can revert under certain circumstances, blocking the admin from setting new reward periods due to wrong order of operands
 
 In the `setRewards()` function, there is an operation to update the tokens that are reserved for rewards, `rewardTokensLocked`:
 
@@ -744,7 +706,7 @@ Invert the order of operands so that the subtraction is only done at the end:
 
 
 
-### [M-4] The deadline of `Liquidity.mintNewPosition()` has no effect
+### [M-3] The deadline of `Liquidity.mintNewPosition()` has no effect
 
 When minting a new position via the `Liquidity` contract, the deadline is hardcoded to `block.timestamp + 100`:
 
@@ -850,6 +812,44 @@ The hardcoded deadline will have no effect, and the position can be minted at an
 #### Team Response: Resolved
 
 ------------------
+
+
+
+### [M-4] The `Soar.sol` and `Liquidity.sol` contracts can receive ETH, but cannot send it so it will get stuck in the contract
+
+The `Soar` and `Liquidity` contracts implement the payable `receive()` function, which allows ether transfers into the contract:
+
+```javascript
+    receive() external payable {
+```
+
+However, once the ether arrives at both contracts, there is no way for the ether to leave them. Therefore, any ether arriving will be forever lost. 
+
+Note: the `Soar.openTrading()` function transfers ether to the Uniswap pool. However, this ether doesn't come from the Soar token contract, but from the `msg.value` of the caller of `openTrading()`. So the ether in the contract balance is still stuck. 
+
+#### Impact
+
+Any ether received by the `Soar.sol` or `Liquidity.sol` contracts will be forever lost, stuck in the contract's balance.
+
+#### Mitigation
+
+I would remove the `receive()` function from both contracts as there is no need to handle ether, besides the `Soar.openTrading()` function, which is already payable.
+
+```diff
+contract Soar is ERC20, Ownable {
+    // ...
+-   receive() external payable {
+```
+
+```diff
+contract Liquidity is IERC721Receiver, Ownable {
+    // ...
+-   receive() external payable {
+```
+
+#### Team Response: Resolved
+
+--------------
 
 
 
