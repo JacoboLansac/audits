@@ -1534,7 +1534,7 @@
         <mxCell id="_8pgDUT177RIIZ457hOx-80" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;curveFitting=1;jiggle=2;" parent="_8pgDUT177RIIZ457hOx-79" vertex="1">
           <mxGeometry width="240" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="_8pgDUT177RIIZ457hOx-81" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;EVault (WETH)&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;- set as Controller&amp;nbsp;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;curveFitting=1;jiggle=2;" parent="_8pgDUT177RIIZ457hOx-79" vertex="1">
+        <mxCell id="_8pgDUT177RIIZ457hOx-81" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;EVault (WETH)&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;- set as Controller of BorrowAndLend&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;curveFitting=1;jiggle=2;" parent="_8pgDUT177RIIZ457hOx-79" vertex="1">
           <mxGeometry x="10" y="10" width="220" height="40" as="geometry" />
         </mxCell>
         <mxCell id="_8pgDUT177RIIZ457hOx-82" value="borrow()&amp;nbsp;&lt;b style=&quot;background-color: initial;&quot;&gt;callThroughEVC&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;sketch=1;curveFitting=1;jiggle=2;" parent="_8pgDUT177RIIZ457hOx-79" vertex="1">
@@ -1589,7 +1589,7 @@
           <mxGeometry x="8" y="31.5" width="120" height="30.5" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-1" value="" style="group;rounded=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1" connectable="0">
-          <mxGeometry x="1460.5" y="4010" width="189.5" height="45" as="geometry" />
+          <mxGeometry x="1472.5" y="4010" width="189.5" height="45" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;curveFitting=1;jiggle=2;" parent="XkXo50envI1S_drhT-zp-1" vertex="1">
           <mxGeometry width="189.5" height="45" as="geometry" />
@@ -1598,7 +1598,7 @@
           <mxGeometry x="7.895833333333333" y="16.46153846153846" width="173.70833333333331" height="13.846153846153847" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-6" value="" style="group;rounded=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1" connectable="0">
-          <mxGeometry x="1460.5" y="4066.63" width="189.5" height="45" as="geometry" />
+          <mxGeometry x="1472.5" y="4066.63" width="189.5" height="45" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-7" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;curveFitting=1;jiggle=2;" parent="XkXo50envI1S_drhT-zp-6" vertex="1">
           <mxGeometry width="189.5" height="45" as="geometry" />
@@ -1607,7 +1607,7 @@
           <mxGeometry x="9.475" y="16.46153846153846" width="173.70833333333331" height="13.846153846153847" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-9" value="" style="group;rounded=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1" connectable="0">
-          <mxGeometry x="1450" y="4256.030000000001" width="194" height="45" as="geometry" />
+          <mxGeometry x="1469" y="4256.030000000001" width="194" height="45" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;curveFitting=1;jiggle=2;" parent="XkXo50envI1S_drhT-zp-9" vertex="1">
           <mxGeometry width="194" height="45" as="geometry" />
@@ -1616,7 +1616,7 @@
           <mxGeometry x="8.083333333333334" y="16.46153846153846" width="177.83333333333334" height="13.846153846153847" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-12" value="" style="group;rounded=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1" connectable="0">
-          <mxGeometry x="1450" y="4196.030000000001" width="194" height="45" as="geometry" />
+          <mxGeometry x="1469" y="4196.030000000001" width="194" height="45" as="geometry" />
         </mxCell>
         <mxCell id="XkXo50envI1S_drhT-zp-13" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;curveFitting=1;jiggle=2;" parent="XkXo50envI1S_drhT-zp-12" vertex="1">
           <mxGeometry width="194" height="45" as="geometry" />
