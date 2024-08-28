@@ -1,5 +1,9 @@
 # Security-reviews
 
+## 2024 - August
+- [Origami - Flexi swapper extension](solo/origami/origami-flexi-swapper-review.md). Two small additions to two contracts.
+- [Origami - Morpho flashloan provider](). (Small extension, No issues found)
+
 ## 2024 - July
 - [SoarFi protocol](solo/soar-review.md). Full security review
 
