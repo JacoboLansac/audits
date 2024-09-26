@@ -74,6 +74,7 @@ The second part of the attack is about getting the assets out of the vault. The 
 1. Do not bypass the inflation-protection mechanism, even when `totalSupply==0`. 
 2. Require a minimum deposit amount.
 3. Revert if minted shares are 0 (to protect `alice`). I think this should be in place no matter what other mitigations are implemented.
+4. Mint a small amount of shares to a dead address at deployment ($1 worth should be enough)
 
 We can discuss further options. 
 
