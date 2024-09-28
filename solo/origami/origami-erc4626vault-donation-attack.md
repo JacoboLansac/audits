@@ -13,7 +13,7 @@ Donation attacks are fairly common knowledge in the context of smart contract se
     }
 ```
 
-Even when the value of `_decimalsOffset()` is set to 0 (which is the default value), adding `+1` in both numerator and denominator makes the attack inprofitable. Even though the shares _can_ be inflated, the inflated value is not accessible by the attacker and is effectively lost. So there is a very high risk for the attacker, and therefore the likelyhood of the attack is very low.
+Even when the value of `_decimalsOffset()` is set to 0 (which is the default value), adding `+1` in both numerator and denominator makes the attack unprofitable. Even though the shares _can_ be inflated, the inflated value is not accessible by the attacker and is effectively lost. So there is a very high risk for the attacker, and therefore the likelyhood of the attack is very low.
 
 However, `OrigamiErc4626` has a small modification in those two critical functions that bypass this protection mechanism in an special scenario: when `_totalSupply==0`.
 
@@ -36,7 +36,7 @@ However, `OrigamiErc4626` has a small modification in those two critical functio
 
 ## Impact: medium/high
 
-Once the vault is deployed, an attacker can frontrun the first honest depositor, and steal the full deposit of the victim. The attack can be repeated for multiple multiple "first" depositors. 
+Once the vault is deployed, an attacker can frontrun the first honest depositor, and steal the full deposit of the victim. The attack can be repeated for multiple "first" depositors. 
 
 Pre-conditions for the attack:
 - `OrigamiErc4626` is deployed
