@@ -48,10 +48,10 @@ In other words, the bytes produced by some combinations of (address, unit256), c
 When this happens, the `_lzReceive()`  will revert with an EVM error, unable to mint the tokens in the destination chain or notify the origin chain. In these situations, the user teleporting the tokens effectively loses the funds, as they were burned in the origin chain. 
 
 
-## Impact: high/medium
+## Impact: medium
 
 For certain combinations of `(address to ,uint amount)`, the teleported tokens will be burned in the origin chain but won't be minted in the destination chain, i.e., user funds are lost.
-- Likelihood: medium (?)
+- Likelihood: low
 - Impact: High
 
 ## Mitigation
