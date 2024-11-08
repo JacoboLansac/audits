@@ -31,7 +31,7 @@ found.
 A security researcher holds no
 responsibility for the findings provided in this document. A security review is not an endorsement of the underlying
 business or product and can never be taken as a guarantee that the protocol is bug-free. This security review is focused
-solely on the security aspects of the javascript implementation of the contracts. Gas optimizations are not the main
+solely on the security aspects of the solidity implementation of the contracts. Gas optimizations are not the main
 focus, but significant inefficiencies will also be reported.
 
 ## Risk classification
@@ -132,7 +132,7 @@ However, during the course of the audit the deam changed strategy and the deploy
 
 The `TempleTeleporter.teleport()` function uses `abi.encodePacked()` when creating the `_payload` that will be sent via Layer Zero `_lzSend()`:
 
-```javascript
+```solidity
     function teleport(
         uint32 dstEid,
         address to,
@@ -154,7 +154,7 @@ The `TempleTeleporter.teleport()` function uses `abi.encodePacked()` when creati
 
 When the `_payload` is received on the destination chain, the `_lzReceive()` function processes the payload, decoding it with `abi.decode()`:
 
-```javascript
+```solidity
     function _lzReceive(
         Origin calldata /*_origin*/,
         bytes32 /*_guid*/,
@@ -170,7 +170,7 @@ When the `_payload` is received on the destination chain, the `_lzReceive()` fun
 
 The issue is that the output bytes from `abi.encodePacked()` cannot always be decoded reliably because it removes padding (to be more gas efficient) and this can lead to collisions.
 In other words, the bytes produced by some combinations of (address, unit256), can be decoded into more than one pair of those types. Illustrative example of collision with `abi.encodePacked` with simple strings:
-```javascript
+```solidity
 abi.encodePacked("a", "bc") == abi.encodePacked("ab", "c") // Both produce "abc", which is ambiguous when decoding.
 ```
 
@@ -218,8 +218,8 @@ Here are two tests.
 - The first one uses `abi.encodePacked()`, and will revert as soon as it finds a collision (very fast most likely).
 - The second one uses `abi.encode()`, which won't fail regardless of the number of fuzz runs.
 
-```javascript
-pragma javascript 0.8.19;
+```solidity
+pragma solidity 0.8.19;
 
 import {Test, console} from "lib/forge-std/src/Test.sol";
 
@@ -294,7 +294,7 @@ contract EncodingTests is Test {
 
 The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. However, a compromised address with the right permissions could call this function and make the contract insolvent.
 
-```javascript
+```solidity
     function notifyDistribution(uint256 amount) external override {
         if (msg.sender != address(templeGold) && !isElevatedAccess(msg.sender, msg.sig)) { revert CommonEventsAndErrors.InvalidAccess(); }
         /// @notice Temple Gold contract mints TGLD amount to contract before calling `notifyDistribution`
@@ -328,7 +328,7 @@ Note however, that there is no economic incentive for `ElevatedAccess` to make t
 
 ### [Z-2] The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever
 
-```javascript
+```solidity
     function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
         unstakeCooldown = _period;
         emit UnstakeCooldownSet(_period);
@@ -337,7 +337,7 @@ Note however, that there is no economic incentive for `ElevatedAccess` to make t
 
 This function has no constraints. ElevatedAccess can block tokens forever and never let users withdraw by setting a very long `unstakeCooldown` period, because the period is not set at the moment of staking, but at the moment of unstaking:
 
-```javascript
+```solidity
     function withdraw(uint256 amount, bool claimRewards) external override whenNotPaused {
         /// @dev Check here so migrationWithdraw can skip this in emergency cases
 >>>     uint256 unstakeTime = stakeTimes[msg.sender] + unstakeCooldown;
@@ -394,7 +394,7 @@ Consider adding a `MAX_UNSTAKE_COOLDOWN` constant variable, and a requirement su
 
 In `TempleGoldStaking`, the migrator has clearly a lot of power over user funds as it can withdraw stakes, and it therefore is a centralization weakpoint:
 
-```javascript
+```solidity
     function migrateWithdraw(address staker) external override onlyMigrator returns (uint256) {
         if (staker == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
         uint256 stakerBalance = _balances[staker];
@@ -444,7 +444,7 @@ The function `SpiceAuction.burnAndNotify()` is payable to pay for fees of the un
 
 However, when the function is called in the `mintChainId`, there is no need to call LayerZero, and the `ITempleGold.burn()` function is invoked. After that, the function returns without returning unused ether to the caller. Therefore, any `msg.value` sent in this chain is donated to the contract.
 
-```javascript
+```solidity
     function _burnAndNotify(uint256 amount, address from, bool useContractEth) private {
         // pull funds from bids recipient (set in config)
         IERC20(templeGold).safeTransferFrom(from, address(this), amount);
@@ -529,7 +529,7 @@ Don't allow `msg.value > 0` in the mint chain:
 
 There is no requirement that the auction configs have been set:
 
-```javascript
+```solidity
     function startAuction() external override {
         if (auctionStarter != address(0) && msg.sender != auctionStarter) { revert CommonEventsAndErrors.InvalidAccess(); }
         EpochInfo storage prevAuctionInfo = epochs[_currentEpochId];
@@ -568,7 +568,7 @@ It is important to note that if this scenario occurr, it limits significantly th
 
 Small proof of code that the auction can actually be started without configs that can be added to `test/forge/templegold/DaiGoldAuction.t.sol`:
 
-```javascript
+```solidity
 contract DaiGoldAuction_POCs_Test is DaiGoldAuctionTestBase {
 
 	function test_startAuction_canBeCalledBeforeConfigsAreSet() public {
@@ -690,7 +690,7 @@ Note: the team decided during the course of the audit to change the deployment c
 In TempleGold, the token transfers are handled by the inherited OFT, which inherits ERC20, which uses the `_update()` method to update balances on transfers.
 The `_update()` method is overridden by TempleGold by only allowing transferring tokens to whitelisted addresses in the `authorized` mapping:
 
-```javascript
+```solidity
     function _update(address from, address to, uint256 value) internal override {
         /// can only transfer to or from whitelisted addreess
         /// @dev skip check on mint and burn. function `send` checks from == to
@@ -704,7 +704,7 @@ The `_update()` method is overridden by TempleGold by only allowing transferring
 When transfers are done cross-chain the `send()` function is used. This function calls `_debit()`, (who calls `_update()`, which is the one checking the `authorized` mapping). However, the `_debit()` function is only called **after** the requirement `msg.sender != _to`. Therefore, trying to send TGLD cross chain to a different address will revert even before reading if the `msg.sender` is `authorized` inside `_update()`.
 
 
-```javascript
+```solidity
     function send(
         SendParam calldata _sendParam,
         MessagingFee calldata _fee,
