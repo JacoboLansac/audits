@@ -209,6 +209,7 @@ For certain combinations of `(address to ,uint amount)`, the teleported tokens w
 
 ```
 
+
 No changes are required in the `_lzReceive()` as both packing methods pack into the same datatype type (bytes).
 
 
@@ -357,11 +358,11 @@ A compormised Elevated access with the right power can lock all staked funds in 
 Consider adding a `MAX_UNSTAKE_COOLDOWN` constant variable, and a requirement such as:
 
 ```diff
-	// ...
+    // ...
 +   uint256 constant MAX_UNSTAKE_COOLDOWN = 4 weeks;
 
     function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
-+ 		if (_period > MAX_UNSTAKE_COOLDOWN) revert("too long");	
++       if (_period > MAX_UNSTAKE_COOLDOWN) revert("too long");    
         unstakeCooldown = _period;
         emit UnstakeCooldownSet(_period);
     }
@@ -496,7 +497,7 @@ Don't allow `msg.value > 0` in the mint chain:
         IERC20(templeGold).safeTransferFrom(from, address(this), amount);
         // burn directly and call TempleGold to update circulating supply
         if (block.chainid == _mintChainId) {
-+			if (msg.value > 0) revert("no eth needed");
++            if (msg.value > 0) revert("no eth needed");
             ITempleGold(templeGold).burn(amount);
             return;
         }
@@ -571,25 +572,25 @@ Small proof of code that the auction can actually be started without configs tha
 ```solidity
 contract DaiGoldAuction_POCs_Test is DaiGoldAuctionTestBase {
 
-	function test_startAuction_canBeCalledBeforeConfigsAreSet() public {
-		IDaiGoldAuction.AuctionConfig memory config = daiGoldAuction.getAuctionConfig();
+    function test_startAuction_canBeCalledBeforeConfigsAreSet() public {
+        IDaiGoldAuction.AuctionConfig memory config = daiGoldAuction.getAuctionConfig();
 
-		assertEq(config.auctionsTimeDiff, 0);
-		assertEq(config.auctionStartCooldown, 0);
-		assertEq(config.auctionMinimumDistributedGold, 0);
+        assertEq(config.auctionsTimeDiff, 0);
+        assertEq(config.auctionStartCooldown, 0);
+        assertEq(config.auctionMinimumDistributedGold, 0);
 
-		vm.prank(executor);
-		daiGoldAuction.startAuction();
+        vm.prank(executor);
+        daiGoldAuction.startAuction();
 
-		// we can see that the startTime is already set by reading the auction info
-		IAuctionBase.EpochInfo memory info = daiGoldAuction.getEpochInfo(1);
-		assertEq(info.startTime, block.timestamp);
+        // we can see that the startTime is already set by reading the auction info
+        IAuctionBase.EpochInfo memory info = daiGoldAuction.getEpochInfo(1);
+        assertEq(info.startTime, block.timestamp);
 
-		// as the cooldown is 0, bids can happen right away
-		vm.startPrank(alice);
-		bidToken.approve(address(daiGoldAuction), type(uint).max);
-		daiGoldAuction.bid(100 ether);
-	}
+        // as the cooldown is 0, bids can happen right away
+        vm.startPrank(alice);
+        bidToken.approve(address(daiGoldAuction), type(uint).max);
+        daiGoldAuction.bid(100 ether);
+    }
 }
 ```
 
@@ -728,7 +729,7 @@ When transfers are done cross-chain the `send()` function is used. This function
             _sendParam.minAmountLD,
             _sendParam.dstEid
         );
-		// ...
+        // ...
 
 ```
 
@@ -815,12 +816,12 @@ Given that this function will probably be one that will be executed more times o
 
 The change would look something like this:
 ```diff
-	modifier updateReward(address _account) {
+    modifier updateReward(address _account) {
 -       rewardData.rewardPerTokenStored = uint216(_rewardPerToken());
 +       uint216 rewardPerTokenCached = uint216(_rewardPerToken());
 +       rewarddata.rewardPerTokenStored = rewardPerTokenCached;
 
-		// ...
+        // ...
 
 -       claimableRewards[_account] = _earned(_account);
 +       claimableRewards[_account] = _earned(_account, rewardPerTokenCached);  // save a lot of gas here
@@ -832,10 +833,10 @@ The change would look something like this:
 And of course you have to redefine the `_earned()` function to accept the new argument:
 
 ```diff
-	function _earned(
-		address _account,
+    function _earned(
+        address _account,
 +       uint256 rewardPerToken
-	) internal view returns (uint256) {
+    ) internal view returns (uint256) {
 -       return _balances[_account] * (_rewardPerToken() - userRewardPerTokenPaid[_account]) / 1e18
 - claimableRewards[_account];
 +       return _balances[_account] * (rewardPerToken - userRewardPerTokenPaid[_account]) / 1e18
