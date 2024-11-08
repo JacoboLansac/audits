@@ -177,7 +177,7 @@ abi.encodePacked("a", "bc") == abi.encodePacked("ab", "c") // Both produce "abc"
 When this happens, the `_lzReceive()`  will revert with an EVM error, unable to mint the tokens in the destination chain or notify the origin chain. In these situations, the user teleporting the tokens effectively loses the funds, as they were burned in the origin chain.
 
 
-#### Impact: medium
+#### Risk: medium
 
 For certain combinations of `(address to ,uint amount)`, the teleported tokens will be burned in the origin chain but won't be minted in the destination chain, i.e., user funds are lost.
 - Likelihood: low
@@ -291,9 +291,9 @@ contract EncodingTests is Test {
 
 
 
-### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the tokens.
+### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the amount
 
-The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. However, a compromised address with the right permissions could call this function and make the contract insolvent.
+The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. 
 
 ```solidity
     function notifyDistribution(uint256 amount) external override {
@@ -303,6 +303,23 @@ The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. 
         emit GoldDistributionNotified(amount, block.timestamp);
     }
 ```
+
+However, a compromised wallet with the right permissions could call this function and make the contract insolvent, because `nextAuctionGoldAmount` is what determins the `TGLD` that is being auctioned. If the amount is aucitoned, but the tokens aren't in the contract balance, the contract is insolvent.
+
+```solidity
+    function startAuction() external override {
+        // ...
+        _distributeGold();
+>>>     uint256 totalGoldAmount = nextAuctionGoldAmount;
+        nextAuctionGoldAmount = 0;
+        uint256 epochId = _currentEpochId = _currentEpochId + 1;
+        // ...
+    }
+```
+
+#### Risk: low/med
+- probability: low
+- impact: high
 
 Note however, that there is no economic incentive for `ElevatedAccess` to make the contract insolvency, besides pure evil.
 
@@ -409,6 +426,10 @@ Even though the protocol has good intentions some of the following things could 
 - The person in charge of deploying the migrator contract is malicious (very unlikely)
 - The migrator has a bug, which can be exploited, affecting this staking contract as well (less unlikely)
 
+#### Risk: low/med
+- probability: low
+- impact: high
+
 #### Mitigation
 
 A way of mitigating this would be to set access control in the `setMigrator()` function so that only the DAO can set the migrator. With this, we give some time to users/tech-geeks to review the new migrator contract before accepting.
@@ -486,6 +507,9 @@ However, when the function is called in the `mintChainId`, there is no need to c
         }
     }
 ```
+#### Risk: low
+- probability: low
+- impact: low
 
 #### Mitigation
 
@@ -497,13 +521,13 @@ Don't allow `msg.value > 0` in the mint chain:
         IERC20(templeGold).safeTransferFrom(from, address(this), amount);
         // burn directly and call TempleGold to update circulating supply
         if (block.chainid == _mintChainId) {
-+            if (msg.value > 0) revert("no eth needed");
++           if (msg.value > 0) revert("no eth needed");
             ITempleGold(templeGold).burn(amount);
             return;
         }
 ```
 
-#### Team response
+#### Team response: Fixed
 
 
 
@@ -567,6 +591,12 @@ The team won't start an auction without configs but if `auctionStarter == addres
 
 It is important to note that if this scenario occurr, it limits significantly the time period where the mistake can be fixed and new configs can be added, so it might require a new contract deployment, but I don't see user funds at risk anywhere.
 
+#### Risk: low
+- probability: low
+- impact: medium
+
+#### Proof of code
+
 Small proof of code that the auction can actually be started without configs that can be added to `test/forge/templegold/DaiGoldAuction.t.sol`:
 
 ```solidity
@@ -619,6 +649,10 @@ If not setup correctly, the `teleport()` function will burn the tokens in the or
 
 Luckily, the team has mint rights, so an affected user could notify the team and get compensated.
 
+#### Risk: low
+- probability: low
+- impact: high
+
 
 #### Mitigation
 
@@ -626,7 +660,9 @@ There isn't a solution that can be implemented at the contract level. However, i
 
 It is a nasty scenario that shouldn't ever occur, but I want to bring the attention so that it is included in the deployment plans.
 
+#### Team response: Acknowledged
 
+The team took note and appreciated the heads up. They will incorporate this info in their deployment plan. 
 
 
 
@@ -658,6 +694,8 @@ Which is misleading, because the minting functions would actually revert.
 Note: other functions could also have the  `onlyArbitrum` modifier for consistency, if they are functions related to the minting logic (`setStaking()`, `setDaiGoldAuction()`, `setTeamGnosis()`, ...), but it is not important
 
 #### Risk: low
+- probability: low
+- impact: low
 
 #### Team response: fixed
 
@@ -733,39 +771,14 @@ When transfers are done cross-chain the `send()` function is used. This function
 
 ```
 
-#### Impact: low
+#### Risk: low
 
 Whitelisted addresses cannot transfer TGLD tokens to a different address cross-chain.
 To transfer tokens cross-chain, smart-contracts need to transfer the tokens first to an EOA (or gnosis safe), then do the `send()` to send it to the same address cross-chain, and then transfer it to the final destination.
 
-#### Proof of code
-
-TBD if requested.
-
-#### Team response: ack
+#### Team response: Invalid
 
 The team only intends to use the `authorized` mapping for whitelisting contracts in each chain, not cross-chain.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -797,6 +810,7 @@ The team only intends to use the `authorized` mapping for whitelisting contracts
 
 Cache the variable in memory.
 
+#### Team response: Fixed
 
 
 
@@ -844,7 +858,7 @@ And of course you have to redefine the `_earned()` function to accept the new ar
 }
 ```
 
-
+#### Team response: Fixed
 
 
 
@@ -892,6 +906,7 @@ And therefore the output becomes
 
 So you might as well return `rewardData.rewardPerTokenStored` directly and save some gas.
 
+#### Team response: Fixed
 
 
 
