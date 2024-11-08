@@ -77,7 +77,7 @@ protocol is affected.
 
 
 Note: the system was thought to be deployed on the Arbitrum chain, and the commit hash for the review aligns with that. 
-However, during the course of the audit the deam changed strategy and the deployment of most contracts will happen in mainnet. This is reflected in the mitigation review. 
+However, during the audit, the team changed strategy and most contracts will be deployed in mainnet. This is reflected in the mitigation review. 
 
 ### Files in original scope
 
@@ -97,8 +97,8 @@ However, during the course of the audit the deam changed strategy and the deploy
 
 ## Protocol Overview
 
-- Temple Gold (TGLD) is an ERC20 that can be earned either by staking into the TempleGoldStaking contract, or by bidding into the DaiGoldAuction contract. 
-- TGLD is non-transferrable
+- Temple Gold (TGLD) is an ERC20 that can be earned by staking into the TempleGoldStaking contract or bidding into the DaiGoldAuction contract. 
+- TGLD is non-transferable
 - TGLD can be bridged over Layer Zero to other chains when the team deploys there
 - Temple can be bridged between chains using the TempleTeleporter contract
 - The Spice Auctions are meant to auction volatile tokens by bidding Temple Gold. After the auctions are complete, the TGLD bid can be burned
@@ -168,7 +168,7 @@ When the `_payload` is received on the destination chain, the `_lzReceive()` fun
 ```
 
 The issue is that the output bytes from `abi.encodePacked()` cannot always be decoded reliably because it removes padding (to be more gas efficient) and this can lead to collisions.
-In other words, the bytes produced by some combinations of (address, unit256), can be decoded into more than one pair of those types. Illustrative example of collision with `abi.encodePacked` with simple strings:
+In other words, the bytes produced by some combinations of (address, unit256), can be decoded into more than one pair of those types. An illustrative example of collision with `abi.encodePacked` with simple strings:
 ```solidity
 abi.encodePacked("a", "bc") == abi.encodePacked("ab", "c") // Both produce "abc", which is ambiguous when decoding.
 ```
@@ -215,7 +215,7 @@ No changes are required in the `_lzReceive()` as both packing methods pack into 
 #### Proof of Code
 
 Here are two tests.
-- The first one uses `abi.encodePacked()`, and will revert as soon as it finds a collision (very fast most likely).
+- The first one uses `abi.encodePacked()`, and will revert when it finds a collision (very fast most likely).
 - The second one uses `abi.encode()`, which won't fail regardless of the number of fuzz runs.
 
 ```solidity
@@ -303,7 +303,7 @@ The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`.
     }
 ```
 
-However, a compromised wallet with the right permissions could call this function and make the contract insolvent, because `nextAuctionGoldAmount` is what determins the `TGLD` that is being auctioned. If the amount is aucitoned, but the tokens aren't in the contract balance, the contract is insolvent.
+However, a compromised wallet with the right permissions could call this function and make the contract insolvent, because `nextAuctionGoldAmount` determines the `TGLD` being auctioned. If the amount is auctioned, but the tokens aren't in the contract balance, the contract is insolvent.
 
 ```solidity
     function startAuction() external override {
@@ -320,7 +320,7 @@ However, a compromised wallet with the right permissions could call this functio
 - probability: low
 - impact: high
 
-Note however, that there is no economic incentive for `ElevatedAccess` to make the contract insolvency, besides pure evil.
+Note, however, that there is no economic incentive for `ElevatedAccess` to make the contract insolvency, besides pure evil.
 
 #### Team response: Acknowledged
 
@@ -409,7 +409,7 @@ Consider adding a `MAX_UNSTAKE_COOLDOWN` constant variable, and a requirement su
 
 ### [Z-3] The migrator in `TempleGoldStaking` has too much power to be configured without any control
 
-In `TempleGoldStaking`, the migrator has clearly a lot of power over user funds as it can withdraw stakes, and it therefore is a centralization weakpoint:
+In `TempleGoldStaking`, the migrator has a lot of power over user funds as it can withdraw stakes, and it, therefore, is a centralization weak point:
 
 ```solidity
     function migrateWithdraw(address staker) external override onlyMigrator returns (uint256) {
@@ -584,9 +584,9 @@ There is no requirement that the auction configs have been set:
 The auctions could be started with all the `AuctionConfig` fields set to zero, which would have the following consequences:
 - auctionsTimeDiff = 0  >>> startAuction() can be called right away
 - auctionStartCooldown = 0  >>> auction starts right after startAuction is called
-- auctionMinimumDistributedGold = 0  >>> an auction can start even if there are no TempleGold to distribute, which makes the auction pretty useless.
+- auctionMinimumDistributedGold = 0  >>> An auction can start even if there are no TempleGold to distribute, which makes the auction pretty useless.
 
-The team won't start an auction without configs but if `auctionStarter == address(0)` , anyone could do it (by mistake or as a greifing attack, because I don't see any economic incentives). So either include a small `require`, or don't set `auctionStarter=address(0)` until configs have been set.
+The team won't start an auction without configs but if `auctionStarter == address(0)`, anyone could do it (by mistake or as a griefing attack, because I don't see any economic incentives). So either include a small `require`, or don't set `auctionStarter=address(0)` until configs have been set.
 
 It is important to note that if this scenario occurr, it limits significantly the time period where the mistake can be fixed and new configs can be added, so it might require a new contract deployment, but I don't see user funds at risk anywhere.
 
@@ -596,7 +596,7 @@ It is important to note that if this scenario occurr, it limits significantly th
 
 #### Proof of code
 
-Small proof of code that the auction can actually be started without configs that can be added to `test/forge/templegold/DaiGoldAuction.t.sol`:
+A small proof of code that the auction can be started without configs that can be added to `test/forge/templegold/DaiGoldAuction.t.sol`:
 
 ```solidity
 contract DaiGoldAuction_POCs_Test is DaiGoldAuctionTestBase {
@@ -642,9 +642,9 @@ Require that any of the auction configs has a non-zero value (because they are a
 ### [L-3] If the `TempleTeleporter` is not set as a valid minter of `TempleERC20` token in all chains, teleported tokens will be lost
 
 
-Even if the TempleTeleporter contracts in both chains are wired up correctly via layer zero, for correct functioning of the system the `TempleTeleporter` needs minting rights.
+Even if the TempleTeleporter contracts in both chains are wired up correctly via layer zero, the `TempleTeleporter` needs minting rights for the correct functioning of the system.
 
-If not setup correctly, the `teleport()` function will burn the tokens in the origin chain, send the message via LayerZero, but in the destination chain `tempe.mint()` will revert due to the lack of minting rights. As there is no way to communicate back to the origin chain that the transaction reverted, the caller will effectively lose his funds.
+If not set up correctly, the `teleport()` function will burn the tokens in the origin chain, and send the message via LayerZero, but in the destination chain `tempe.mint()` will revert due to the lack of minting rights. As there is no way to communicate back to the origin chain that the transaction reverted, the caller will effectively lose his funds.
 
 Luckily, the team has mint rights, so an affected user could notify the team and get compensated.
 
@@ -661,7 +661,7 @@ It is a nasty scenario that shouldn't ever occur, but I want to bring the attent
 
 #### Team response: Acknowledged
 
-The team took note and appreciated the heads up. They will incorporate this info in their deployment plan. 
+The team took note and appreciated the heads-up. They will incorporate this info into their deployment plan. 
 
 
 
@@ -690,7 +690,7 @@ If `setVestingFactor()` is called in a chain that is not the mint-chain for TGLD
 
 Which is misleading, because the minting functions would actually revert.
 
-Note: other functions could also have the  `onlyArbitrum` modifier for consistency, if they are functions related to the minting logic (`setStaking()`, `setDaiGoldAuction()`, `setTeamGnosis()`, ...), but it is not important
+Note: other functions could also have the  `onlyArbitrum` modifier for consistency if they are functions related to the minting logic (`setStaking()`, `setDaiGoldAuction()`, `setTeamGnosis()`, ...), but it is not important
 
 #### Risk: low
 - probability: low
@@ -773,7 +773,7 @@ When transfers are done cross-chain the `send()` function is used. This function
 #### Risk: low
 
 Whitelisted addresses cannot transfer TGLD tokens to a different address cross-chain.
-To transfer tokens cross-chain, smart-contracts need to transfer the tokens first to an EOA (or gnosis safe), then do the `send()` to send it to the same address cross-chain, and then transfer it to the final destination.
+To transfer tokens cross-chain, smart contracts need to transfer the tokens first to an EOA (or gnosis safe), then do the `send()` to send it to the same address cross-chain, and then transfer it to the final destination.
 
 #### Team response: Invalid
 
@@ -801,7 +801,7 @@ The team only intends to use the `authorized` mapping for whitelisting contracts
 
 ## Gas optimizations
 
-### [G-1] Variables that are read more than once inside the same function should be cached into memory
+### [G-1] Variables that are read more than once inside the same function should be cached in memory
 
 - The function `DaiGoldAuction::startAuction()` reads from storage `_currenEpochId` 3 times.
 - The function `DaiGoldAuction::setAuctionConfig()` reads from storage `_currentEpochId` 2 times.
@@ -843,7 +843,7 @@ The change would look something like this:
 }
 ```
 
-And of course you have to redefine the `_earned()` function to accept the new argument:
+And of course, you have to redefine the `_earned()` function to accept the new argument:
 
 ```diff
     function _earned(
@@ -924,7 +924,7 @@ So you might as well return `rewardData.rewardPerTokenStored` directly and save 
 - Incorrect naming of
 - Unused declared state variables in `TempleGoldStaking`: `periodFinish` and `lastUpdateTime`
 - Rename `_totalBurnedFromSpiceAuctions` to `_totalBurned` as not only the Spice auctions can burn tokens
-- In the auction contracts, it would be very handly to expose `epochLib.isActive()` in a view function to quickly see if the current auction is active or not.
-- Everytime `recoverToken()` is called, that epoch becomes a ghost auction with everything set at 0. This happens because `recoverToken()` only deletes `epoch[i]` but doesn't change `currentEpochId`, and then when `startAuction()` is called, the `epochId` of the new auction is `i+1`. So auction `i` is left as a ghost auction.
-- `SpiceAuction` needed to have the `lzReceiveExecutorGas` updated to match the new gas ussage after the latest changes.
+- In the auction contracts, it would be very handy to expose `epochLib.isActive()` in a view function to quickly see if the current auction is active or not.
+- Every time `recoverToken()` is called, that epoch becomes a ghost auction with everything set at 0. This happens because `recoverToken()` only deletes `epoch[i]` but doesn't change `currentEpochId`, and then when `startAuction()` is called, the `epochId` of the new auction is `i+1`. So auction `i` is left as a ghost auction.
+- `SpiceAuction` needed to have the `lzReceiveExecutorGas` updated to match the new gas usage after the latest changes.
 - The function `EpocLib::hasStarted()` is not used anywhere and can be removed
