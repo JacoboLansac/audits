@@ -69,13 +69,14 @@ protocol is affected.
 - Start date: `2024-10-13`
 - End date: `2024-11-06`
 - Effective total time: `48 hours`
-- Commit hash in scope:
-- [e20676d37c452f1405cbe91d39943c0322a6478e](https://github.com/TempleDAO/temple/pull/990/commits/e20676d37c452f1405cbe91d39943c0322a6478e)
+- Commit hash in scope: [e20676d37c452f1405cbe91d39943c0322a6478e](https://github.com/TempleDAO/temple/pull/990/commits/e20676d37c452f1405cbe91d39943c0322a6478e)
 
 - **Mitigation review**
 - Mitigation review delivery date: `2024-11-07`
-- Commit hash:
-- [73c5e8bb0b3ebb622e454137b8a1302792f11457](https://github.com/TempleDAO/temple/pull/990/commits/73c5e8bb0b3ebb622e454137b8a1302792f11457)
+- Commit hash: [73c5e8bb0b3ebb622e454137b8a1302792f11457](https://github.com/TempleDAO/temple/pull/990/commits/73c5e8bb0b3ebb622e454137b8a1302792f11457)
+
+Note: the system was thought to be deployed on the Arbitrum chain, and the commit hash for the review aligns with that. 
+However, during the course of the audit the deam changed strategy and the deployment of most contracts will happen in mainnet. This is reflected in the mitigation review. 
 
 ### Files in original scope
 
@@ -95,16 +96,16 @@ protocol is affected.
 
 ## Protocol Overview
 
-> TBD
+- Temple Gold (TGLD) is an ERC20 that can be earned either by staking into the TempleGoldStaking contract, or by bidding into the DaiGoldAuction contract. 
+- TGLD is non-transferrable
+- TGLD can be bridged over Layer Zero to other chains when the team deploys there
+- Temple can be bridged between chains using the TempleTeleporter contract
+- The Spice Auctions are meant to auction volatile tokens by bidding Temple Gold. After the auctions are complete, the TGLD bid can be burned
 
-Note: the team decided during the course of the audit to change the deployment chain from arbitrum to mainnet.
+<br>
 
-## Architecture high level review
-
-- The architecture is well organized and generally gas-efficient
-- Contracts have an acceptable level of inline comments, although some function doc strings are missing
-- The `Minter.sol` and `SoarStaknig.sol` are upgradeable contracts. However, **I do not endorse upgradeability on a staking contract holding user funds**, as it is an important centralization risk: rugpull of all staked tokens in case of a malicious owner or compromised private keys.
-- The Minter contract depends on a single oracle (which is TWAPed with 1h average prices). Single oracles are not generally recommended, but a valid attack path was not found after some fixes were implemented.
+------------------------
+------------------------
 
 # Findings
 
@@ -294,14 +295,7 @@ assertEq(inputValue, decodedValue);
 
 
 
-
-
-
-
-
-
-
-### [X-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the tokens.
+### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the tokens.
 
 The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. However, a compromised address with the right permissions could call this function and make the contract insolvent.
 
@@ -333,7 +327,7 @@ Note however, that there is no economic incentive for `ElevatedAccess` to make t
 
 
 
-### [X-2] The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever
+### [Z-2] The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever
 
 ```solidity
 function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
@@ -396,7 +390,7 @@ emit UnstakeCooldownSet(_period);
 
 
 
-### [X-3] The migrator in `TempleGoldStaking` has too much power to be configured without any control
+### [Z-3] The migrator in `TempleGoldStaking` has too much power to be configured without any control
 
 In `TempleGoldStaking`, the migrator has clearly a lot of power over user funds as it can withdraw stakes, and it therefore is a centralization weakpoint:
 
