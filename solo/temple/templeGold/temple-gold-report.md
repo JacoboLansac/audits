@@ -9,20 +9,19 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 | Finding | Severity | Description | Status |
 | :--- | :--- | :--- | :--- |
-| [[M-1]](<#m-1-temple-tokens-can-be-lost-forever-in-the-teleporter-for-certain-combinations-of-the-amount-and-destination-address>) | Medium | Temple Tokens can be lost forever in the Teleporter for certain combinations of the amount and destination address |  |
-| [[X-1]](<#x-1-elevatedaccess-can-make-the-daigoldauction-contract-insolvent-by-calling-notifydistribution-without-transfering-the-tokens>) | Centralization | ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the tokens. |  |
-| [[X-2]](<#x-2-the-function-templegoldstakingsetunstakecooldown-has-no-restrictions-and-elevated-access-can-lock-staked-funds-forever>) | Centralization | The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and Elevated access can lock staked funds forever |  |
-| [[X-3]](<#x-3-the-migrator-in-templegoldstaking-has-too-much-power-to-be-configured-without-any-control>) | Centralization | The migrator in `TempleGoldStaking` has too much power to be configured without any control |  |
-| [[L-1]](<#l-1-any-msgvalue-sent-to-spiceauctionburnandnotify-will-be-donated-to-the-contract-and-not-returned-to-the-caller-if-invoked-in-the-minting-chain>) | Low | Any `msg.value` sent to `SpiceAuction.burnAndNotify()` will be donated to the contract and not returned to the caller if invoked in the minting chain |  |
-| [[L-2]](<#l-2-it-is-possible-to-call-daigoldauctionstartauction-before-setting-the-configs>) | Low | It is possible to call `DaiGoldAuction.startAuction()` before setting the configs |  |
-| [[L-3]](<#l-3-if-the-templeteleporter-is-not-set-as-a-valid-minter-of-templeerc20-token-in-all-chains-teleported-tokens-will-be-lost>) | Low | If the `TempleTeleporter` is not set as a valid minter of `TempleERC20` token in all chains, teleported tokens will be lost |  |
-| [[L-4]](<#l-4-the-function-setvestingfactor-should-have-the-onlyarbitrum-modifier-to-avoid-misleading-outputs-from-other-view-functions>) | Low | The function `setVestingFactor()` should have the `onlyArbitrum` modifier to avoid misleading outputs from other view functions |  |
-| [[L-5]](<#l-5-the-transfers-whitelisting-mechanism-in-templegold-does-not-work-cross-chain>) | Low | The transfers-whitelisting mechanism in TempleGold does not work cross-chain. |  |
-| [[G-1]](<#g-1-variables-that-are-read-more-than-once-inside-the-same-function-should-be-cached-into-memory>) | Gas | Variables that are read more than once inside the same function should be cached into memory |  |
-| [[G-2]](<#g-2-the-updaterewards-makes-a-duplicated-call-to-_rewardpertoken-while-the-output-should-not-change-in-between-calls>) | Gas | The `updateRewards()` makes a duplicated call to `_rewardPerToken()` while the output should not change in between calls |  |
-| [[G-3]](<#g-3-some-logic-can-be-skipped-in-_rewardpertoken-when-lastupdatetime--periodfinish-to-save-gas>) | Gas | Some logic can be skipped in `_rewardPerToken()` when `lastUpdateTime == periodFinish` to save gas |  |
-| [[I-1]](<#i-1-informational-issues--best-practices>) | Info | Informational issues / best practices |  |
-
+| [[M-1]](<#m-1-temple-tokens-can-be-lost-forever-in-the-templeteleporter-for-certain-combinations-of-the-amount-and-destination-address>) | Medium | Temple Tokens can be lost forever in the TempleTeleporter for certain combinations of the amount and destination address | ✅ fixed |
+| [[Z-1]](<#z-1-elevatedaccess-can-make-the-daigoldauction-contract-insolvent-by-calling-notifydistribution-without-transfering-the-amount>) | Centralization | ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the amount | 🤝 acknowledged |
+| [[Z-2]](<#z-2-the-function-templegoldstakingsetunstakecooldown-has-no-restrictions-and-elevatedaccess-can-lock-staked-funds-forever>) | Centralization | The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever | ✅ fixed |
+| [[Z-3]](<#z-3-the-migrator-in-templegoldstaking-has-too-much-power-to-be-configured-without-any-control>) | Centralization | The migrator in `TempleGoldStaking` has too much power to be configured without any control | ✅ fixed |
+| [[L-1]](<#l-1-any-msgvalue-sent-to-spiceauctionburnandnotify-will-be-donated-to-the-contract-and-not-returned-to-the-caller-if-invoked-in-the-minting-chain>) | Low | Any `msg.value` sent to `SpiceAuction.burnAndNotify()` will be donated to the contract and not returned to the caller if invoked in the minting chain | ✅ fixed |
+| [[L-2]](<#l-2-it-is-possible-to-call-daigoldauctionstartauction-before-setting-the-configs>) | Low | It is possible to call `DaiGoldAuction.startAuction()` before setting the configs |   |
+| [[L-3]](<#l-3-if-the-templeteleporter-is-not-set-as-a-valid-minter-of-templeerc20-token-in-all-chains-teleported-tokens-will-be-lost>) | Low | If the `TempleTeleporter` is not set as a valid minter of `TempleERC20` token in all chains, teleported tokens will be lost | 🤝 acknowledged |
+| [[L-4]](<#l-4-the-function-setvestingfactor-should-have-the-onlyarbitrum-modifier-to-avoid-misleading-outputs-from-other-view-functions>) | Low | The function `setVestingFactor()` should have the `onlyArbitrum` modifier to avoid misleading outputs from other view functions | ✅ fixed |
+| [[L-5]](<#l-5-the-transfers-whitelisting-mechanism-in-templegold-does-not-work-cross-chain>) | Low | The transfers-whitelisting mechanism in TempleGold does not work cross-chain. |  invalid |
+| [[G-1]](<#g-1-variables-that-are-read-more-than-once-inside-the-same-function-should-be-cached-into-memory>) | Gas | Variables that are read more than once inside the same function should be cached into memory | ✅ fixed |
+| [[G-2]](<#g-2-the-updaterewards-makes-a-duplicated-call-to-_rewardpertoken-while-the-output-should-not-change-in-between-calls>) | Gas | The `updateRewards()` makes a duplicated call to `_rewardPerToken()` while the output should not change in between calls | ✅ fixed |
+| [[G-3]](<#g-3-some-logic-can-be-skipped-in-templegoldstaking_rewardpertoken-when-lastupdatetime--periodfinish-to-save-gas>) | Gas | Some logic can be skipped in `TempleGoldStaking._rewardPerToken()` when `lastUpdateTime == periodFinish` to save gas | ✅ fixed |
+| [[I-1]](<#i-1-informational-issues--best-practices>) | Info | Informational issues / best practices |   |
 ## Disclaimer
 
 A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
