@@ -31,7 +31,7 @@ found.
 A security researcher holds no
 responsibility for the findings provided in this document. A security review is not an endorsement of the underlying
 business or product and can never be taken as a guarantee that the protocol is bug-free. This security review is focused
-solely on the security aspects of the Solidity implementation of the contracts. Gas optimizations are not the main
+solely on the security aspects of the javascript implementation of the contracts. Gas optimizations are not the main
 focus, but significant inefficiencies will also be reported.
 
 ## Risk classification
@@ -132,7 +132,7 @@ However, during the course of the audit the deam changed strategy and the deploy
 
 The `TempleTeleporter.teleport()` function uses `abi.encodePacked()` when creating the `_payload` that will be sent via Layer Zero `_lzSend()`:
 
-```solidity
+```javascript
     function teleport(
         uint32 dstEid,
         address to,
@@ -142,18 +142,19 @@ The `TempleTeleporter.teleport()` function uses `abi.encodePacked()` when creati
         if (amount == 0) { revert CommonEventsAndErrors.ExpectedNonZero(); }
         if (to == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
         // Encodes the message before invoking _lzSend.
->>>     bytes memory _payload = abi.encode(to.addressToBytes32(), amount);
+>>>     bytes memory _payload = abi.encodePacked(to.addressToBytes32(), amount);
         // debit
         temple.burnFrom(msg.sender, amount);
         emit TempleTeleported(dstEid, msg.sender, to, amount);
 
         receipt = _lzSend(dstEid, _payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
     }
+
 ```
 
 When the `_payload` is received on the destination chain, the `_lzReceive()` function processes the payload, decoding it with `abi.decode()`:
 
-```solidity
+```javascript
     function _lzReceive(
         Origin calldata /*_origin*/,
         bytes32 /*_guid*/,
@@ -169,7 +170,7 @@ When the `_payload` is received on the destination chain, the `_lzReceive()` fun
 
 The issue is that the output bytes from `abi.encodePacked()` cannot always be decoded reliably because it removes padding (to be more gas efficient) and this can lead to collisions.
 In other words, the bytes produced by some combinations of (address, unit256), can be decoded into more than one pair of those types. Illustrative example of collision with `abi.encodePacked` with simple strings:
-```solidity
+```javascript
 abi.encodePacked("a", "bc") == abi.encodePacked("ab", "c") // Both produce "abc", which is ambiguous when decoding.
 ```
 
@@ -188,24 +189,24 @@ For certain combinations of `(address to ,uint amount)`, the teleported tokens w
 - Only use `abi.encodePacked` if gas optimization is critical AND you're sure your inputs won't collide
 
 ```diff
-	function teleport(
-		uint32 dstEid,
-		address to,
-		uint256 amount,
-		bytes calldata options
-	) external payable override returns(MessagingReceipt memory receipt) {
-		if (amount == 0) { revert CommonEventsAndErrors.ExpectedNonZero(); }
-		if (to == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
-		// Encodes the message before invoking _lzSend.
+    function teleport(
+        uint32 dstEid,
+        address to,
+        uint256 amount,
+        bytes calldata options
+    ) external payable override returns(MessagingReceipt memory receipt) {
+        if (amount == 0) { revert CommonEventsAndErrors.ExpectedNonZero(); }
+        if (to == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
+        // Encodes the message before invoking _lzSend.
 -       bytes memory _payload = abi.encodePacked(to.addressToBytes32(), amount);
 +       bytes memory _payload = abi.encode(to.addressToBytes32(), amount);
-		// debit
-		temple.burnFrom(msg.sender, amount);
-		emit TempleTeleported(dstEid, msg.sender, to, amount);
+        // debit
+        temple.burnFrom(msg.sender, amount);
+        emit TempleTeleported(dstEid, msg.sender, to, amount);
 
-		receipt = _lzSend(dstEid, _payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
-		// ...
-	}
+        receipt = _lzSend(dstEid, _payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
+    }
+
 ```
 
 No changes are required in the `_lzReceive()` as both packing methods pack into the same datatype type (bytes).
@@ -217,39 +218,39 @@ Here are two tests.
 - The first one uses `abi.encodePacked()`, and will revert as soon as it finds a collision (very fast most likely).
 - The second one uses `abi.encode()`, which won't fail regardless of the number of fuzz runs.
 
-```solidity
-pragma solidity 0.8.19;
+```javascript
+pragma javascript 0.8.19;
 
 import {Test, console} from "lib/forge-std/src/Test.sol";
 
 contract EncodingTests is Test {
-	/// For the sake of being as close as possible to the actual implementation,
-	/// we encode the address as a bytes32 using the same function from LZ as the TempleTeleporter
-	function addressToBytes32(address _addr) internal pure returns (bytes32) {
-		return bytes32(uint256(uint160(_addr)));
-	}
+    /// For the sake of being as close as possible to the actual implementation,
+    /// we encode the address as a bytes32 using the same function from LZ as the TempleTeleporter
+    function addressToBytes32(address _addr) internal pure returns (bytes32) {
+        return bytes32(uint256(uint160(_addr)));
+    }
 
-	function testEncodePacked(address inputAddress, uint256 inputValue) public {
-		bytes memory data = abi.encodePacked(addressToBytes32(inputAddress), inputValue);
+    function testEncodePacked(address inputAddress, uint256 inputValue) public {
+        bytes memory data = abi.encodePacked(addressToBytes32(inputAddress), inputValue);
 
-		(address decodedAddress, uint256 decodedValue) = abi.decode(data, (address, uint256));
+        (address decodedAddress, uint256 decodedValue) = abi.decode(data, (address, uint256));
 
-		// These assertions will some times fail,
-		// For instance for the pair (0xfBaA208935a3cb0bFC2C0663F43f1e38B229DB4F, 55928329213096)
-		// This can be double-checked with chisel
-		assertEq(inputAddress, decodedAddress);
-		assertEq(inputValue, decodedValue);
-	}
+        // These assertions will some times fail, 
+        // For instance for the pair (0xfBaA208935a3cb0bFC2C0663F43f1e38B229DB4F, 55928329213096)
+        // This can be double-checked with chisel
+        assertEq(inputAddress, decodedAddress);
+        assertEq(inputValue, decodedValue);
+    }
 
-	function testEncode_Strict(address inputAddress, uint256 inputValue) public {
-		bytes memory data = abi.encode(addressToBytes32(inputAddress), inputValue);
+    function testEncode_Strict(address inputAddress, uint256 inputValue) public {
+        bytes memory data = abi.encode(addressToBytes32(inputAddress), inputValue);
 
-		(address decodedAddress, uint256 decodedValue) = abi.decode(data, (address, uint256));
+        (address decodedAddress, uint256 decodedValue) = abi.decode(data, (address, uint256));
 
-		// These assertions will never fail, because the encoding is done in an uneqivocal way
-		assertEq(inputAddress, decodedAddress);
-		assertEq(inputValue, decodedValue);
-	}
+        // These assertions will never fail, because the encoding is done in an uneqivocal way
+        assertEq(inputAddress, decodedAddress);
+        assertEq(inputValue, decodedValue);
+    }
 }
 ```
 
@@ -293,13 +294,13 @@ contract EncodingTests is Test {
 
 The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. However, a compromised address with the right permissions could call this function and make the contract insolvent.
 
-```solidity
-	function notifyDistribution(uint256 amount) external override {
-		if (msg.sender != address(templeGold) && !isElevatedAccess(msg.sender, msg.sig)) { revert CommonEventsAndErrors.InvalidAccess(); }
-		/// @notice Temple Gold contract mints TGLD amount to contract before calling `notifyDistribution`
->>>>	nextAuctionGoldAmount += amount;
-		emit GoldDistributionNotified(amount, block.timestamp);
-	}
+```javascript
+    function notifyDistribution(uint256 amount) external override {
+        if (msg.sender != address(templeGold) && !isElevatedAccess(msg.sender, msg.sig)) { revert CommonEventsAndErrors.InvalidAccess(); }
+        /// @notice Temple Gold contract mints TGLD amount to contract before calling `notifyDistribution`
+>>>     nextAuctionGoldAmount += amount;
+        emit GoldDistributionNotified(amount, block.timestamp);
+    }
 ```
 
 Note however, that there is no economic incentive for `ElevatedAccess` to make the contract insolvency, besides pure evil.
@@ -327,22 +328,22 @@ Note however, that there is no economic incentive for `ElevatedAccess` to make t
 
 ### [Z-2] The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever
 
-```solidity
-	function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
-		unstakeCooldown = _period;
-		emit UnstakeCooldownSet(_period);
-	}
+```javascript
+    function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
+        unstakeCooldown = _period;
+        emit UnstakeCooldownSet(_period);
+    }
 ```
 
 This function has no constraints. ElevatedAccess can block tokens forever and never let users withdraw by setting a very long `unstakeCooldown` period, because the period is not set at the moment of staking, but at the moment of unstaking:
 
-```solidity
-	function withdraw(uint256 amount, bool claimRewards) external override whenNotPaused {
-		/// @dev Check here so migrationWithdraw can skip this in emergency cases
->>>>    uint256 unstakeTime = stakeTimes[msg.sender] + unstakeCooldown;
-		if (unstakeTime > block.timestamp) { revert UnstakeCooldown(block.timestamp, unstakeTime); }
-		_withdrawFor(msg.sender, msg.sender, amount, claimRewards, msg.sender);
-	}
+```javascript
+    function withdraw(uint256 amount, bool claimRewards) external override whenNotPaused {
+        /// @dev Check here so migrationWithdraw can skip this in emergency cases
+>>>     uint256 unstakeTime = stakeTimes[msg.sender] + unstakeCooldown;
+        if (unstakeTime > block.timestamp) { revert UnstakeCooldown(block.timestamp, unstakeTime); }
+        _withdrawFor(msg.sender, msg.sender, amount, claimRewards, msg.sender);
+    }
 ```
 
 #### Risk: low
@@ -357,13 +358,13 @@ Consider adding a `MAX_UNSTAKE_COOLDOWN` constant variable, and a requirement su
 
 ```diff
 	// ...
-	+   uint256 constant MAX_UNSTAKE_COOLDOWN = 4 weeks;
++   uint256 constant MAX_UNSTAKE_COOLDOWN = 4 weeks;
 
-	function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
-+       if (_periot > MAX_UNSTAKE_COOLDOWN) revert("Too long.");
-		unstakeCooldown = _period;
-		emit UnstakeCooldownSet(_period);
-	}
+    function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
++ 		if (_period > MAX_UNSTAKE_COOLDOWN) revert("too long");	
+        unstakeCooldown = _period;
+        emit UnstakeCooldownSet(_period);
+    }
 ```
 
 #### Team response: Fixed
@@ -393,13 +394,13 @@ Consider adding a `MAX_UNSTAKE_COOLDOWN` constant variable, and a requirement su
 
 In `TempleGoldStaking`, the migrator has clearly a lot of power over user funds as it can withdraw stakes, and it therefore is a centralization weakpoint:
 
-```solidity
-function migrateWithdraw(address staker) external override onlyMigrator returns (uint256) {
-	if (staker == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
-	uint256 stakerBalance = _balances[staker];
-	_withdrawFor(staker, msg.sender, stakerBalance, true, staker);
-	return stakerBalance;
-}
+```javascript
+    function migrateWithdraw(address staker) external override onlyMigrator returns (uint256) {
+        if (staker == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
+        uint256 stakerBalance = _balances[staker];
+        _withdrawFor(staker, msg.sender, stakerBalance, true, staker);
+        return stakerBalance;
+    }
 ```
 
 Even though the protocol has good intentions some of the following things could happen:
@@ -443,45 +444,46 @@ The function `SpiceAuction.burnAndNotify()` is payable to pay for fees of the un
 
 However, when the function is called in the `mintChainId`, there is no need to call LayerZero, and the `ITempleGold.burn()` function is invoked. After that, the function returns without returning unused ether to the caller. Therefore, any `msg.value` sent in this chain is donated to the contract.
 
-```solidity
+```javascript
+    function _burnAndNotify(uint256 amount, address from, bool useContractEth) private {
+        // pull funds from bids recipient (set in config)
+        IERC20(templeGold).safeTransferFrom(from, address(this), amount);
+        // burn directly and call TempleGold to update circulating supply
+        if (block.chainid == _mintChainId) {
+            ITempleGold(templeGold).burn(amount);
+>>>         return;
+        }
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(lzReceiveExecutorGas, 0);
+        SendParam memory sendParam = SendParam(
+            _arbitrumOneLzEid, //<ARB_EID>,
+            bytes32(uint256(uint160(address(0)))), // bytes32(address(0)) to burn
+            amount,
+            0,
+            options,
+            bytes(""), // compose message
+            ""
+        );
+        MessagingFee memory fee = ITempleGold(templeGold).quoteSend(sendParam, false);
+        if (useContractEth && address(this).balance < fee.nativeFee) {
+            revert CommonEventsAndErrors.InsufficientBalance(address(0), fee.nativeFee, address(this).balance);
+        } else if (!useContractEth && msg.value < fee.nativeFee) { 
+            revert CommonEventsAndErrors.InsufficientBalance(address(0), fee.nativeFee, msg.value); 
+        }
 
-	function _burnAndNotify(uint256 amount, bool useContractEth) private {
-		// burn directly and call TempleGold to update circulating supply
->>>>    if (block.chainid == _mintChainId) {
-			ITempleGold(templeGold).burn(amount);
-			return;
-		}
-		bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(lzReceiveExecutorGas, 0);
-		SendParam memory sendParam = SendParam(
-			_arbitrumOneLzEid, //<ARB_EID>,
-			bytes32(uint256(uint160(address(0)))), // bytes32(address(0)) to burn
-			amount,
-			0,
-			options,
-			bytes(""), // compose message
-			""
-		);
-		MessagingFee memory fee = ITempleGold(templeGold).quoteSend(sendParam, false);
-		if (useContractEth && address(this).balance < fee.nativeFee) {
-			revert CommonEventsAndErrors.InsufficientBalance(address(0), fee.nativeFee, address(this).balance);
-		} else if (!useContractEth && msg.value < fee.nativeFee) {
-			revert CommonEventsAndErrors.InsufficientBalance(address(0), fee.nativeFee, msg.value);
-		}
-
-		if (useContractEth) {
-			ITempleGold(templeGold).send{ value: fee.nativeFee }(sendParam, fee, payable(address(this)));
-		} else {
-			ITempleGold(templeGold).send{ value: fee.nativeFee }(sendParam, fee, payable(msg.sender));
-			uint256 leftover;
-			unchecked {
->>>>            leftover = msg.value - fee.nativeFee;
-			}
-			if (leftover > 0) {
->>>>            (bool success,) = payable(msg.sender).call{ value: leftover }("");
-				if (!success) { revert WithdrawFailed(leftover); }
-			}
-		}
-	}
+        if (useContractEth) {
+            ITempleGold(templeGold).send{ value: fee.nativeFee }(sendParam, fee, payable(address(this)));
+        } else {
+            ITempleGold(templeGold).send{ value: fee.nativeFee }(sendParam, fee, payable(msg.sender));
+            uint256 leftover;
+            unchecked {
+>>>             leftover = msg.value - fee.nativeFee;
+            }
+            if (leftover > 0) { 
+>>>             (bool success,) = payable(msg.sender).call{ value: leftover }("");
+                if (!success) { revert WithdrawFailed(leftover); }
+            }
+        }
+    }
 ```
 
 #### Mitigation
@@ -489,13 +491,15 @@ However, when the function is called in the `mintChainId`, there is no need to c
 Don't allow `msg.value > 0` in the mint chain:
 
 ```diff
-	function _burnAndNotify(uint256 amount, bool useContractEth) private {
-		// burn directly and call TempleGold to update circulating supply
-		if (block.chainid == _mintChainId) {
-+           if (msg.value > 0) revert("eth not needed");
-			ITempleGold(templeGold).burn(amount);
-			return;
-		}
+    function _burnAndNotify(uint256 amount, address from, bool useContractEth) private {
+        // pull funds from bids recipient (set in config)
+        IERC20(templeGold).safeTransferFrom(from, address(this), amount);
+        // burn directly and call TempleGold to update circulating supply
+        if (block.chainid == _mintChainId) {
++			if (msg.value > 0) revert("no eth needed");
+            ITempleGold(templeGold).burn(amount);
+            return;
+        }
 ```
 
 #### Team response
@@ -525,31 +529,31 @@ Don't allow `msg.value > 0` in the mint chain:
 
 There is no requirement that the auction configs have been set:
 
-```solidity
-	function startAuction() external override {
-		if (auctionStarter != address(0) && msg.sender != auctionStarter) { revert CommonEventsAndErrors.InvalidAccess(); }
-		EpochInfo storage prevAuctionInfo = epochs[_currentEpochId];
-		if (!prevAuctionInfo.hasEnded()) { revert CannotStartAuction(); }
+```javascript
+    function startAuction() external override {
+        if (auctionStarter != address(0) && msg.sender != auctionStarter) { revert CommonEventsAndErrors.InvalidAccess(); }
+        EpochInfo storage prevAuctionInfo = epochs[_currentEpochId];
+        if (!prevAuctionInfo.hasEnded()) { revert CannotStartAuction(); }
+       
+        AuctionConfig storage config = auctionConfig;
+        /// @notice last auction end time plus wait period
+        if (_currentEpochId > 0 && (prevAuctionInfo.endTime + config.auctionsTimeDiff > block.timestamp)) {
+            revert CannotStartAuction();
+        }
+        _distributeGold();
+        uint256 totalGoldAmount = nextAuctionGoldAmount;
+        nextAuctionGoldAmount = 0;
+        uint256 epochId = _currentEpochId = _currentEpochId + 1;
+        
+        if (totalGoldAmount < config.auctionMinimumDistributedGold) { revert LowGoldDistributed(totalGoldAmount); }
 
-		AuctionConfig storage config = auctionConfig;
-		/// @notice last auction end time plus wait period
-		if (_currentEpochId > 0 && (prevAuctionInfo.endTime + config.auctionsTimeDiff > block.timestamp)) {
-			revert CannotStartAuction();
-		}
-		_distributeGold();
-		uint256 totalGoldAmount = nextAuctionGoldAmount;
-		nextAuctionGoldAmount = 0;
-		uint256 epochId = _currentEpochId = _currentEpochId + 1;
+        EpochInfo storage info = epochs[epochId];
+        info.totalAuctionTokenAmount = totalGoldAmount;
+        uint128 startTime = info.startTime = uint128(block.timestamp) + config.auctionStartCooldown;
+        uint128 endTime = info.endTime = startTime + AUCTION_DURATION;
 
-		if (totalGoldAmount < config.auctionMinimumDistributedGold) { revert LowGoldDistributed(totalGoldAmount); }
-
-		EpochInfo storage info = epochs[epochId];
-		info.totalAuctionTokenAmount = totalGoldAmount;
-		uint128 startTime = info.startTime = uint128(block.timestamp) + config.auctionStartCooldown;
-		uint128 endTime = info.endTime = startTime + AUCTION_DURATION;
-
-		emit AuctionStarted(epochId, msg.sender, startTime, endTime, totalGoldAmount);
-	}
+        emit AuctionStarted(epochId, msg.sender, startTime, endTime, totalGoldAmount);
+    }
 ```
 
 
@@ -564,7 +568,7 @@ It is important to note that if this scenario occurr, it limits significantly th
 
 Small proof of code that the auction can actually be started without configs that can be added to `test/forge/templegold/DaiGoldAuction.t.sol`:
 
-```solidity
+```javascript
 contract DaiGoldAuction_POCs_Test is DaiGoldAuctionTestBase {
 
 	function test_startAuction_canBeCalledBeforeConfigsAreSet() public {
@@ -687,47 +691,45 @@ In TempleGold, the token transfers are handled by the inherited OFT, which inher
 The `_update()` method is overridden by TempleGold by only allowing transferring tokens to whitelisted addresses in the `authorized` mapping:
 
 ```javascript
-	function _update(address from, address to, uint256 value) internal override {
-		/// can only transfer to or from whitelisted addreess
-		/// @dev skip check on mint and burn. function `send` checks from == to
-		if (from != address(0) && to != address(0)) {
->>>>        if (!authorized[from] && !authorized[to]) { revert ITempleGold.NonTransferrable(from, to); }
-		}
-		super._update(from, to, value);
-	}
+    function _update(address from, address to, uint256 value) internal override {
+        /// can only transfer to or from whitelisted addreess
+        /// @dev skip check on mint and burn. function `send` checks from == to
+        if (from != address(0) && to != address(0)) {
+>>>         if (!authorized[from] && !authorized[to]) { revert ITempleGold.NonTransferrable(from, to); }
+        }
+        super._update(from, to, value);
+    }
 ```
 
 When transfers are done cross-chain the `send()` function is used. This function calls `_debit()`, (who calls `_update()`, which is the one checking the `authorized` mapping). However, the `_debit()` function is only called **after** the requirement `msg.sender != _to`. Therefore, trying to send TGLD cross chain to a different address will revert even before reading if the `msg.sender` is `authorized` inside `_update()`.
 
 
 ```javascript
-	function send(
-		SendParam calldata _sendParam,
-		MessagingFee calldata _fee,
-		address _refundAddress
-	) external payable virtual override(IOFT, OFTCore) returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
-		if (_sendParam.composeMsg.length > 0) { revert CannotCompose(); }
-		/// cast bytes32 to address
-		address _to = _sendParam.to.bytes32ToAddress();
-		/// @dev user can cross-chain transfer to self
-		/// @dev whitelisted address like spice auctions can burn by setting `_to` to address(0)
-		// only burn TGLD on source chain
-		if (_to == address(0) && _sendParam.dstEid != _mintChainLzEid) { revert CommonEventsAndErrors.InvalidParam(); }
->>>>    if (_to != address(0) && msg.sender != _to) { revert ITempleGold.NonTransferrable(msg.sender, _to); }
+    function send(
+        SendParam calldata _sendParam,
+        MessagingFee calldata _fee,
+        address _refundAddress
+    ) external payable virtual override(IOFT, OFTCore) returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+        if (_sendParam.composeMsg.length > 0) { revert CannotCompose(); }
+        /// cast bytes32 to address
+        address _to = _sendParam.to.bytes32ToAddress();
+        /// @dev user can cross-chain transfer to self
+        /// @dev whitelisted address like spice auctions can burn by setting `_to` to address(0)
+        // only burn TGLD on source chain
+        if (_to == address(0) && _sendParam.dstEid != _mintChainLzEid) { revert CommonEventsAndErrors.InvalidParam(); }
+>>>     if (_to != address(0) && msg.sender != _to) { revert ITempleGold.NonTransferrable(msg.sender, _to); }
 
-		/// @dev Applies the token transfers regarding this send() operation.
-		// - amountSentLD is the amount in local decimals that was ACTUALLY sent/debited from the sender.
-		// - amountReceivedLD is the amount in local decimals that will be received/credited to the recipient on the remote OFT instance.
->>>>    (uint256 amountSentLD, uint256 amountReceivedLD) = _debit(
-			msg.sender,
-			_sendParam.amountLD,
-			_sendParam.minAmountLD,
-			_sendParam.dstEid
-		);
-
+        /// @dev Applies the token transfers regarding this send() operation.
+        // - amountSentLD is the amount in local decimals that was ACTUALLY sent/debited from the sender.
+        // - amountReceivedLD is the amount in local decimals that will be received/credited to the recipient on the remote OFT instance.
+>>>     (uint256 amountSentLD, uint256 amountReceivedLD) = _debit(
+            msg.sender,
+            _sendParam.amountLD,
+            _sendParam.minAmountLD,
+            _sendParam.dstEid
+        );
 		// ...
 
-	}
 ```
 
 #### Impact: low
@@ -814,7 +816,6 @@ Given that this function will probably be one that will be executed more times o
 The change would look something like this:
 ```diff
 	modifier updateReward(address _account) {
-
 -       rewardData.rewardPerTokenStored = uint216(_rewardPerToken());
 +       uint216 rewardPerTokenCached = uint216(_rewardPerToken());
 +       rewarddata.rewardPerTokenStored = rewardPerTokenCached;
@@ -859,25 +860,25 @@ And of course you have to redefine the `_earned()` function to accept the new ar
 
 
 
-### [G-3] Some logic can be skipped in `_rewardPerToken()` when `lastUpdateTime == periodFinish` to save gas
+### [G-3] Some logic can be skipped in `TempleGoldStaking._rewardPerToken()` when `lastUpdateTime == periodFinish` to save gas
 
 ```diff
-function _rewardPerToken() internal view returns (uint256) {
-if (totalSupply == 0) {
-return rewardData.rewardPerTokenStored;
-}
+    function _rewardPerToken() internal view returns (uint256) {
+        if (totalSupply == 0) {
+            return rewardData.rewardPerTokenStored;
+        }
 
 +       if (rewardData.lastUpdateTime == rewardData.periodFinish) {
 +           return rewardData.rewardPerTokenStored;
 +       }
 
-return
-rewardData.rewardPerTokenStored +
-(((_lastTimeRewardApplicable(rewardData.periodFinish) -
-rewardData.lastUpdateTime) *
-rewardData.rewardRate * 1e18)
-/ totalSupply);
-}
+        return
+            rewardData.rewardPerTokenStored +
+            (((_lastTimeRewardApplicable(rewardData.periodFinish) -
+                rewardData.lastUpdateTime) *
+                rewardData.rewardRate * 1e18)
+                / totalSupply);
+    }
 ```
 
 Because when `rewardData.lastUpdateTime == rewardData.periodFinish`, then
