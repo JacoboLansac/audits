@@ -7,7 +7,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-| Finding | Severity | Description | Status |
+| Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
 | [[M-1]](<#m-1-temple-tokens-can-be-lost-forever-in-the-templeteleporter-for-certain-combinations-of-the-amount-and-destination-address>) | Medium | Temple Tokens can be lost forever in the TempleTeleporter for certain combinations of the amount and destination address | ✅ fixed |
 | [[Z-1]](<#z-1-elevatedaccess-can-make-the-daigoldauction-contract-insolvent-by-calling-notifydistribution-without-transfering-the-amount>) | Centralization | ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the amount | 🤝 Ackn. |
