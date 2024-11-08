@@ -133,39 +133,38 @@ However, during the course of the audit the deam changed strategy and the deploy
 The `TempleTeleporter.teleport()` function uses `abi.encodePacked()` when creating the `_payload` that will be sent via Layer Zero `_lzSend()`:
 
 ```solidity
-	function teleport(
-		uint32 dstEid,
-		address to,
-		uint256 amount,
-		bytes calldata options
-	) external payable override returns(MessagingReceipt memory receipt) {
-		if (amount == 0) { revert CommonEventsAndErrors.ExpectedNonZero(); }
-		if (to == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
-		// Encodes the message before invoking _lzSend.
->>>>    bytes memory _payload = abi.encodePacked(to.addressToBytes32(), amount);
-		// debit
-		temple.burnFrom(msg.sender, amount);
-		emit TempleTeleported(dstEid, msg.sender, to, amount);
-		
->>>>    receipt = _lzSend(dstEid, _payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
-		// ...
-	}
+    function teleport(
+        uint32 dstEid,
+        address to,
+        uint256 amount,
+        bytes calldata options
+    ) external payable override returns(MessagingReceipt memory receipt) {
+        if (amount == 0) { revert CommonEventsAndErrors.ExpectedNonZero(); }
+        if (to == address(0)) { revert CommonEventsAndErrors.InvalidAddress(); }
+        // Encodes the message before invoking _lzSend.
+>>>     bytes memory _payload = abi.encode(to.addressToBytes32(), amount);
+        // debit
+        temple.burnFrom(msg.sender, amount);
+        emit TempleTeleported(dstEid, msg.sender, to, amount);
+
+        receipt = _lzSend(dstEid, _payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
+    }
 ```
 
 When the `_payload` is received on the destination chain, the `_lzReceive()` function processes the payload, decoding it with `abi.decode()`:
 
 ```solidity
-	function _lzReceive(
-		Origin calldata /*_origin*/,
-		bytes32 /*_guid*/,
-		bytes calldata _payload,
-		address /*_executor,*/,  // Executor address as specified by the OApp.
-		bytes calldata /*_extraData */ // Any extra data or options to trigger on receipt.
-	) internal override {
-		// Decode the payload to get the message
->>>>    (address _recipient, uint256 _amount) = abi.decode(_payload, (address, uint256));
-		temple.mint(_recipient, _amount);
-	}
+    function _lzReceive(
+        Origin calldata /*_origin*/,
+        bytes32 /*_guid*/,
+        bytes calldata _payload,
+        address /*_executor,*/,  // Executor address as specified by the OApp.
+        bytes calldata /*_extraData */ // Any extra data or options to trigger on receipt.
+    ) internal override {
+        // Decode the payload to get the message
+>>>     (address _recipient, uint256 _amount) = abi.decode(_payload, (address, uint256));
+        temple.mint(_recipient, _amount);
+    }
 ```
 
 The issue is that the output bytes from `abi.encodePacked()` cannot always be decoded reliably because it removes padding (to be more gas efficient) and this can lead to collisions.
