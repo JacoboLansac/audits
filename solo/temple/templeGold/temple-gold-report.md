@@ -72,7 +72,7 @@ protocol is affected.
 
 
 **Mitigation review:**
-- Mitigation review delivery date: `2024-11-07`
+- Mitigation review delivery date: `2024-11-09`
 - Commit hash: [73c5e8bb0b3ebb622e454137b8a1302792f11457](https://github.com/TempleDAO/temple/pull/990/commits/73c5e8bb0b3ebb622e454137b8a1302792f11457)
 
 
@@ -290,7 +290,7 @@ contract EncodingTests is Test {
 
 
 
-### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transfering the amount
+### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transferring the amount
 
 The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. 
 
