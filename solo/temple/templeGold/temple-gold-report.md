@@ -14,7 +14,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 | [[Z-2]](<#z-2-the-function-templegoldstakingsetunstakecooldown-has-no-restrictions-and-elevatedaccess-can-lock-staked-funds-forever>) | Centralization | The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever | ✅ fixed |
 | [[Z-3]](<#z-3-the-migrator-in-templegoldstaking-has-too-much-power-to-be-configured-without-any-control>) | Centralization | The migrator in `TempleGoldStaking` has too much power to be configured without any control | ✅ fixed |
 | [[L-1]](<#l-1-any-msgvalue-sent-to-spiceauctionburnandnotify-will-be-donated-to-the-contract-and-not-returned-to-the-caller-if-invoked-in-the-minting-chain>) | Low | Any `msg.value` sent to `SpiceAuction.burnAndNotify()` will be donated to the contract and not returned to the caller if invoked in the minting chain | ✅ fixed |
-| [[L-2]](<#l-2-it-is-possible-to-call-daigoldauctionstartauction-before-setting-the-configs>) | Low | It is possible to call `DaiGoldAuction.startAuction()` before setting the configs |   |
+| [[L-2]](<#l-2-it-is-possible-to-call-daigoldauctionstartauction-before-setting-the-configs>) | Low | It is possible to call `DaiGoldAuction.startAuction()` before setting the configs | ✅ fixed |
 | [[L-3]](<#l-3-if-the-templeteleporter-is-not-set-as-a-valid-minter-of-templeerc20-token-in-all-chains-teleported-tokens-will-be-lost>) | Low | If the `TempleTeleporter` is not set as a valid minter of `TempleERC20` token in all chains, teleported tokens will be lost | 🤝 Ackn. |
 | [[L-4]](<#l-4-the-function-setvestingfactor-should-have-the-onlyarbitrum-modifier-to-avoid-misleading-outputs-from-other-view-functions>) | Low | The function `setVestingFactor()` should have the `onlyArbitrum` modifier to avoid misleading outputs from other view functions | ✅ fixed |
 | [[L-5]](<#l-5-the-transfers-whitelisting-mechanism-in-templegold-does-not-work-cross-chain>) | Low | The transfers-whitelisting mechanism in TempleGold does not work cross-chain. | 🔨 invalid |
@@ -627,7 +627,7 @@ contract DaiGoldAuction_POCs_Test is DaiGoldAuctionTestBase {
 
 Require that any of the auction configs has a non-zero value (because they are all required to be greater than zero when calling `setAuctionConfig()`).
 
-
+#### Team response: Fixed
 
 
 
