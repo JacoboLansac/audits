@@ -1,5 +1,16 @@
 # Security-reviews
 
+## 2024 - November
+
+- [TempleDAO - Temple Gold](solo/temple/templeGold/temple-gold-report.md). Full security review.
+
+## 2024 - October
+- Origami - New USDS++ vault - link soon
+- Origami - New ERC4626 based vault - link soon
+
+## 2024 - September
+- Origami - CowSwap Vault integration - link soon
+
 ## 2024 - August
 - [Origami - Flexi swapper extension](solo/origami/origami-flexi-swapper-review.md). Two small additions to two contracts.
 - [Origami - Morpho flashloan provider](). (Small extension, No issues found)
