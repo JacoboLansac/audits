@@ -9,12 +9,12 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
-| [[M-1]](<#m-1-temple-tokens-can-be-lost-forever-in-the-templeteleporter-for-certain-combinations-of-the-amount-and-destination-address>) | Medium | Temple Tokens can be lost forever in the TempleTeleporter for certain combinations of the amount and destination address | ✅ Fixed |
-| [[Z-1]](<#z-1-elevatedaccess-can-make-the-daigoldauction-contract-insolvent-by-calling-notifydistribution-without-transferring-the-amount>) | Centralization | ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transferring the amount | 🤝 Ackn. |
-| [[Z-2]](<#z-2-the-function-templegoldstakingsetunstakecooldown-has-no-restrictions-and-elevatedaccess-can-lock-staked-funds-forever>) | Centralization | The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever | ✅ Fixed |
-| [[Z-3]](<#z-3-the-migrator-in-templegoldstaking-has-too-much-power-to-be-configured-without-any-control>) | Centralization | The migrator in `TempleGoldStaking` has too much power to be configured without any control | ✅ Fixed |
+| [[M-1]](<#m-1-temple-tokens-can-be-lost-in-the-templeteleporter-for-certain-combinations-of-the-amount-and-destination-address>) | Medium | Temple Tokens can be lost in the `TempleTeleporter` for certain combinations of the amount and destination address | ✅ Fixed |
+| [[Z-1]](<#z-1-elevatedaccess-can-make-the-daigoldauction-contract-insolvent-by-calling-notifydistribution-without-transferring-the-same-amount>) | Centralization | ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transferring the same amount | 🤝 Ackn. |
+| [[Z-2]](<#z-2-the-function-templegoldstakingsetunstakecooldown-has-no-restrictions-and-elevatedaccess-can-lock-staked-funds-indefinitely>) | Centralization | The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds indefinitely | ✅ Fixed |
+| [[Z-3]](<#z-3-the-migrator-contract-in-templegoldstaking-has-great-power-over-user-funds-and-its-configuration-should-have-more-control>) | Centralization | The migrator contract in `TempleGoldStaking` has great power over user funds and its configuration should have more control | ✅ Fixed |
 | [[L-1]](<#l-1-any-msgvalue-sent-to-spiceauctionburnandnotify-will-be-donated-to-the-contract-and-not-returned-to-the-caller-if-invoked-in-the-minting-chain>) | Low | Any `msg.value` sent to `SpiceAuction.burnAndNotify()` will be donated to the contract and not returned to the caller if invoked in the minting chain | ✅ Fixed |
-| [[L-2]](<#l-2-it-is-possible-to-call-daigoldauctionstartauction-before-setting-the-configs>) | Low | It is possible to call `DaiGoldAuction.startAuction()` before setting the configs | ✅ Fixed |
+| [[L-2]](<#l-2-it-is-possible-to-call-daigoldauctionstartauction-before-setting-the-auction-config-first>) | Low | It is possible to call `DaiGoldAuction.startAuction()` before setting the auction config first | ✅ Fixed |
 | [[L-3]](<#l-3-if-the-templeteleporter-is-not-set-as-a-valid-minter-of-templeerc20-token-in-all-chains-teleported-tokens-will-be-lost>) | Low | If the `TempleTeleporter` is not set as a valid minter of `TempleERC20` token in all chains, teleported tokens will be lost | 🤝 Ackn. |
 | [[L-4]](<#l-4-the-function-setvestingfactor-should-have-the-onlyarbitrum-modifier-to-avoid-misleading-outputs-from-other-view-functions>) | Low | The function `setVestingFactor()` should have the `onlyArbitrum` modifier to avoid misleading outputs from other view functions | ✅ Fixed |
 | [[L-5]](<#l-5-the-transfers-whitelisting-mechanism-in-templegold-does-not-work-cross-chain>) | Low | The transfers-whitelisting mechanism in TempleGold does not work cross-chain. | 🔨 invalid |
@@ -125,7 +125,7 @@ However, during the audit, the team changed strategy and most contracts will be 
 
 ## Medium
 
-### [M-1] Temple Tokens can be lost forever in the TempleTeleporter for certain combinations of the amount and destination address
+### [M-1] Temple Tokens can be lost in the `TempleTeleporter` for certain combinations of the amount and destination address
 
 #### Description
 
@@ -290,7 +290,7 @@ contract EncodingTests is Test {
 
 
 
-### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transferring the amount
+### [Z-1] ElevatedAccess can make the `DaiGoldauction` contract insolvent by calling `notifyDistribution()` without transferring the same amount
 
 The function is handy to incorporate donated tokens to `nextAuctionGoldAmount`. 
 
@@ -343,7 +343,7 @@ Note, however, that there is no economic incentive for `ElevatedAccess` to make 
 
 
 
-### [Z-2] The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds forever
+### [Z-2] The function `TempleGoldStaking::setUnstakeCooldown()` has no restrictions and ElevatedAccess can lock staked funds indefinitely
 
 ```solidity
     function setUnstakeCooldown(uint32 _period) external override onlyElevatedAccess {
@@ -407,7 +407,7 @@ Consider adding a `MAX_UNSTAKE_COOLDOWN` constant variable, and a requirement su
 
 
 
-### [Z-3] The migrator in `TempleGoldStaking` has too much power to be configured without any control
+### [Z-3] The migrator contract in `TempleGoldStaking` has great power over user funds and its configuration should have more control
 
 In `TempleGoldStaking`, the migrator has a lot of power over user funds as it can withdraw stakes, and it, therefore, is a centralization weak point:
 
@@ -549,7 +549,7 @@ Don't allow `msg.value > 0` in the mint chain:
 
 
 
-### [L-2] It is possible to call `DaiGoldAuction.startAuction()` before setting the configs
+### [L-2] It is possible to call `DaiGoldAuction.startAuction()` before setting the auction config first
 
 There is no requirement that the auction configs have been set:
 
