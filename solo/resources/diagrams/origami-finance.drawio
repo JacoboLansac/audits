@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36" version="24.8.4">
   <diagram name="Page-1" id="6f-JhiVzj78bMLrCzDAU">
-    <mxGraphModel dx="3678" dy="1108" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3480" dy="997" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1880,10 +1880,10 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-1" value="" style="group;rounded=0;" vertex="1" connectable="0" parent="1">
-          <mxGeometry x="1200" y="5639.94" width="240" height="250" as="geometry" />
+          <mxGeometry x="1200" y="5639.94" width="300" height="250" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="sUYsaNxipIeIxrwQtyJF-1">
-          <mxGeometry y="-100" width="240" height="350" as="geometry" />
+          <mxGeometry x="-20" y="-100" width="230" height="350" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-4" value="stake()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;" vertex="1" parent="sUYsaNxipIeIxrwQtyJF-1">
           <mxGeometry x="12" y="37.53" width="150" height="35" as="geometry" />
@@ -2069,6 +2069,39 @@
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-57" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;EOA" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="390" y="5930" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-67" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;admin&lt;div&gt;&lt;/div&gt;" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="6040" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="sUYsaNxipIeIxrwQtyJF-62" target="sUYsaNxipIeIxrwQtyJF-67">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1160" y="5855" />
+              <mxPoint x="1160" y="5948" />
+              <mxPoint x="1115" y="5948" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-69" value="rewards for&amp;nbsp;&lt;div&gt;Origami treasury&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="sUYsaNxipIeIxrwQtyJF-68">
+          <mxGeometry x="0.4429" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=0.996;entryY=0.552;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="sUYsaNxipIeIxrwQtyJF-62" target="sUYsaNxipIeIxrwQtyJF-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-71" value="rewards for vault" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="sUYsaNxipIeIxrwQtyJF-70">
+          <mxGeometry x="0.3721" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-73" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="sUYsaNxipIeIxrwQtyJF-62" target="sUYsaNxipIeIxrwQtyJF-57">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-74" value="rewards for caller" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="sUYsaNxipIeIxrwQtyJF-73">
+          <mxGeometry x="0.0104" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
