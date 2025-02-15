@@ -1,9 +1,12 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36" version="24.8.4">
   <diagram name="Page-1" id="6f-JhiVzj78bMLrCzDAU">
-    <mxGraphModel dx="3248" dy="867" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3794" dy="1173" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-7" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="533" y="5400" width="408.5" height="730" as="geometry" />
+        </mxCell>
         <mxCell id="E9fr20aTo7T8fgr599q_-31" value="" style="group;rounded=0;" parent="1" vertex="1" connectable="0">
           <mxGeometry x="1123" y="4600" width="240" height="150.06" as="geometry" />
         </mxCell>
@@ -1892,10 +1895,7 @@
           <mxGeometry x="11" y="109.06" width="150" height="23.94" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="-136" y="5460" width="408.5" height="480" as="geometry" />
-        </mxCell>
-        <mxCell id="sUYsaNxipIeIxrwQtyJF-7" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="541.5" y="5460" width="408.5" height="480" as="geometry" />
+          <mxGeometry x="-164" y="5345" width="442.5" height="790" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-8" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;EOA" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="-375" y="5710" width="60" height="60" as="geometry" />
@@ -1904,13 +1904,13 @@
           <mxGeometry x="-690" y="5474.17" width="381" height="65.83" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="-85.5" y="5624" width="340" height="300" as="geometry" />
+          <mxGeometry x="-150" y="5510" width="404.5" height="540" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-11" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;OrigamiERC4626&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-66" y="5640" width="200" height="20.625" as="geometry" />
+          <mxGeometry x="-129.5" y="5519.38" width="200" height="20.625" as="geometry" />
         </mxCell>
-        <mxCell id="sUYsaNxipIeIxrwQtyJF-12" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;SUSDS vault&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-130.5" y="5470" width="200" height="20.625" as="geometry" />
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-12" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;oriBGT vault&amp;nbsp; &amp;nbsp;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;OrigamiDelegated4626Vault&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;asset = iBGT&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-146.5" y="5360" width="200" height="60" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-13" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;deposit()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;mint()&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;" vertex="1" parent="1">
           <mxGeometry x="-66" y="5680" width="203" height="40" as="geometry" />
@@ -1925,19 +1925,22 @@
           <mxGeometry x="-66" y="5814" width="203" height="18.33" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-17" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setManager()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setTokenPrices()&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="-114" y="5500" width="203" height="40" as="geometry" />
+          <mxGeometry x="-138" y="5450" width="203" height="40" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="sUYsaNxipIeIxrwQtyJF-19" target="sUYsaNxipIeIxrwQtyJF-17">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="sUYsaNxipIeIxrwQtyJF-19" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;admin&lt;div&gt;&lt;/div&gt;" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-249" y="5330" width="70" height="70" as="geometry" />
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="sUYsaNxipIeIxrwQtyJF-19" target="sUYsaNxipIeIxrwQtyJF-54">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="sUYsaNxipIeIxrwQtyJF-20" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;SUSDS vault Manager&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="550" y="5470" width="200" height="20.625" as="geometry" />
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-19" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;admin&lt;div&gt;&lt;/div&gt;" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-251" y="5345" width="70" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-20" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;oriBGT Manager&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;OrigamiInfrarredVaultManager&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;IOrigamiCompoundVaultManager&lt;b&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="548" y="5450" width="200" height="49.63" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-21" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setPerformanceFees()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setFeeCollector()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setSwapper()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setSwitchFarmCooldown()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;addFarm()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;removeFarm()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setFarmReferralCode()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;switchFarms()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;recoverToken()&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="570" y="5500" width="203" height="180" as="geometry" />
+          <mxGeometry x="570" y="5505" width="203" height="180" as="geometry" />
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="sUYsaNxipIeIxrwQtyJF-23" target="sUYsaNxipIeIxrwQtyJF-21">
           <mxGeometry relative="1" as="geometry" />
@@ -2079,6 +2082,9 @@
         </mxCell>
         <mxCell id="sUYsaNxipIeIxrwQtyJF-48" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;EOA" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="373" y="5040" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sUYsaNxipIeIxrwQtyJF-54" value="&lt;div style=&quot;line-height: 18px;&quot;&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;seedDeposit()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;setMaxTotalSupply()&lt;/div&gt;&lt;div style=&quot;line-height: 18px;&quot;&gt;recoverToken()&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="-129.5" y="5542.54" width="203" height="64.97" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
