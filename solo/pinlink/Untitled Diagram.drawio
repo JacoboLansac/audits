@@ -122,7 +122,7 @@
         <mxCell id="JGkmI-_ZL2MUS3Ad0X21-66" value="" style="whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="JGkmI-_ZL2MUS3Ad0X21-82">
           <mxGeometry x="90" y="30" width="180" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="JGkmI-_ZL2MUS3Ad0X21-67" value="PositionsManager" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="JGkmI-_ZL2MUS3Ad0X21-82">
+        <mxCell id="JGkmI-_ZL2MUS3Ad0X21-67" value="Manager" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="JGkmI-_ZL2MUS3Ad0X21-82">
           <mxGeometry x="145" width="60" height="30" as="geometry" />
         </mxCell>
         <mxCell id="JGkmI-_ZL2MUS3Ad0X21-74" value="buyAndStake()" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#f8cecc;align=left;" vertex="1" parent="JGkmI-_ZL2MUS3Ad0X21-82">
