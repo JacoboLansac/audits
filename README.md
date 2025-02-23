@@ -1,5 +1,9 @@
 # Security-reviews
 
+## 2025 - February
+
+- [Origami - oriBGT](solo/origami/oriBGT-audit-report.md). Full security review.
+
 ## 2024 - November
 
 - [TempleDAO - Temple Gold](solo/temple/templeGold/temple-gold-report.md). Full security review.
