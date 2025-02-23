@@ -1,4 +1,4 @@
-# SOAR security review
+# Origami oriBGT - security review
 
 A time-boxed security review of OriBGT for [**Origami Finance**](https://origami.finance/), with a focus on smart contract security and gas optimizations.
 
