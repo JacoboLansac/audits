@@ -1,4 +1,4 @@
-# Origami oriBGT - security review
+# Origami oriBGT - Security review
 
 A time-boxed security review of OriBGT for [**Origami Finance**](https://origami.finance/), with a focus on smart contract security and gas optimizations.
 
@@ -18,7 +18,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Team Response
 
-The team responsibly decided to changed a couple of things in the architecture and do a second full security review after that. 
+The team responsibly decided to apply a few architectural changes before doing a second security review. 
 
 ## Disclaimer
 
