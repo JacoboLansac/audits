@@ -399,12 +399,19 @@
         <mxCell id="KzfKtaWBuFEqerHDpouQ-4" value="enableAsset()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.007;entryY=0.159;entryDx=0;entryDy=0;entryPerimeter=0;curved=1;fillColor=#f5f5f5;strokeColor=#666666;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-3" target="PQhuScfrUYGWe95c9BbK-16">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="KzfKtaWBuFEqerHDpouQ-14" value="&lt;div&gt;claim()&lt;/div&gt;&lt;div&gt;collect rewards fees&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;shape=connector;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-16" target="KzfKtaWBuFEqerHDpouQ-33">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="KzfKtaWBuFEqerHDpouQ-14" value="&lt;div&gt;claim()&lt;/div&gt;&lt;div&gt;rewards &amp;gt;&amp;gt;&lt;/div&gt;&lt;div&gt;(collects rewards fees)&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;shape=connector;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;entryX=0.25;entryY=0.2;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-16" target="KzfKtaWBuFEqerHDpouQ-33">
+          <mxGeometry x="-0.4433" y="20" relative="1" as="geometry">
+            <mxPoint x="680" y="3160" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="590" y="3194" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="KzfKtaWBuFEqerHDpouQ-15" value="collectPaymentFees&lt;div&gt;PIN &amp;gt;&amp;gt;&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;shape=connector;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-16" target="KzfKtaWBuFEqerHDpouQ-33">
-          <mxGeometry relative="1" as="geometry">
+        <mxCell id="KzfKtaWBuFEqerHDpouQ-15" value="collectPaymentFees()&lt;div&gt;PIN &amp;gt;&amp;gt;&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;shape=connector;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-16" target="KzfKtaWBuFEqerHDpouQ-33">
+          <mxGeometry x="0.218" y="23" relative="1" as="geometry">
             <mxPoint x="980" y="3010" as="targetPoint" />
+            <mxPoint y="1" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="KzfKtaWBuFEqerHDpouQ-16" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#ebf3ff, #1d293b);strokeColor=#6c8ebf;" vertex="1" parent="1">
@@ -420,7 +427,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="KzfKtaWBuFEqerHDpouQ-19" value="Wallet&lt;div&gt;(doing nothing)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="KzfKtaWBuFEqerHDpouQ-19" value="Wallet" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="150" y="2870" width="150" height="190" as="geometry" />
         </mxCell>
         <mxCell id="KzfKtaWBuFEqerHDpouQ-20" value="delist()" style="edgeStyle=orthogonalEdgeStyle;shape=connector;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeColor=#6c8ebf;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;fillColor=#dae8fc;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-23" target="KzfKtaWBuFEqerHDpouQ-25">
@@ -472,7 +479,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="KzfKtaWBuFEqerHDpouQ-33" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;feeCollector&lt;/div&gt;" style="shape=actor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="580" y="3170" width="110" height="70" as="geometry" />
+          <mxGeometry x="700" y="3180" width="110" height="70" as="geometry" />
         </mxCell>
         <mxCell id="KzfKtaWBuFEqerHDpouQ-34" style="edgeStyle=orthogonalEdgeStyle;shape=connector;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.914;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#666666;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;fillColor=#f5f5f5;" edge="1" parent="1" source="KzfKtaWBuFEqerHDpouQ-16" target="KzfKtaWBuFEqerHDpouQ-16">
           <mxGeometry relative="1" as="geometry">
