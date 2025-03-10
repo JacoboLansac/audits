@@ -2,11 +2,12 @@
 
 ## 2025 - February
 
-- [Origami - oriBGT](solo/origami/oriBGT-audit-report.md). Full security review.
+- [Origami - oriBGT V2](solo/origami/oriBGT-V2-audit-report.md). Security review.
+- [Origami - oriBGT](solo/origami/oriBGT-audit-report.md). Security review.
 
 ## 2024 - November
 
-- [TempleDAO - Temple Gold](solo/temple/templeGold/temple-gold-report.md). Full security review.
+- [TempleDAO - Temple Gold](solo/temple/templeGold/temple-gold-report.md). Security review.
 
 ## 2024 - October
 - Origami - New USDS++ vault - link soon
@@ -20,11 +21,11 @@
 - [Origami - Morpho flashloan provider](). (Small extension, No issues found)
 
 ## 2024 - July
-- [SoarFi protocol](solo/soar-review.md). Full security review
+- [SoarFi protocol](solo/soar-review.md). Security review
 
 ## 2024 - May
-- [PinLink protocol](solo/pinlink-phase1-audit.md). Full security review
-- [TaiNet Protocol](solo/tai-net-ytao.md). Full security review
+- [PinLink protocol](solo/pinlink-phase1-audit.md). Security review
+- [TaiNet Protocol](solo/tai-net-ytao.md). Security review
 
 ## 2024 - April
 - [TempleDAO - Morpho Integration & Ethena Lov Tokens](solo/temple-origami-morpho-integration-review.md). Extension on existing codebase
