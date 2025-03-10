@@ -9,7 +9,7 @@ See [other security reviews here](https://github.com/JacoboLansac/audits/blob/ma
 
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
-| [[L-1]](<#m-1-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Medium | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price | ✅ fixed  |
+| [[L-1]](<#m-1-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Low | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price | ✅ fixed  |
 
 ### Context
 
