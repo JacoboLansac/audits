@@ -14,18 +14,17 @@ See [other security reviews here](https://github.com/JacoboLansac/audits/blob/ma
 | [[M-2]](<#m-2-an-attacker-can-bypass-the-performance-fees-and-distribute-them-among-vault-shareholders-if-rewardtoken--_asset>) | Medium | An attacker can bypass the performance fees and distribute them among vault shareholders if `rewardToken == _asset` | ✅ fixed in V2 |
 
 
-Note: the issues shown as "fixed in V2", refer to the new architecture of the oriBGT manager, implemented as a consequence of this review. The fixes are reviewed in a [separate report](.oriBGT-V2-audit-report.md) 
+Note: the issues shown as "fixed in V2", refer to the new architecture of the oriBGT manager, implemented as a consequence of this review. The fixes are reviewed in a [separate report](oriBGT-V2-audit-report.md) 
 
 ## Disclaimer
 
-A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
+_A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
 resource-bound effort to find as many vulnerabilities as possible, but there is no guarantee that all issues will be
-found.
-A security researcher holds no
+found. A security researcher holds no
 responsibility for the findings provided in this document. A security review is not an endorsement of the underlying
 business or product and can never be taken as a guarantee that the protocol is bug-free. This security review is focused
 solely on the security aspects of the Solidity implementation of the contracts. Gas optimizations are not the main
-focus, but significant inefficiencies will also be reported.
+focus, but significant inefficiencies will also be reported._
 
 ## Risk classification
 

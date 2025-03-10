@@ -1,4 +1,4 @@
-# Origami oriBGT - Security review
+# Origami oriBGT (V2)- Security review
 
 A time-boxed security review of OriBGT for [**Origami Finance**](https://origami.finance/), with a focus on smart contract security and gas optimizations.
 
@@ -9,7 +9,7 @@ See [other security reviews here](https://github.com/JacoboLansac/audits/blob/ma
 
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
-| [[M-1]](<#m-1-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Medium | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price |   |
+| [[M-1]](<#m-1-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Medium | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price | ✅ fixed  |
 
 ### Context
 
@@ -18,14 +18,13 @@ Note: a first architecture of oriBGT was implemented before, and was reviewed in
 
 ## Disclaimer
 
-A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
+_A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
 resource-bound effort to find as many vulnerabilities as possible, but there is no guarantee that all issues will be
-found.
-A security researcher holds no
+found. A security researcher holds no
 responsibility for the findings provided in this document. A security review is not an endorsement of the underlying
 business or product and can never be taken as a guarantee that the protocol is bug-free. This security review is focused
 solely on the security aspects of the Solidity implementation of the contracts. Gas optimizations are not the main
-focus, but significant inefficiencies will also be reported.
+focus, but significant inefficiencies will also be reported._
 
 ## Risk classification
 
@@ -58,15 +57,7 @@ focus, but significant inefficiencies will also be reported.
 
 ## Scope
 
-- **Main review:**
-  - [Report of origBGT V1 here](oriBGT-audit-report.md)
-  - Start date: `2025-02-09`
-  - End date: `2025-02-22`
-  - Effective total time: `25 hours`
-  - Commit hash in scope:
-    - [edda2db8fd72d84b948d8dd205ef28e380c6af00](https://github.com/TempleDAO/origami/tree/edda2db8fd72d84b948d8dd205ef28e380c6af00)
-
-- **Mitigation review**
+- **Re-architecture review**
   - Mitigation review delivery date: `2025-03-13`
   - Commit hash: [fc15af4dcd78df31d7d44f1b7d4d345224c09bd6](https://github.com/TempleDAO/origami/tree/fc15af4dcd78df31d7d44f1b7d4d345224c09bd6)
 
@@ -89,15 +80,15 @@ The reward tokens are sent to the swapper, that swaps them for iBGT to be staked
 
 ## Architecture high level review
 
-The architecture of oriBGT was damaged by the fact that anybody could claim rewards from the Infrared vault on behalf of oriBGT vault. 
+The architecture of oriBGT V1 suffered from the fact that anybody could claim rewards from the Infrared vault on behalf of oriBGT vault. 
 
-The new architecture was simplified and relied on a simple assumption: any asset (or token) held by the manager contract is considered either a reward or a donation, which should increase the vault share price, and therefore is subject to a fee. 
+The new architecture was simplified by relying on a simple assumption: any asset (or token) held by the manager contract is considered either a reward or a donation, which should increase the vault share price, and therefore is subject to a fee. 
 
 With that assumption, any non-asset held can be converted into assets, and any assets can be reinvested into the Infrared vault, taking a performance fee before doing so. With this simplified assumptions, it doesn't matter who claims rewards on behalf of the vault or who donates assets/tokens to the vault. 
 
 ![image](oriBGT-v2-finance.drawio.png)
 
-Some vesting mechanics are introduced to avoid step-jumps in share prices. 
+Note: Some vesting mechanics are introduced to avoid step-jumps in share prices. 
 
 # Findings
 
@@ -132,7 +123,7 @@ NOTE: This is temporary. Accounting goes back to normal after the broken vesting
 
 Here is a rough example of how the `totalAssets()` drops by 1/3 when the vesting duration is increased 50%. 
 
-![image](https://gist.github.com/user-attachments/assets/961fa6dd-aa1c-4994-8889-68beb51b9da0)
+![image](rewardsVestingPeriodUpdate.png)
 
 
 `OrigamiERC4626.sol` uses `totalAssets()` to calculate share prices:
