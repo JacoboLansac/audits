@@ -9,7 +9,7 @@ See [other security reviews here](https://github.com/JacoboLansac/audits/blob/ma
 
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
-| [[M-1]](<#m-1-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Medium | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price | ✅ fixed  |
+| [[L-1]](<#m-1-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Medium | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price | ✅ fixed  |
 
 ### Context
 
@@ -98,7 +98,11 @@ No high-risk issues found.
 
 ## Medium risk
 
-### [M-1] Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price
+No medium-risk issues found. 
+
+## Low risk
+
+### [L-1] Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price
 
 - Severity: **medium**
 - Contract: **OrigamiInfraredVaultManager**
