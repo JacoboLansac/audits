@@ -7,15 +7,13 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-| Finding | Risk | Description | Response |
+| Finding | Risk | Description | Team response |
 | :--- | :--- | :--- | :--- |
-| [[H-1]](<#h-1-an-attacker-can-steal-up-to-33-of-the-vault-yield-when-rewardtoken--_asset>) | High | An attacker can steal up to 33% of the vault yield when `rewardToken == _asset` |   |
-| [[M-1]](<#m-1-withdrawals-will-revert-with-underflow-when-the-amount-to-withdraw-is-smaller-than-the-managers-balance>) | Medium | Withdrawals will revert with underflow when the amount to withdraw is smaller than the manager's balance |   |
-| [[M-2]](<#m-2-an-attacker-can-bypass-the-performance-fees-and-distribute-them-among-vault-shareholders-if-rewardtoken--_asset>) | Medium | An attacker can bypass the performance fees and distribute them among vault shareholders if `rewardToken == _asset` |   |
+| [[H-1]](<#h-1-an-attacker-can-steal-up-to-33-of-the-vault-yield-when-rewardtoken--_asset>) | High | An attacker can steal up to 33% of the vault yield when `rewardToken == _asset` | ✅ |
+| [[M-1]](<#m-1-withdrawals-will-revert-with-underflow-when-the-amount-to-withdraw-is-smaller-than-the-managers-balance>) | Medium | Withdrawals will revert with underflow when the amount to withdraw is smaller than the manager's balance | ✅ |
+| [[M-2]](<#m-2-an-attacker-can-bypass-the-performance-fees-and-distribute-them-among-vault-shareholders-if-rewardtoken--_asset>) | Medium | An attacker can bypass the performance fees and distribute them among vault shareholders if `rewardToken == _asset` | ✅ |
+| [[M-3]](<#m-3-updating-reservesvestingduration-during-an-active-vesting-period-will-step-change-the-vault-share-price>) | Medium | Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price | ✅ |
 
-## Team Response
-
-The team responsibly decided to apply a few architectural changes before doing a second security review. 
 
 ## Disclaimer
 
@@ -67,8 +65,8 @@ focus, but significant inefficiencies will also be reported.
     - [edda2db8fd72d84b948d8dd205ef28e380c6af00](https://github.com/TempleDAO/origami/tree/edda2db8fd72d84b948d8dd205ef28e380c6af00)
 
 - **Mitigation review**
-  - Mitigation review delivery date: `TBD`
-  - Commit hash: -
+  - Mitigation review delivery date: `2025-03-13`
+  - Commit hash: [fc15af4dcd78df31d7d44f1b7d4d345224c09bd6](https://github.com/TempleDAO/origami/tree/fc15af4dcd78df31d7d44f1b7d4d345224c09bd6)
 
 ### Files in original scope
 
@@ -90,7 +88,8 @@ The reward tokens are sent to the swapper, that swaps them for iBGT to be staked
 
 ## Architecture high level review
 
-The architecture was generally well structured and the code was clean. 
+The architecture was generally well structured and the code was clean. However, the fact that any user could claim rewards on behalf of OriBGT vault, made it necessary to re-architecture the manager contract a bit. 
+This re-architecture also solved issues H-1, and M-2. However, it introduced M-3, which was also fixed responsibly by the team.
 
 # Findings
 
@@ -119,4 +118,10 @@ https://gist.github.com/JacoboLansac/9e54de0b8bdb663af5951afa6980f6c1
 The issue is described in depth here:
 
 https://gist.github.com/JacoboLansac/b3f4432f31ff109f45a216a9100f3d8b
+
+### [M-3] Updating `reservesVestingDuration` during an active vesting period will step-change the vault share price
+
+The issue is described in depth here:
+
+https://gist.github.com/JacoboLansac/b38df6c77d41c2e20e46cdf97cc8f731
 
