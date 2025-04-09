@@ -5,29 +5,31 @@ A time-boxed security review of the LockIn Compounder and LockInExternal contrac
 Author: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
 Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
 
-## Findings Summary (high & med risk)
+## Findings Summary
 
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
 | [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>) | High | An attacker can cause an unfair distribution of iBGT among POL tokens leaving certain depositors with 0% returns |   |
-| [[H-2]](<#h-2-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions->) | High | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions  |   |
+| [[H-2]](<#h-2-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | High | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions |   |
 | [[M-1]](<#m-1-if-oribgt-is-paused-users-cant-withdraw-assets-or-claim-rewards-from-the-compounder>) | Medium | If oriBGT is paused, users can't withdraw assets or claim rewards from the Compounder |   |
 | [[M-2]](<#m-2-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>) | Medium | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders |   |
-|
-## Low-risk & informational issues
+
+
+## Low risk issues
 
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
 | [[L-01]](<#l-01-changing-the-fee-applies-retroactive-taxation-to-accrued-rewards-in-the-infrared-vault-that-hasnt-been-compounded-yet-into-oribgt>) | Low | Changing the fee applies retroactive taxation to accrued rewards in the Infrared Vault that hasn't been compounded yet into oriBGT |   |
-| [[L-02]](<#l-02-a-malicious-owner-of-the-compounder-can-steal-ibgt-from-users>) | Low | A malicious owner of the Compounder can steal iBGT from users |   |
+| [[L-02]](<#l-02-a-malicious-owner-of-the-compounder-can-steal-ibgt-rewards-from-users>) | Low | A malicious owner of the Compounder can steal iBGT rewards from users |   |
 | [[L-03]](<#l-03-misleading-output-variable-in-compounderdeposit>) | Low | Misleading output variable in `Compounder.deposit()` |   |
-| [[L-05]](<#l-05-oribgt-donations-in-compounder_claimpol-wont-be-accounted-and-will-get-stuck-in-the-compounder-contract>) | Low | OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract |   |
-| [[L-06]](<#l-06-uninformative-error-in-lockinexternalredeempol-doesnt-tell-the-caller-what-tokenids-are-not-meeting-the-requirements>) | Low | Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements |   |
-| [[L-07]](<#l-07-potential-balance-inflation-in-lockinexternalgetclaimablemultiple-when-maxforitem_-exceeds-contracts-balance-of-oribgt->) | Low | Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT  |   |
-| [[L-08]](<#l-08-division-by-zero-error-in-lockinexternalgetpolperitem-when-the-full-collection-is-redeemed>) | Low | Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed |   |
-| [[L-09]](<#l-09-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>) | Low | Interface mismatch in `Compounder.deposit() when called from LockInExternal` |   |
-| [[L-10]](<#l-10-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>) | Low | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()` |   |
-| [[L-11]](<#l-11-inconsistent-period-restriction-in-factorycreateexternallockincontract>) | Low | Inconsistent period restriction in `Factory.createExternalLockInContract()` |   |
+| [[L-04]](<#l-04-oribgt-donations-in-compounder_claimpol-wont-be-accounted-and-will-get-stuck-in-the-compounder-contract>) | Low | OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract |   |
+| [[L-05]](<#l-05-uninformative-error-in-lockinexternalredeempol-doesnt-tell-the-caller-what-tokenids-are-not-meeting-the-requirements>) | Low | Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements |   |
+| [[L-06]](<#l-06-potential-balance-inflation-in-lockinexternalgetclaimablemultiple-when-maxforitem_-exceeds-contracts-balance-of-oribgt->) | Low | Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT  |   |
+| [[L-07]](<#l-07-division-by-zero-error-in-lockinexternalgetpolperitem-when-the-full-collection-is-redeemed>) | Low | Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed |   |
+| [[L-08]](<#l-08-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>) | Low | Interface mismatch in `Compounder.deposit() when called from LockInExternal` |   |
+| [[L-09]](<#l-09-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>) | Low | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()` |   |
+| [[L-10]](<#l-10-inconsistent-period-restriction-in-factorycreateexternallockincontract>) | Low | Inconsistent period restriction in `Factory.createExternalLockInContract()` |   |
+
 
 
 ## Disclaimer
@@ -237,7 +239,7 @@ A POC can be provided if needed.
 
 
 
-### [H-2] In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions 
+### [H-2] In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions
 
 Functions with the issue: 
 - `LockInExternal::getLifetimeoriBGTPerItem()`
@@ -426,7 +428,7 @@ function setFee(uint256 newFee_) external onlyOwner {
 }
 ```
 
-### [L-02] A malicious owner of the Compounder can steal iBGT from users
+### [L-02] A malicious owner of the Compounder can steal iBGT rewards from users
 
 Issue type: Centralization
 Function with the issue: `Compounder::withdrawStuckToken()`
@@ -489,7 +491,7 @@ Rename the output variable to better reflect its purpose:
 + function deposit(address _token, uint256 _nftId, uint256 _amount) external returns (uint256 _id, uint256 _transferredRewards)
 ```
 
-### [L-05] OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract
+### [L-04] OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract
 
 Function with the issue: `Compounder::_claimPOL()`
 
@@ -556,7 +558,7 @@ Inside _claimPOL(), include any potential extra oriBGT balance that has been don
 
 ```
 
-### [L-06] Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements
+### [L-05] Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements
 
 Function with the issue: `LockInExternal::redeemPOL()`
 
@@ -580,7 +582,7 @@ for (uint256 i; i < id_.length; ++i) {
 }
 ```
 
-### [L-07] Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT 
+### [L-06] Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT 
 Function with the issue: `LockInExternal::getClaimableMultiple()`
 
 #### Description
@@ -616,7 +618,7 @@ function getClaimableMultiple(uint256[] calldata id_) external view returns (uin
 }
 ```
 
-### [L-08] Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed
+### [L-07] Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed
 Function with the issue: `LockInExternal::getPOLPerItem()`
 
 #### Description
@@ -650,7 +652,7 @@ function getPOLPerItem() public view returns (uint256 polPerItem_) {
 }
 ```
 
-### [L-09] Interface mismatch in `Compounder.deposit() when called from LockInExternal`
+### [L-08] Interface mismatch in `Compounder.deposit() when called from LockInExternal`
 
 Functions with the issue: 
 - `LockInExternal::_addToPOL()`
@@ -673,7 +675,7 @@ When `LockInExternal._addToPOL()` calls Compounder.deposit() the pending rewards
 Update the ICompounder interface and the usages of the compounder to get both values
 
 
-### [L-10] Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()`
+### [L-09] Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()`
 
 Function with the issue: `LockInExternal::_claimPOL()`
 
@@ -707,7 +709,7 @@ Use the output from `claimRewards()` instead:
     }
 ```
 
-### [L-11] Inconsistent period restriction in `Factory.createExternalLockInContract()`
+### [L-10] Inconsistent period restriction in `Factory.createExternalLockInContract()`
 Function with the issue: `Factory::createExternalLockInContract()`
 
 #### Description

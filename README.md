@@ -2,7 +2,7 @@
 
 ## 2025 - April
 
-- [LockIn XYZ - LockIn Compounder](solo/lockin-xyz/lockin-audit-report_jacopod.md). Security review.
+- [LockIn XYZ - LockIn Compounder](solo/lockin-xyz/lockin-audit-report.md). Security review.
 
 ## 2025 - March
 
