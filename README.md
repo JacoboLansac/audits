@@ -1,8 +1,15 @@
 # Security-reviews
 
-## 2025 - February
+## 2025 - April
+
+- [LockIn XYZ - LockIn Compounder](solo/lockin-xyz/lockin-audit-report_jacopod.md). Security review.
+
+## 2025 - March
 
 - [Origami - oriBGT V2](solo/origami/oriBGT-V2-audit-report.md). Security review.
+
+## 2025 - February
+
 - [Origami - oriBGT](solo/origami/oriBGT-audit-report.md). Security review.
 
 ## 2024 - November
