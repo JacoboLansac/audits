@@ -72,7 +72,7 @@ focus, but significant inefficiencies will also be reported._
 | `contracts/investments/OrigamiDelegated4626Vault.sol`                     | 72    | <<<<<<       |
 | `contracts/common/OrigamiErc4626.sol`                                     | 282   |
 | `contracts/investments/infrared/OrigamiInfraredVaultManager.sol`          | 212   | <<<<<<       |
-
+| **total**                                                                 | **326** 
 
 
 ## Protocol Overview
