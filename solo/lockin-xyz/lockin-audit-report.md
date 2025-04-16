@@ -7,28 +7,28 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-| Finding | Risk | Description | Response |
-| :--- | :--- | :--- | :--- |
-| [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>) | High | An attacker can cause an unfair distribution of iBGT among POL tokens leaving certain depositors with 0% returns |   |
-| [[H-2]](<#h-2-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | High | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions |   |
-| [[M-1]](<#m-1-if-oribgt-is-paused-users-cant-withdraw-assets-or-claim-rewards-from-the-compounder>) | Medium | If oriBGT is paused, users can't withdraw assets or claim rewards from the Compounder |   |
-| [[M-2]](<#m-2-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>) | Medium | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders |   |
+| Finding                                                                                                                                               | Risk   | Description                                                                                                                                      | Response       |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------- | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :------------- |
+| [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>)                       | High   | An attacker can cause an unfair distribution of iBGT among POL tokens leaving certain depositors with 0% returns                                 | ✅ ?????        |
+| [[M-1]](<#m-1-if-oribgt-is-paused-users-cant-withdraw-assets-or-claim-rewards-from-the-compounder>)                                                   | Medium | If oriBGT is paused, users can't withdraw assets or claim rewards from the Compounder                                                            |                |
+| [[M-2]](<#m-2-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>)                              | Medium | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders                                         |                |
+| [[M-3]](<#h-3-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | High   | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions | 🤝 Ackn. |
 
 
 ## Low risk issues
 
-| Finding | Risk | Description | Response |
-| :--- | :--- | :--- | :--- |
-| [[L-01]](<#l-01-changing-the-fee-applies-retroactive-taxation-to-accrued-rewards-in-the-infrared-vault-that-hasnt-been-compounded-yet-into-oribgt>) | Low | Changing the fee applies retroactive taxation to accrued rewards in the Infrared Vault that hasn't been compounded yet into oriBGT |   |
-| [[L-02]](<#l-02-a-malicious-owner-of-the-compounder-can-steal-ibgt-rewards-from-users>) | Low | A malicious owner of the Compounder can steal iBGT rewards from users |   |
-| [[L-03]](<#l-03-misleading-output-variable-in-compounderdeposit>) | Low | Misleading output variable in `Compounder.deposit()` |   |
-| [[L-04]](<#l-04-oribgt-donations-in-compounder_claimpol-wont-be-accounted-and-will-get-stuck-in-the-compounder-contract>) | Low | OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract |   |
-| [[L-05]](<#l-05-uninformative-error-in-lockinexternalredeempol-doesnt-tell-the-caller-what-tokenids-are-not-meeting-the-requirements>) | Low | Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements |   |
-| [[L-06]](<#l-06-potential-balance-inflation-in-lockinexternalgetclaimablemultiple-when-maxforitem_-exceeds-contracts-balance-of-oribgt->) | Low | Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT  |   |
-| [[L-07]](<#l-07-division-by-zero-error-in-lockinexternalgetpolperitem-when-the-full-collection-is-redeemed>) | Low | Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed |   |
-| [[L-08]](<#l-08-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>) | Low | Interface mismatch in `Compounder.deposit() when called from LockInExternal` |   |
-| [[L-09]](<#l-09-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>) | Low | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()` |   |
-| [[L-10]](<#l-10-inconsistent-period-restriction-in-factorycreateexternallockincontract>) | Low | Inconsistent period restriction in `Factory.createExternalLockInContract()` |   |
+| Finding                                                                                                                                             | Risk | Description                                                                                                                        | Response       |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------- | :--- | :--------------------------------------------------------------------------------------------------------------------------------- | :------------- |
+| [[L-01]](<#l-01-changing-the-fee-applies-retroactive-taxation-to-accrued-rewards-in-the-infrared-vault-that-hasnt-been-compounded-yet-into-oribgt>) | Low  | Changing the fee applies retroactive taxation to accrued rewards in the Infrared Vault that hasn't been compounded yet into oriBGT | 🤝 Ackn. |
+| [[L-02]](<#l-02-a-malicious-owner-of-the-compounder-can-steal-ibgt-rewards-from-users>)                                                             | Low  | A malicious owner of the Compounder can steal iBGT rewards from users                                                              | ✅ Fixed        |
+| [[L-03]](<#l-03-misleading-output-variable-in-compounderdeposit>)                                                                                   | Low  | Misleading output variable in `Compounder.deposit()`                                                                               | ✅ Fixed        |
+| [[L-04]](<#l-04-oribgt-donations-in-compounder_claimpol-wont-be-accounted-and-will-get-stuck-in-the-compounder-contract>)                           | Low  | OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract                      | 🤝 Ackn. |
+| [[L-05]](<#l-05-uninformative-error-in-lockinexternalredeempol-doesnt-tell-the-caller-what-tokenids-are-not-meeting-the-requirements>)              | Low  | Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements         | ✅ Fixed        |
+| [[L-06]](<#l-06-potential-balance-inflation-in-lockinexternalgetclaimablemultiple-when-maxforitem_-exceeds-contracts-balance-of-oribgt->)           | Low  | Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT     | ✅ Fixed        |
+| [[L-07]](<#l-07-division-by-zero-error-in-lockinexternalgetpolperitem-when-the-full-collection-is-redeemed>)                                        | Low  | Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed                                    | ✅ Fixed        |
+| [[L-08]](<#l-08-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>)                                                           | Low  | Interface mismatch in `Compounder.deposit() when called from LockInExternal`                                                       | ✅ Fixed        |
+| [[L-09]](<#l-09-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>)                                 | Low  | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()`                             | ✅ Fixed              |
+| [[L-10]](<#l-10-inconsistent-period-restriction-in-factorycreateexternallockincontract>)                                                            | Low  | Inconsistent period restriction in `Factory.createExternalLockInContract()`                                                        | ✅ Fixed        |
 
 
 
@@ -88,12 +88,12 @@ focus, but significant inefficiencies will also be reported.
 ### Files in original scope
 
 
-| Files in scope                                       | nSLOC    |
-| ---------------------------------------------------- | -------- |
-| contracts/Compounder.sol                             | 188      |
-| contracts/NonFungiblePOL/external/LockInExternal.sol | 135      |
-| contracts/NonFungiblePOL/external/Factory.sol        | 22       |
-| **Total**                                            | **345**  |
+| Files in scope                                       | nSLOC   |
+| ---------------------------------------------------- | ------- |
+| contracts/Compounder.sol                             | 188     |
+| contracts/NonFungiblePOL/external/LockInExternal.sol | 135     |
+| contracts/NonFungiblePOL/external/Factory.sol        | 22      |
+| **Total**                                            | **345** |
 
 
 ## Protocol Overview
@@ -238,58 +238,6 @@ A POC can be provided if needed.
 
 
 
-
-### [H-2] In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions
-
-Functions with the issue: 
-- `LockInExternal::getLifetimeoriBGTPerItem()`
-- `LockInExternal::getPOLPerItem()`
-
-#### Description
-
-There is no guarantee that the totalSupply of a collection is immutable. When the items of the collection can be burned
-the `totalSupply` will decrease. This can become an issue for both of the functions below, 
-which perform the following subtraction between `totalSupply` and `totalItemsRedeemedPOL`:
-
-```solidity
-    function getLifetimeoriBGTPerItem() public view returns (uint256 totaloriBGT_) {
-        return (getPendingoriBGT() + totaloriBGTReceived - totaloriBGTClaimedByRedeemedItems)
->>>     / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
-    }
-
-    // ...
-
-    function getPOLPerItem() public view returns (uint256 polPerItem_) {
-        uint256 polDeposited_ = ICompounder(compounder).getPOLDeposited(POLTokenAddress, compounderId);
->>>     return polDeposited_ / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
-    }
-```
-
-Example scenario:
-- Intitial totalSupply = 100
-
-Then at some point:
-- Redeemed tokens = 80
-- burned tokens = 25
-- denominator = (100-25) - 80 = 75 - 80 --> **reverts with underflow**
-
-The worst case scenario is when all items redeemed are also burned, as the functions above will revert when half the supply is redeemed & burned. 
-
-#### Impact: high
-
-When the condition `totalSupply() < totalItemsRedeemedPOL` is true, then both of the functions above will revert with an underflow. Which means:
-- All new `redeemPOL()` transactions will revert, so the users that haven't redeemed so far will lose their share of POL tokens
-- All `claim()` transactions will revert for all users that have pending claims. 
-
-#### Suggested mitigation
-
-The fix is not trivial with the current architecture. Possible fixes are:
-
-- Whitelisting only collections with fixed totalSupply
-- Enforcing depositing the NFTs in the LockIn balance, so that only the deposited NFTs are used in the divisor for the calculation of POL redemptions and rewards. NFTs would be returned to the users upon redemptions. 
-
-
-
 -----------------------------------------------------------------------
 
 
@@ -390,6 +338,61 @@ The fix is not straight forward, and the team may simply decide to acknowledge t
 
 
 
+### [M-3] In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions
+
+Functions with the issue: 
+- `LockInExternal::getLifetimeoriBGTPerItem()`
+- `LockInExternal::getPOLPerItem()`
+
+#### Description
+
+There is no guarantee that the totalSupply of a collection is immutable. When the items of the collection can be burned
+the `totalSupply` will decrease. This can become an issue for both of the functions below, 
+which perform the following subtraction between `totalSupply` and `totalItemsRedeemedPOL`:
+
+```solidity
+    function getLifetimeoriBGTPerItem() public view returns (uint256 totaloriBGT_) {
+        return (getPendingoriBGT() + totaloriBGTReceived - totaloriBGTClaimedByRedeemedItems)
+>>>     / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
+    }
+
+    // ...
+
+    function getPOLPerItem() public view returns (uint256 polPerItem_) {
+        uint256 polDeposited_ = ICompounder(compounder).getPOLDeposited(POLTokenAddress, compounderId);
+>>>     return polDeposited_ / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
+    }
+```
+
+Example scenario:
+- Intitial totalSupply = 100
+
+Then at some point:
+- Redeemed tokens = 80
+- burned tokens = 25
+- denominator = (100-25) - 80 = 75 - 80 --> **reverts with underflow**
+
+The worst case scenario is when all items redeemed are also burned, as the functions above will revert when half the supply is redeemed & burned. 
+
+#### Impact: medium
+
+When the condition `totalSupply() < totalItemsRedeemedPOL` is true, then both of the functions above will revert with an underflow. Which means:
+- All new `redeemPOL()` transactions will revert, so the users that haven't redeemed so far will lose their share of POL tokens
+- All `claim()` transactions will revert for all users that have pending claims. 
+
+#### Suggested mitigation
+
+The fix is not trivial with the current architecture. Possible fixes are:
+
+- Whitelisting only collections with fixed totalSupply
+- Enforcing depositing the NFTs in the LockIn balance, so that only the deposited NFTs are used in the divisor for the calculation of POL redemptions and rewards. NFTs would be returned to the users upon redemptions. 
+
+#### Team response
+
+Collection owners are not incentived to me malicious as they are depositing their POL for their communities. 
+While collection owners may not act maliciously, they may create undesired situations by mistake. So the team committed to display appropriate warnings explaining the consequences of integrating with burnable collections
+
+
 
 
 
@@ -427,6 +430,11 @@ function setFee(uint256 newFee_) external onlyOwner {
     fee = newFee_;
 }
 ```
+
+#### Team response
+
+With the new architecture of individual Compounders, the `_claimPOL()` accepts a `token` parameter that would require iterating through an unknown amount of tokens. 
+So the team decided to acknowledge the issue, with the expectation that the fees would never be increased but only decreased. 
 
 ### [L-02] A malicious owner of the Compounder can steal iBGT rewards from users
 
@@ -651,6 +659,14 @@ function getPOLPerItem() public view returns (uint256 polPerItem_) {
 +   return polDeposited_ / remainingItems;
 }
 ```
+
+#### Team response
+The team applied the suggested solution above. 
+
+While the solution above avoids reverts, there is an edge case in which when there is one pending item to be redeemed but the collection is burnable, someone else can burn one item causing the last share of POL to be locked in the contract. 
+
+The team is OK with this edgecase, as the frontend will warn against burnable collections.
+
 
 ### [L-08] Interface mismatch in `Compounder.deposit() when called from LockInExternal`
 
