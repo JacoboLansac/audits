@@ -11,8 +11,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :------------- |
 | [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>)                       | High   | An attacker can cause an unfair distribution of iBGT among POL tokens leaving certain depositors with 0% returns                                 | ✅ ?????        |
 | [[M-1]](<#m-1-if-oribgt-is-paused-users-cant-withdraw-assets-or-claim-rewards-from-the-compounder>)                                                   | Medium | If oriBGT is paused, users can't withdraw assets or claim rewards from the Compounder                                                            |                |
-| [[M-2]](<#m-2-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>)                              | Medium | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders                                         |                |
-| [[M-3]](<#h-3-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | High   | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions | 🤝 Ackn. |
+| [[M-2]](<#m-2-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | Medium   | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions | 🤝 Ackn. |
 
 
 ## Low risk issues
@@ -29,6 +28,7 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 | [[L-08]](<#l-08-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>)                                                           | Low  | Interface mismatch in `Compounder.deposit() when called from LockInExternal`                                                       | ✅ Fixed        |
 | [[L-09]](<#l-09-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>)                                 | Low  | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()`                             | ✅ Fixed              |
 | [[L-10]](<#l-10-inconsistent-period-restriction-in-factorycreateexternallockincontract>)                                                            | Low  | Inconsistent period restriction in `Factory.createExternalLockInContract()`                                                        | ✅ Fixed        |
+| [[L-11]](<#l-11-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>)                              | Low | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders                                         | 🤝 Ackn.   |
 
 
 
@@ -295,50 +295,7 @@ By default they should always compound, but in emergency situations the users ca
 
 
 
-### [M-2] NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders
-Functions with the issue: 
-- `LockInExternal::getLifetimeoriBGTPerItem()`
-- `LockInExternal::getPOLPerItem()`
-
-#### Description
-
-Both functions above share the underlying assumption that totalSupply is immutable once the collection is minted out. 
-However, this assumption is not guaranteed and some collections may allow mints even after the lockin has been completed. 
-
-When new NFTs are minted, the oriBGT rewards and the POL allocation gets diluted, 
-as the newly minted assets are entitled to the same amounts af the assets that were minted before the LockIn was created.
-
-
-```solidity
-    function getLifetimeoriBGTPerItem() public view returns (uint256 totaloriBGT_) {
-        return (getPendingoriBGT() + totaloriBGTReceived - totaloriBGTClaimedByRedeemedItems)
->>>     / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
-}
-
-    function getPOLPerItem() public view returns (uint256 polPerItem_) {
-        uint256 polDeposited_ = ICompounder(compounder).getPOLDeposited(POLTokenAddress, compounderId);
->>>     return polDeposited_ / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
-    }
-```
-
-#### Impact: medium
-
-- An unfair situation is created where minting before the lockin has no benefits compared to minting after the lockin is completed.
-- A structure of wrong incentives is created when users can chose when to mint, as no one has incentives to mint before the lockin is created, because their POL allocation and rewards can get later diluted.
-
-#### Suggested Fix
-
-The fix is not straight forward, and the team may simply decide to acknowledge this issue and think of rewards/POL dilution as a feature. Alternatively:
-
-- Whitelisting only collections with fixed totalSupply
-- Enforcing depositing the NFTs in the LockIn, so that only the deposit NFTs are used in the divisor for the calculation of POL redemptions and rewards
-- Caching the supply and implementing an emergency mechanism if it changes (because some items are minted). I don't like this one too much
-
-
-
-
-
-### [M-3] In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions
+### [M-2] In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions
 
 Functions with the issue: 
 - `LockInExternal::getLifetimeoriBGTPerItem()`
@@ -391,6 +348,9 @@ The fix is not trivial with the current architecture. Possible fixes are:
 
 Collection owners are not incentived to me malicious as they are depositing their POL for their communities. 
 While collection owners may not act maliciously, they may create undesired situations by mistake. So the team committed to display appropriate warnings explaining the consequences of integrating with burnable collections
+
+
+
 
 
 
@@ -489,7 +449,7 @@ The output variable `_pendingRewards` is misleading as these rewards are actuall
     }
 ```
 
-**Impact**: the integrating contracts can be mislead, but the LockInExternal contract is not affected as this output variable is not read except when the NFT is initialized (where pending rewards are correctly 0).
+#### Impact: the integrating contracts can be mislead, but the LockInExternal contract is not affected as this output variable is not read except when the NFT is initialized (where pending rewards are correctly 0).
 
 #### Recommended fix
 Rename the output variable to better reflect its purpose:
@@ -745,4 +705,44 @@ Add the same restriction to the lock-in contract if the time restriction is actu
 // In ExternalTimeLockInNonFungiblePOL.sol
 + require(timeLockedIn_ > 30 days, "Must LockIn for at least 30 days");
 ```
+
+
+### [L-11] NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders
+Functions with the issue: 
+- `LockInExternal::getLifetimeoriBGTPerItem()`
+- `LockInExternal::getPOLPerItem()`
+
+#### Description
+
+Both functions above share the underlying assumption that totalSupply is immutable once the collection is minted out. 
+However, this assumption is not guaranteed and some collections may allow mints even after the lockin has been completed. 
+
+When new NFTs are minted, the oriBGT rewards and the POL allocation gets diluted, 
+as the newly minted assets are entitled to the same amounts af the assets that were minted before the LockIn was created.
+
+
+```solidity
+    function getLifetimeoriBGTPerItem() public view returns (uint256 totaloriBGT_) {
+        return (getPendingoriBGT() + totaloriBGTReceived - totaloriBGTClaimedByRedeemedItems)
+>>>     / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
+}
+
+    function getPOLPerItem() public view returns (uint256 polPerItem_) {
+        uint256 polDeposited_ = ICompounder(compounder).getPOLDeposited(POLTokenAddress, compounderId);
+>>>     return polDeposited_ / (IERC721Enumerable(collection).totalSupply() - totalItemsRedeemedPOL);
+    }
+```
+
+#### Impact: medium/low
+
+- An unfair situation is created where minting before the lockin has no benefits compared to minting after the lockin is completed.
+- A structure of wrong incentives is created when users can chose when to mint, as no one has incentives to mint before the lockin is created, because their POL allocation and rewards can get later diluted.
+
+#### Suggested Fix
+
+The fix is not straight forward, and the team may simply decide to acknowledge this issue and think of rewards/POL dilution as a feature. Alternatively:
+
+- Whitelisting only collections with fixed totalSupply
+- Enforcing depositing the NFTs in the LockIn, so that only the deposit NFTs are used in the divisor for the calculation of POL redemptions and rewards
+- Caching the supply and implementing an emergency mechanism if it changes (because some items are minted). I don't like this one too much
 
