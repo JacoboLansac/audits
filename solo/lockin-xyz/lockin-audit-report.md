@@ -7,28 +7,28 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
-| Finding                                                                                                                                               | Risk   | Description                                                                                                                                      | Response       |
-| :---------------------------------------------------------------------------------------------------------------------------------------------------- | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :------------- |
-| [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>)                       | High   | An attacker can cause an unfair distribution of iBGT among POL tokens leaving certain depositors with 0% returns                                 | ✅ ?????        |
-| [[M-1]](<#m-1-if-oribgt-is-paused-users-cant-withdraw-assets-or-claim-rewards-from-the-compounder>)                                                   | Medium | If oriBGT is paused, users can't withdraw assets or claim rewards from the Compounder                                                            |                |
-| [[M-2]](<#m-2-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | Medium   | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions | 🤝 Ackn. |
+| Finding                                                                                                                                               | Risk   | Description                                                                                                                                      | Response |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------- | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>)                       | High   | An attacker can cause an unfair distribution of iBGT among POL tokens leaving certain depositors with 0% returns                                 | ✅ Fixed  |
+| [[M-1]](<#m-1-if-oribgt-is-paused-users-cant-withdraw-assets-or-claim-rewards-from-the-compounder>)                                                   | Medium | If oriBGT is paused, users can't withdraw assets or claim rewards from the Compounder                                                            | ✅ Fixed  |
+| [[M-2]](<#m-2-in-lockinexternal-claim-and-redeempol-will-revert-for-burnable-collections-once-the-totalsupply-drops-below-the-number-of-redemptions>) | Medium | In LockInExternal, `claim()` and `redeemPOL()` will revert for burnable collections once the `totalSupply` drops below the number of redemptions | 🤝 Ackn.  |
 
 
 ## Low risk issues
 
-| Finding                                                                                                                                             | Risk | Description                                                                                                                        | Response       |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------- | :--- | :--------------------------------------------------------------------------------------------------------------------------------- | :------------- |
-| [[L-01]](<#l-01-changing-the-fee-applies-retroactive-taxation-to-accrued-rewards-in-the-infrared-vault-that-hasnt-been-compounded-yet-into-oribgt>) | Low  | Changing the fee applies retroactive taxation to accrued rewards in the Infrared Vault that hasn't been compounded yet into oriBGT | 🤝 Ackn. |
-| [[L-02]](<#l-02-a-malicious-owner-of-the-compounder-can-steal-ibgt-rewards-from-users>)                                                             | Low  | A malicious owner of the Compounder can steal iBGT rewards from users                                                              | ✅ Fixed        |
-| [[L-03]](<#l-03-misleading-output-variable-in-compounderdeposit>)                                                                                   | Low  | Misleading output variable in `Compounder.deposit()`                                                                               | ✅ Fixed        |
-| [[L-04]](<#l-04-oribgt-donations-in-compounder_claimpol-wont-be-accounted-and-will-get-stuck-in-the-compounder-contract>)                           | Low  | OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract                      | 🤝 Ackn. |
-| [[L-05]](<#l-05-uninformative-error-in-lockinexternalredeempol-doesnt-tell-the-caller-what-tokenids-are-not-meeting-the-requirements>)              | Low  | Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements         | ✅ Fixed        |
-| [[L-06]](<#l-06-potential-balance-inflation-in-lockinexternalgetclaimablemultiple-when-maxforitem_-exceeds-contracts-balance-of-oribgt->)           | Low  | Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT     | ✅ Fixed        |
-| [[L-07]](<#l-07-division-by-zero-error-in-lockinexternalgetpolperitem-when-the-full-collection-is-redeemed>)                                        | Low  | Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed                                    | ✅ Fixed        |
-| [[L-08]](<#l-08-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>)                                                           | Low  | Interface mismatch in `Compounder.deposit() when called from LockInExternal`                                                       | ✅ Fixed        |
-| [[L-09]](<#l-09-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>)                                 | Low  | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()`                             | ✅ Fixed              |
-| [[L-10]](<#l-10-inconsistent-period-restriction-in-factorycreateexternallockincontract>)                                                            | Low  | Inconsistent period restriction in `Factory.createExternalLockInContract()`                                                        | ✅ Fixed        |
-| [[L-11]](<#l-11-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>)                              | Low | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders                                         | 🤝 Ackn.   |
+| Finding                                                                                                                                             | Risk | Description                                                                                                                        | Response |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------- | :--- | :--------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| [[L-01]](<#l-01-changing-the-fee-applies-retroactive-taxation-to-accrued-rewards-in-the-infrared-vault-that-hasnt-been-compounded-yet-into-oribgt>) | Low  | Changing the fee applies retroactive taxation to accrued rewards in the Infrared Vault that hasn't been compounded yet into oriBGT | 🤝 Ackn.  |
+| [[L-02]](<#l-02-a-malicious-owner-of-the-compounder-can-steal-ibgt-rewards-from-users>)                                                             | Low  | A malicious owner of the Compounder can steal iBGT rewards from users                                                              | ✅ Fixed  |
+| [[L-03]](<#l-03-misleading-output-variable-in-compounderdeposit>)                                                                                   | Low  | Misleading output variable in `Compounder.deposit()`                                                                               | ✅ Fixed  |
+| [[L-04]](<#l-04-oribgt-donations-in-compounder_claimpol-wont-be-accounted-and-will-get-stuck-in-the-compounder-contract>)                           | Low  | OriBGT donations in `Compounder._claimPOL()` won't be accounted and will get stuck in the Compounder contract                      | 🤝 Ackn.  |
+| [[L-05]](<#l-05-uninformative-error-in-lockinexternalredeempol-doesnt-tell-the-caller-what-tokenids-are-not-meeting-the-requirements>)              | Low  | Uninformative error in `LockInExternal.redeemPOL()` doesn't tell the caller what tokenIds are not meeting the requirements         | ✅ Fixed  |
+| [[L-06]](<#l-06-potential-balance-inflation-in-lockinexternalgetclaimablemultiple-when-maxforitem_-exceeds-contracts-balance-of-oribgt->)           | Low  | Potential balance Inflation in `LockInExternal.getClaimableMultiple()` when `maxForItem_` exceeds contract's balance of oriBGT     | ✅ Fixed  |
+| [[L-07]](<#l-07-division-by-zero-error-in-lockinexternalgetpolperitem-when-the-full-collection-is-redeemed>)                                        | Low  | Division by zero error in `LockInExternal.getPOLPerItem()` when the full collection is redeemed                                    | ✅ Fixed  |
+| [[L-08]](<#l-08-interface-mismatch-in-compounderdeposit-when-called-from-lockinexternal>)                                                           | Low  | Interface mismatch in `Compounder.deposit() when called from LockInExternal`                                                       | ✅ Fixed  |
+| [[L-09]](<#l-09-rewards-received-from-compounder-may-not-match-the-internal-accounting-in-lockinexternal_claimpol>)                                 | Low  | Rewards received from compounder may not match the internal accounting in `LockInExternal._claimPOL()`                             | ✅ Fixed  |
+| [[L-10]](<#l-10-inconsistent-period-restriction-in-factorycreateexternallockincontract>)                                                            | Low  | Inconsistent period restriction in `Factory.createExternalLockInContract()`                                                        | ✅ Fixed  |
+| [[L-11]](<#l-11-nfts-minted-after-a-lock-in-has-been-concluded-are-will-receive-same-pol-and-oribgt-than-initial-holders>)                          | Low  | NFTs minted after a lock-in has been concluded are will receive same POL and oriBGT than initial holders                           | 🤝 Ackn.  |
 
 
 
@@ -81,9 +81,9 @@ focus, but significant inefficiencies will also be reported.
     - [4c44ac2797c2b9143ce4b38972b9d55a989c53ce](https://github.com/4c44ac2797c2b9143ce4b38972b9d55a989c53ce)
 
 - **Mitigation review**
-  - Mitigation review delivery date: `YYYY-MM-DD`
+  - Mitigation review delivery date: `2024-04-19`
   - Commit hash:
-    - [pending](https://github.com/pending)
+    - [10dea49476ff2c8e5bfc9e3bb23c032dbd4ae8bd](https://github.com/pending10dea49476ff2c8e5bfc9e3bb23c032dbd4ae8bd)
 
 ### Files in original scope
 
@@ -121,6 +121,15 @@ Below is a graphical overview of the architecture from the point of view of func
 NOTE: gas optimizations have not been pointed out, as the gas fees in Berachain are virtually negligible.
 
 ------------------------
+
+## Updated architecture
+
+Due to finding [[H-1]](<#h-1-an-attacker-can-cause-an-unfair-distribution-of-ibgt-among-pol-tokens-leaving-certain-depositors-with-0-returns>), the team re-designed the architecture of the system, adding the individual-compounder contract in between the Compounder and the infrared vaults. The new architecture looks as follows:
+
+![LockIn Architecture](lockin-xyz.drawio-rearchitecture.png)
+
+
+------------
 
 # Findings
 
