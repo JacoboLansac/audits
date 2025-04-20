@@ -81,12 +81,12 @@ focus, but significant inefficiencies will also be reported.
     - [4c44ac2797c2b9143ce4b38972b9d55a989c53ce](https://github.com/4c44ac2797c2b9143ce4b38972b9d55a989c53ce)
 
 - **Mitigation review**
-  - Mitigation review delivery date: `2024-04-19`
+  - Mitigation review delivery date: `2024-04-21`
   - Commit hash:
     - [10dea49476ff2c8e5bfc9e3bb23c032dbd4ae8bd](https://github.com/pending10dea49476ff2c8e5bfc9e3bb23c032dbd4ae8bd)
 
-### Files in original scope
 
+### Files in original scope
 
 | Files in scope                                       | nSLOC   |
 | ---------------------------------------------------- | ------- |
