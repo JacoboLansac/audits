@@ -2,6 +2,7 @@
 
 ## 2025 - April
 
+- [TempleDAO - Spice Auction](solo/temple/templeGold/temple-gold-spice-auction-updates.md). Security review.
 - [LockIn XYZ - LockIn Compounder](solo/lockin-xyz/lockin-audit-report.md). Security review.
 
 ## 2025 - March

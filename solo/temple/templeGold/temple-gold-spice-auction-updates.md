@@ -100,7 +100,7 @@ There are permissioned mechanisms in place for:
 
 ```mermaid
 stateDiagram
-    direction LR
+    %%direction LR
 
     Uninitialized --> Configured : setAuctionConfig()
     Configured --> Funded : fundNextAuction()
@@ -110,7 +110,7 @@ stateDiagram
     Funded --> Uninitialized : removeAuctionConfig()
 ```
 
-### Attributes that define each state:
+### Attributes that define each auction state:
 
 - **Uninitialized** (not configured): 
     - `config.duration=0`
