@@ -10,8 +10,8 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
 | [[M-1]](<#m-1-if-oribgt-is-paused-users-cannot-withdraw-their-principal-or-claim-rewards-from-autostaking-vaults>) | Medium | If oriBGT is paused, users cannot withdraw their principal or claim rewards from AutoStaking vaults | ✅ Fixed |
-| [[L-1]](<#l-1-reward-tokens-that-dont-comply-with-ierc20-interface-outputs-will-revert-despite-the-try-catch-block>) | Low | Reward tokens that don't comply with IERC20 interface outputs will revert despite the try-catch block | ✅ Fixed |
-| [[L-2]](<#l-2-admins-have-the-power-of-rugging-all-staked-funds-with-migrateunderlyingrewardsvault>) | Low | Admins have the power of rugging all staked funds with `migrateUnderlyingRewardsVault()` | ✅ Fixed |
+| [[L-1]](<#l-1-users-cant-claim-their-rewards-if-one-of-the-reward-tokens-doesnt-return-a-boolean-on-transfer->) | Low | Users can't claim their rewards if one of the reward tokens doesn't return a boolean on transfer  | ✅ Fixed |
+| [[L-2]](<#l-2-the-function-migrateunderlyingrewardsvault-gives-a-significant-power-to-the-contract-owner>) | Low | The function `migrateUnderlyingRewardsVault()` gives a significant power to the contract owner | ✅ Fixed |
 
 A couple of informational issues are at the bottom of the report, not worth including them in the table. 
 
@@ -164,7 +164,7 @@ The team added a toggle config, so that the oriBGT deposit can be bypassed.
 
 ## Low risk
 
-### [L-1] Reward tokens that don't comply with IERC20 interface outputs will revert despite the try-catch block
+### [L-1] Users can't claim their rewards if one of the reward tokens doesn't return a boolean on transfer 
 
 The function `MultiRewards.getRewardForUser()` transfers all reward tokens that a user has accrued. It has a mechanism to bypass weird ERC20 reward tokens that fail on transfers or that consume too much gas. This is done by encapsulating the `transfer()` external call with a `try/catch` block:
 
@@ -252,7 +252,7 @@ contract AnnoyingERC20Test is Test {
 Fixed in [7ed72b958b8269ae5ca4ef7b2ed69cc7a9727c9e](https://github.com/TempleDAO/origami/commit/7ed72b958b8269ae5ca4ef7b2ed69cc7a9727c9e), using a similar implementation to Infrared and SafeErc20 library.
 
 
-### [L-2] Admins have the power of rugging all staked funds with `migrateUnderlyingRewardsVault()`
+### [L-2] The function `migrateUnderlyingRewardsVault()` gives a significant power to the contract owner
 
 Origami team put in place a mechanism to migrate all the staked funds from an AutoStaking vault to another one, in case Infrared deprecates the underlying vault of a certain AutoStaking vault. However, this means that the team also has the power to deploy a new fake vault, and migrate all staked assets in the AutoStaking vault to the fake one, effectively rug-pulling all user deposits: 
 
