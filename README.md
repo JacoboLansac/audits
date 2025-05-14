@@ -1,5 +1,8 @@
 # Security-reviews
 
+## 2025 - May
+- [Origami - AutoStaking vaults](solo/origami/origami-autostaking-review.md). Security review.
+
 ## 2025 - April
 
 - [TempleDAO - Spice Auction](solo/temple/templeGold/temple-gold-spice-auction-updates.md). Security review.
