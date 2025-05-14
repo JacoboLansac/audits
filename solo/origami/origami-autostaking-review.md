@@ -7,11 +7,14 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
+
 | Finding | Risk | Description | Response |
 | :--- | :--- | :--- | :--- |
 | [[M-1]](<#m-1-if-oribgt-is-paused-users-cannot-withdraw-their-principal-or-claim-rewards-from-autostaking-vaults>) | Medium | If oriBGT is paused, users cannot withdraw their principal or claim rewards from AutoStaking vaults | ✅ Fixed |
-| [[L-1]](<#l-1-users-cant-claim-their-rewards-if-one-of-the-reward-tokens-doesnt-return-a-boolean-on-transfer->) | Low | Users can't claim their rewards if one of the reward tokens doesn't return a boolean on transfer  | ✅ Fixed |
+| [[L-1]](<#l-1-claiming-rewards-reverts-if-one-of-the-reward-tokens-doesnt-return-boolean-on-transfer>) | Low | Claiming rewards reverts if one of the reward tokens doesn't return boolean on transfer | ✅ Fixed |
 | [[L-2]](<#l-2-the-function-migrateunderlyingrewardsvault-gives-a-significant-power-to-the-contract-owner>) | Low | The function `migrateUnderlyingRewardsVault()` gives a significant power to the contract owner | ✅ Fixed |
+
+
 
 Some informational issues are at the bottom of the report, not worth including in the table. 
 
@@ -83,32 +86,36 @@ focus, but significant inefficiencies will also be reported.
 
 ## System Overview
 
-Users can stake their tokens into these AutoStaking vaults and their principal is staked into Infrared Vaults. 
+Users can stake their tokens into these AutoStaking vaults and their principal is directly staked into Infrared Vaults. 
 The system offers a mechanism to reinvest the rewards coming from infrared:
-- iBGT tokens are invested into oriBGT (an ERC4626 vault that continuously compounds iBGT)
+- Rewards in the form of iBGT tokens are invested into oriBGT (an ERC4626 vault that continuously compounds iBGT)
 - Other reward tokens can be handled in two ways:
-  - In *SingleReward* mode, the other reward tokens are transferred to the OrigamiSwapperWithCallback, which swaps them for iBGT, which is transferred back to the AutoStaking pool, to then be deposited in oriBGT. 
-  - In *MultiReward* mode, the other reward tokens are distributed among the depositors
+  - In *SingleReward* mode, the other reward tokens are transferred to the OrigamiSwapperWithCallback, which swaps them for iBGT, which is transferred back to the AutoStaking vault, to then be deposited in oriBGT. 
+  - In *MultiReward* mode, the other reward tokens are directly distributed among the depositors
 
 To streamline the deployment of these AutoStaking vaults, an AutoStaking factory is implemented as well. 
 
 
 ## Architecture high-level review
 
+The overall architecture is very clean with a clear focus on security and composability with future modules of the Origami ecosystem. The test suite is very extensive and all interfaces and functions have proper documentation. 
+
 ### AutoStaking vault architecture
-- The AutoStaking vault inherits the MultiRewards contract inspired by Infrared rewards management, and overrides some hooks like `onStake()`, `onWithdraw()`, etc. 
-- The AutoStaking vault is inherited by the AutoStakingToErc4626, which processes the primaryRewardsToken (iBGT) by depositing them into the oriBGT vault. 
+- The AutoStaking vault inherits the MultiRewards contract inspired by Infrared rewards management, with some custom overrides to hooks like `onStake()`, `onWithdraw()`, etc. 
+- The AutoStakingToErc4626 is an AutoStaking vault with the custom processing of the rewards described above (depositing iBGT in the oriBGT vault for autocompounding. 
 
 Here is a rough diagram of how the AutoStaking vault integrates with other components:
 
 ![image](./diagrams/origami-auto-staking-vaults.drawio.autostaking.png)
 
 ### AutoStaking factory deployment strategy
-The AutoStakingFactory keeps track of the AutoStaking vaults deployed and their staking assets. It also manages configuration of this deployment process. To register a new vault, the factory deploys a new SwapperWithCallback (so that balances are not mixed up between different vaults in the swapper), and the AutoStakingVault. During this vault registration, the vault and the swapper are configured with the necessary elevatedAccess permissions.
+The AutoStakingFactory keeps track of the AutoStaking vaults deployed, linked to staking assets, and the corresponding swappers. It also manages configuration of this deployment process. To register a new vault, the factory deploys a new SwapperWithCallback (so that balances are not mixed up between different vaults in the swapper), and the AutoStakingVault. During this vault registration, the vault and the swapper are configured with the necessary elevatedAccess permissions.
 
-Below is a small illustration of how the deployment pipeline looks:
+Below is a simplified illustration of the deployment process:
 
 ![image](./diagrams/origami-auto-staking-vaults.drawio.deployments.png)
+
+
 
 
 # Findings
@@ -126,7 +133,14 @@ None.
 
 ### [M-1] If oriBGT is paused, users cannot withdraw their principal or claim rewards from AutoStaking vaults
 
-As seen in the architecture diagram in the introduction of the report, all external user actions (`stake()`, `withdraw()`, `getRewardForUser()`, etc) collect accrued iBGT rewards and deposit them in oriBGT. This takes place inside `_postProcessClaimedRewards()`: 
+As seen in the [AutoStaking vault architecture diagram](#autostaking-vault-architecture), the collection and deposit of iBGT rewards into oriBGT is done automatically as part of all the main external functions: 
+- `stake()`
+- `withdraw()`
+- `getReward()`
+- `harvestVault()`
+- etc
+
+This is because all those functions call the internal function `_postProcessClaimedRewards()`: 
 
 ```solidity
 contract OrigamiAutoStakeToErc4626 {
@@ -143,16 +157,16 @@ contract OrigamiAutoStakeToErc4626 {
 }
 ```
 
-Note that in the above, `primaryRewardToken4626` would be `oriBGT`. 
+Note: in the above code, `primaryRewardToken4626` would be `oriBGT`. 
 
-However, if oriBGT is paused for any reason (hopefully not a hack), then the `oriBGT.deposit()` transaction reverts. This means that all those external user actions would revert as well. From those actions, it is acceptable that users cannot deposit more tokens into the AutoStaking vault. However, the following two are not so acceptable:
-- Users should be able to withdraw their principal, so the `withdraw()` function should work even if oriBGT paused.
-- Users should be able to collect the accrued oriBGT rewards (even though they may not be very useful). So, possibly, `getReward()` should also work regardless of oriBGT being paused. 
+In the undesirable circumstance that oriBGT is paused, the `oriBGT.deposit()` transaction reverts. This means that all those external functions in the AutoStaking vault would revert as well. It does make sense that new deposits into the AutoStaking are not permitted. However:
+- Users should be able to withdraw their principal, so the `withdraw()` function should not revert even if oriBGT paused.
+- Users should be able to collect the already accrued oriBGT rewards. So, `getReward()` should not revert as well if oriBGT is paused. 
 
 #### Mitigation
-- Checking if oriBGT is paused before depositing inside 
-- A toggle parameter bypassOriBGTdeposits that admins can toggle when oriBGT is paused, so that withdrawals are possible
-Before depositing, read if investments are paused
+Proposed solutions:
+- Checking if oriBGT is paused before depositing
+- A toggle parameter (example `bypassOriBGTdeposits`) that admins can toggle to bypass the oriBGT deposits. With this, if oriBGT is paused, admins can bypass the deposit and so that withdrawals/rewardsClaims would be possible.
 
 #### Team response: fixed
 Fixed in [48dee5018b8eb7e8349b2509e457550ce032d171](https://github.com/TempleDAO/origami/commit/48dee5018b8eb7e8349b2509e457550ce032d171)
@@ -163,9 +177,9 @@ The team added a toggle config so that the oriBGT deposit can be bypassed.
 
 ## Low risk
 
-### [L-1] Users can't claim their rewards if one of the reward tokens doesn't return a boolean on transfer 
+### [L-1] Claiming rewards reverts if one of the reward tokens doesn't return boolean on transfer
 
-The function `MultiRewards.getRewardForUser()` transfers all reward tokens that a user has accrued. It has a mechanism to bypass weird ERC20 reward tokens that fail on transfers or that consume too much gas. This is done by encapsulating the `transfer()` external call with a `try/catch` block:
+The function `MultiRewards.getRewardForUser()` transfers rewards to the `_user` of all reward tokens configured. This function has a dedicated mechanism to bypass weird ERC20 reward tokens that fail on transfers or that consume too much gas. This mechanism consists in encapsulating the `transfer()` external call with a `try/catch` block:
 
 ```solidity
     function getRewardForUser(address _user)
@@ -195,15 +209,20 @@ The function `MultiRewards.getRewardForUser()` transfers all reward tokens that 
     }
 ```
 
-Unfortunately, the `try/catch` block only catches if the external call itself fails. However, if the external call goes through, but returns a different output than what the IERC20 interface expects, then the transaction reverts. An realistic example when this can be triggered is if any reward token implements a `transfer()` function that doesn't return a `bool` for success. This is done by well-known tokens as USDT or BNB. 
+Unfortunately, the `try/catch` block only catches if the external call itself fails. However, it does not catch any other reverts happening in the context of the AutoStaking contract. For example, if the external call goes through, but the output expected by the IERC20 interface doesn't match the received data, the transaction will revert. 
+
+More specifically, `IERC20.transfer()` expects a `bool` return. Some ERC20 tokens do not return a boolean on transfer. This will cause a revert because the output doesn't match the expected boolean by the interface. 
+
+Not returning a boolean on transfers is not considered the norm, but it is used by some widely used tokens like USDT or BNB. 
 
 #### Impact: low
 
-If a reward token doesn't return a boolean as the IERC20 interface expects, claiming rewards via `getRewardForUser()` will revert. The situation is not irreversible, as the team could remove the reward token, and everything would be back to normal. Also, the likelihood of having such a non-standard reward token is not very high. 
+If a reward token doesn't return a boolean as the IERC20 interface expects, claiming rewards via `getRewardForUser()` will revert. However, the situation is not irreversible, as the team could remove the reward token from the configs, and everything would be back to normal. Also, the likelihood of having to deal with such a non-standard reward token is low. 
 
 #### Mitigation
 
-Either use SafeTransfer lib (but then specifying gas is not possible) or use a low-level call with the same checks as SafeTransfer lib. This approach was also followed by Infrared. 
+- Use SafeTransfer lib 
+- Use a low-level call with the same checks as SafeTransfer lib. This is the approach followed by Infrared. 
 
 #### Proof of Code
 
@@ -252,7 +271,9 @@ Fixed in [7ed72b958b8269ae5ca4ef7b2ed69cc7a9727c9e](https://github.com/TempleDAO
 
 
 ### [L-2] The function `migrateUnderlyingRewardsVault()` gives a significant power to the contract owner
-The Origami team put in place a mechanism to migrate all the staked funds from an AutoStaking vault to another one, in case Infrared deprecates the underlying vault of a certain AutoStaking vault. However, this means that the team also has the power to deploy a new fake vault, and migrate all staked assets in the AutoStaking vault to the fake one, effectively rug-pulling all user deposits: 
+The Origami team put in place a mechanism to migrate all the staked funds from the underlying Infrared vault to another one, in case Infrared deprecates the underlying vault used by an AutoStaking vault. 
+
+However, this means that the team also has the power to deploy a new fake vault, and migrate all staked assets from the original InfraredVault to the fake one.
 
 ```solidity
     /// @inheritdoc IOrigamiAutoStaking
@@ -277,10 +298,10 @@ Even though I understand the reasons for doing this, and I trust the Origami's t
 
 #### Impact: low
 - Probability: very low. It requires a compromised multisig or a malicious team
-- Damage: high: users lose their principal
+- Damage: high: users can lose all of their principal
 
 #### Suggested fix:
-Remove this capability and let the users migrate their funds (worse UX, but less trust placed on the protocol)
+Remove this function and let the users migrate their funds (worse UX, but requires less trust on the protocol).
 
 #### Team Response: fixed
 Fixed in [5fc775acc5b2f6c65c94883aab84d1173b8a62ef](https://github.com/TempleDAO/origami/commit/5fc775acc5b2f6c65c94883aab84d1173b8a62ef)
@@ -292,7 +313,7 @@ The team responsibly removed this function, and the protocol cannot migrate fund
 
 ### [I-1] If the proposed vault owner doesn't accept, the AutoStakingFactory cannot propose a new owner
 
-When registering a new vault, it is initially deployed with the `AutoStakingFactory` as the owner. Then the vault does some admin-only operations, and then it proposes a new owner:
+When registering a new vault, it is initially deployed with the `AutoStakingFactory` as the owner. Then the vault does some owner-only operations, and then it proposes a new owner:
 
 ```solidity
     function registerVault(
@@ -323,10 +344,10 @@ When registering a new vault, it is initially deployed with the `AutoStakingFact
     }
 ```
 
-If the proposed owner doesn't accept ownership, the AutoStakingFactory cannot propose a new owner. 
+The issue: if the proposed owner doesn't accept ownership, the AutoStakingFactory cannot propose a new owner. 
 
 #### Impact
-This is hardly an issue as the owners can deploy a new vault. And the probability of this happening is extremely low anyway, as they would always accept the ownership. 
+This is hardly an issue as the team can simply deploy a new vault. And the probability of this happening is extremely low anyway, as they would always accept the ownership. 
 
 #### Team response: fixed
 Despite the low probability and reduced impact, the team implemented a `proposeOwner()` function in the factory so that a new owner could be proposed. 
