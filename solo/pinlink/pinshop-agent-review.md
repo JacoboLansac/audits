@@ -7,6 +7,11 @@ Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/RE
 
 ## Findings Summary
 
+| Finding | Risk | Description | Response |
+| :--- | :--- | :--- | :--- |
+| [[H-1]](<#h-1-a-malicious-seller-can-frontrun-the-makepurchase-transaction-and-increase-the-price-because-the-slippage-protection-mechanism-is-flawed>) | High | A malicious seller can frontrun the `makePurchase()` transaction and increase the price because the slippage protection mechanism is flawed |   |
+| [[L-1]](<#l-1-the-transaction-to-swap-rewards-for-pin-can-be-executed-at-any-time-because-the-configured-deadline-no-effect->) | Low | The transaction to swap rewards for PIN can be executed at any time because the configured deadline no effect  |   |
+| [[L-2]](<#l-2-slippage-protection-can-only-be-integers-so-it-cannot-be-05-for-example>) | Low | Slippage protection can only be integers so it cannot be 0.5% for example |   |
 
 
 ## Disclaimer
@@ -56,10 +61,7 @@ focus, but significant inefficiencies will also be reported.
   - Commit hash in scope:
     - [4c46efc9ab7d189fa8bab7a869ecaf06db18cea5](https://github.com/FasihHaider/PinLinkShop-Agent/blob/4c46efc9ab7d189fa8bab7a869ecaf06db18cea5/)
 
-- **Mitigation review**
-  - Mitigation review delivery date: `2025-05-14`
-  - Commit hash:
-    - [3d68df9ff83708305e8a606f0de6a65e6893f0b8](https://github.com/TempleDAO/origami/pull/1532/commits/3d68df9ff83708305e8a606f0de6a65e6893f0b8)
+
 
 ### Files in original scope
 
@@ -82,30 +84,75 @@ The purchase-agent is a single monolithic contract which interacts with the Pinl
 The purchase agent is designed to manage only one tokenId at a time, which means that once all fractions from that tokenId are purchased, the contract can only keep claiming USDC, but not purchase anymore fractions. 
 
 
-
 # Findings
-
-
-## Critical risk
-
-None.
 
 ## High risk
 
-None.
+### [H-1] A malicious seller can frontrun the `makePurchase()` transaction and increase the price because the slippage protection mechanism is flawed
+
+Below is how the purchase is executed. On the purchase, the function first calls the shop to get a quote for a given listingId and an amount of fractions. Then, that is used to set the `maxTotalPinAmount`. 
+
+```solidity
+    function makePurchase(uint256 _fractionsAmount) external onlyOwner {
+>>>     uint256 price = shop.getQuoteInTokens(listingId, _fractionsAmount);
+        uint256 maxTotalPinAmount = (price * (100 + purchaseSlippage)) / 100;
+        if (PIN.balanceOf(address(this)) <= maxTotalPinAmount) {
+            revert NotEnoughTokens();
+        }
+        shop.purchase(listingId, _fractionsAmount, maxTotalPinAmount);
+
+        emit Purchased(listingId, _fractionsAmount, maxTotalPinAmount);
+    }
+```
+
+Note the same issue exists in the `performUpkeep()` function, which also performs a purchase if the balance is higher than the fractions price. 
+
+#### Impact
+- A malicious seller can inflate the price right before the purchase and sell for a much higher price.
+- The limit of this attack is on the actual USDC balance in the contract.
+
+The issue is that the quote and the purchase happen in the same transaction. A malicious seller can frontrun this function, modify the price of the listing, and then the `getQuoteInTokens()` will return the inflated price. Therefore the slippage protection won't work, and this contract will end up paying a larger amount for the fractions. 
+
+#### Mitigation
+
+In the ideal world, the slippage protection would work by calling `getQuoteInTokens()` off-chain. Then passing that quote as the `maxTotalPinAmount` as the slippage protection to the actual purchase. 
+
+The ideal solution would be to configure a "max USDC amount" per fraction to pay. Then here instead of calling `getQuoteInTokens()`, the oracle should be called directly to convert the max USDC into a max-PIN. With this, a malicious seller has no power because frontrunning to increase the price will simply revert the transaction. 
+
 
 ## Medium risk
 
-### [M-1] 
+No issues
 
 ## Low risk
-
 
 ### [L-1] The transaction to swap rewards for PIN can be executed at any time because the configured deadline no effect 
 
 When swapping USDC for PIN in the `_convertRewards()` function, the deadline is set to `block.timestamp + 30`:
 
-https://github.com/FasihHaider/PinLinkShop-Agent/blob/4c46efc9ab7d189fa8bab7a869ecaf06db18cea5/src/PurchaseAgent.sol#L144
+```solidity
+    function _convertRewards() private {
+        uint256 amountIn = USDC.balanceOf(address(this));
+
+        address[] memory path = new address[](3);
+        path[0] = address(USDC);
+        path[1] = WETH;
+        path[2] = address(PIN);
+
+        uint256 amountOut = IUniswapV2Router02(UniswapV2Router).getAmountsOut(amountIn, path)[1];
+        uint256 minOut = (amountOut * (100 - swapSlippage)) / 100;
+
+        IERC20(USDC).approve(address(UniswapV2Router), amountIn);
+
+        uint256 prevPinBal = PIN.balanceOf(address(this));
+
+        IUniswapV2Router02(UniswapV2Router).swapExactTokensForTokensSupportingFeeOnTransferTokens(
+>>>         amountIn, minOut, path, address(this), block.timestamp + 30
+        );
+
+        emit ConvertedRewards(amountIn, PIN.balanceOf(address(this)) - prevPinBal);
+    }
+```
 
 This deadline is ineffective because `block.timesatmp` will take whatever time the transaction is minted in. Assuming the intention is that the swap can only be executed within the following 30 seconds after broadcasting the transaction, this check will never work correctly. Example:
 
@@ -114,22 +161,37 @@ This deadline is ineffective because `block.timesatmp` will take whatever time t
 - The transaction is picked up by a miner in `t + period`
 - When the transaction is executed, `block.timestamp = `t + period` (when the tx is minted)
 - The deadline requirement is 
-  - `T + period + 30 seconds > T + period` which can be rewriten as:
+  - `T + period + 30 seconds > T + period` which can be rewritten as:
   - `T + 30 seconds > T`, and this will always hold.
 - So the transaction will be always minted regardless of the `period` that the tx spends in the mempool. 
 
 
 ### [L-2] Slippage protection can only be integers so it cannot be 0.5% for example
 
-The slippage protection is configured as a percentage. However, it is using unsigned integers which means it can only take round numbers: 0%, 1%, 2%, ... 
+The slippage protection is configured as a percentage. However, it is using unsigned integers which means it can only take round numbers: 0%, 1%, 2%, ... The divisor in the slippage calculations is 100:
 
-https://github.com/FasihHaider/PinLinkShop-Agent/blob/4c46efc9ab7d189fa8bab7a869ecaf06db18cea5/src/PurchaseAgent.sol#L25
+```solidity
 
-The divisor in the slippage calculations is 100:
+    uint256 purchaseSlippage = 5; // 5%
+    uint256 swapSlippage = 5; // 5%
 
-https://github.com/FasihHaider/PinLinkShop-Agent/blob/4c46efc9ab7d189fa8bab7a869ecaf06db18cea5/src/PurchaseAgent.sol#L91C29-L91C30
+    // ... 
 
-While not a vulnerability as such, it simply means that a slippage protection of 0.5% is not possible. 
+    function makePurchase(uint256 _fractionsAmount) external onlyOwner {
+        uint256 price = shop.getQuoteInTokens(listingId, _fractionsAmount);
+>>>     uint256 maxTotalPinAmount = (price * (100 + purchaseSlippage)) / 100;
+        if (PIN.balanceOf(address(this)) <= maxTotalPinAmount) {
+            revert NotEnoughTokens();
+        }
+        shop.purchase(listingId, _fractionsAmount, maxTotalPinAmount);
+
+        emit Purchased(listingId, _fractionsAmount, maxTotalPinAmount);
+    }
+```
+
+The same problem is also present in the function `performUpkeep()` and `_convertRewards()`. 
+
+While it is not a vulnerability as such, it simply means that a slippage protection of 0.5% is not possible. 
 
 #### Suggested fix
 
@@ -187,4 +249,3 @@ Use basis points instead
 
 
 ```
-
