@@ -83,6 +83,13 @@ The purchase-agent is a single monolithic contract which interacts with the Pinl
 
 The purchase agent is designed to manage only one tokenId at a time, which means that once all fractions from that tokenId are purchased, the contract can only keep claiming USDC, but not purchase anymore fractions. 
 
+### Gas optimizations
+
+All storage variables that are not expected to change should be marked to either constant or immutable:
+- To `constant` if the have a pre-defined value in the variable declaration
+- To `immutable` if they are initialized in the constructor and never changed again
+
+------
 
 # Findings
 
