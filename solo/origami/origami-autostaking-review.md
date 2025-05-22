@@ -62,7 +62,7 @@ focus, but significant inefficiencies will also be reported.
 - **Main review:**
   - Start date: `2025-04-24`
   - End date: `2025-05-13`
-  - Effective total time: `19 hours`
+  - Effective total time: `20 hours`
   - Commit hash in scope:
     - [0b0c5ae1833ad30965909f6f3f405c532a07dd16](https://github.com/TempleDAO/origami/pull/1532/commits/0b0c5ae1833ad30965909f6f3f405c532a07dd16)
 
