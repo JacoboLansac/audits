@@ -1,4 +1,4 @@
-# [THA-RWA] - Stage 0 - security review
+# Tharwa Stage 0 - security review
 
 > Insert logo
 
@@ -161,7 +161,7 @@ When a user swaps stablecoins (USDC, USDT, DAI) for thUSD, the stablecoins are t
             IERC20 token = IERC20(tokens[i]);
             uint256 balance = token.balanceOf(address(this));
             if (balance > 0) {
-                token.safeTransfer(treasury, balance);
+>>>             token.safeTransfer(treasury, balance);
                 transferredAmounts[i] = balance;
             }
         }
@@ -186,8 +186,8 @@ In those unlikely scenarios, if one of them cannot be transferred, the funds fro
 
 A failing transfer of one of the stablecoins causes the other two to also stay locked in the thUSDSwap contract.
 
-- Probability: *very low*
-- Impact: *medium*, as only the funds that are currently in the thUSDCSwap are affected, but any funds that have already been transferred are not. 
+- **Probability**: *very low*
+- **Impact**: *medium*, as only the funds that are currently in the thUSDCSwap are affected, but any funds that have already been transferred are not. 
 
 #### Suggested mitigation
 
