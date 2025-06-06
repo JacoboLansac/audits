@@ -1,5 +1,8 @@
 # Security-reviews
 
+## 2025 - June
+- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.md). Security review
+
 ## 2025 - May
 - [Origami - AutoStaking vaults](solo/origami/origami-autostaking-review.md). Security review.
 - [Pinlink - Purchasing agent](solo/pinlink/pinshop-agent-review.md). Security review.
