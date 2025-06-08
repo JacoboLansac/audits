@@ -1,21 +1,31 @@
+
+
+![image](https://github.com/user-attachments/assets/0ae845fe-36a7-499a-ae79-59f008a28a8f)
+
+_Prism delivers specialized security solutions for blockchain and AI companies. We go beyond traditional audits, offering bespoke penetration testing, adversary simulation, and AI security solutions to meet the needs of every client. With tailored services and best-in-class expertise, we safeguard your business from the most sophisticated threats so you can focus on innovation._
+
+Read more: [prismsec.xyz](http://prismsec.xyz/)
+
+<br>
+<br>
+<br>
+<br>
+
 # Tharwa Stage 0 - security review
-
-> Insert logo
-
 A time-boxed security review of **THARWA - Stage 0 contracts** for [**Tharwa Finance**](https://tharwa.finance/), with a focus on smart contract security, conducted by [prismsec.xyz](http://prismsec.xyz/).
 
-Lead author: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
-Read [past security reviews](https://github.com/JacoboLansac/audits/blob/main/README.md).
+Lead Security Researcher: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
+Read [full portfolio](https://github.com/JacoboLansac/audits/blob/main/README.md).
 
-## Findings Summary
+## 1.1 - Findings Summary
 
 | Finding                                                                                                                                             | Risk   | Description                                                                                                                          | Response |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------- | :----- | :----------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| [[M-1]](<#m-1-send-tokens-cross-chain-while-the-oft-tokens-are-paused-leads-to-users-losing-their-funds-permanently>)                               | Medium | Send tokens cross-chain while the OFT tokens are paused leads to users losing their funds permanently                                | ✅ Fixed  |
+| [[M-1]](<#m-1-sending-tokens-cross-chain-while-the-oft-tokens-are-paused-leads-to-users-losing-their-funds-permanently>)                               | Medium | Sending tokens cross-chain while the OFT tokens are paused leads to users losing their funds permanently                                | ✅ Fixed  |
 | [[L-1]](<#l-1-if-moving-stablecoins-from-the-thusdswap-to-the-treasury-reverts-for-one-of-the-stablecoins-all-three-will-be-stuck-in-the-contract>) | Low    | If moving stablecoins from the thUSDSwap to the treasury reverts for one of the stablecoins, all three will be stuck in the contract | ✅ Fixed  |
 
 
-## Disclaimer
+##  1.2 - Disclaimer
 
 A smart contract security review can never verify the complete absence of vulnerabilities. This is a time and
 resource-bound effort to find as many vulnerabilities as possible, but there is no guarantee that all issues will be
@@ -26,7 +36,7 @@ business or product and can never be taken as a guarantee that the protocol is b
 solely on the security aspects of the Solidity implementation of the contracts. Gas optimizations are not the main
 focus, but significant inefficiencies will also be reported.
 
-## Risk classification
+## 1.3 - Risk classification
 
 | Severity           | Impact: High | Impact: Medium | Impact: Low |
 | :----------------- | :----------: | :------------: | :---------: |
@@ -34,7 +44,7 @@ focus, but significant inefficiencies will also be reported.
 | Likelihood: Medium |     High     |     Medium     |     Low     |
 | Likelihood: Low    |    Medium    |      Low       |     Low     |
 
-### Likelihood
+### 1.3.1 - Likelihood
 
 - **High** - attack path is possible with reasonable assumptions that mimic on-chain conditions and the cost of the
   attack is relatively low to the amount of funds that can be stolen or lost.
@@ -42,20 +52,20 @@ focus, but significant inefficiencies will also be reported.
 - **Low** - has too many or too unlikely assumptions or requires a huge stake by the attacker with little or no
   incentive.
 
-### Impact
+### 1.3.2 - Impact
 
 - **High** - leads to a significant material loss of assets in the protocol or significantly harms a group of users.
 - **Medium** - only a small amount of funds can be lost (such as leakage of value) or a core functionality of the
   protocol is affected.
 - **Low** - can lead to unexpected behavior with some of the protocol's functionalities that are not so critical.
 
-### Actions required by severity level
+### 1.3.3 - Actions required by severity level
 
 - **High/Critical** - client **must** fix the issue.
 - **Medium** - client **should** fix the issue.
 - **Low** - client **could** fix the issue.
 
-## Scope
+## 1.4 - Scope
 
 - **Preliminary manual review:**
   - Start date: `2025-06-03`
@@ -66,7 +76,7 @@ focus, but significant inefficiencies will also be reported.
   - Mitigation review delivery date: `2025-06-06`
   - Commit hash: [01e98827917ad2e065c72cec4b034bc0d3345484](https://github.com/tharwa-finance/contracts-v0/commit/01e98827917ad2e065c72cec4b034bc0d3345484)
 
-### Files in original scope
+### 1.4.1 - Files in the original scope
 
 | Files in scope                              | nSLOC |
 | ------------------------------------------- | ----- |
@@ -76,36 +86,36 @@ focus, but significant inefficiencies will also be reported.
 | **Total**                                   | 264   |
 
 
-## Protocol Overview
+## 1.5 - Context
+
+### 1.5.1 - Protocol Overview
 
 In its Stage 0, Tharwa consists only of a stable coin `thUSD.sol` that can be minted in exchange for other more established stablecoins (DAI, USDC, USDT). This exchange happens in the `thUSDSwap.sol` contract. The `thUSD` token is a cross-chain token leveraging [*LayerZero*'s](https://layerzero.network/) OFT standard. Initially, `thUSD` will only be minted in Ethereum mainnet, but the team plans to deploy also in other EVM chains like [Base](https://www.base.org/) or non-EVM chains like [Solana](https://www.base.org/).
 
 Lastly, there is a governance token (`TRWA.sol`) which is also a cross-chain token inheriting the OFT standard.
 
 
-## Architecture high level review
+### 1.5.2 - Architecture high-level review
 
-- The contracts are well written and the logic is well structured. 
+- The contracts are well written, and the logic is well structured. 
 - The architecture is very simple, which is always good for security.
 - Since `thUSD` and `TRWA` are OFT tokens, special attention has been paid to the non-atomic nature of cross-chain transactions. 
-- Both OFT contracts inherit `Pausable` which can lead to some niche scenarios in cross-chain communication (see issue M-1).
+- Both OFT contracts inherit `Pausable`, which can lead to some niche scenarios in cross-chain communication (see issue M-1).
 
 The diagram below illustrates the different components around the `thUSD` token. The `TRWA` is excluded from the diagram as it would be basically the same:
 
 ![image](tharwa-funds-flow-diagram.drawio.png)
 
 
+# 2 - Findings
 
-
-# Findings
-
-## High risk
+## 2.1 - High risk
 
 *No findings found.*
 
-## Medium risk
+## 2.2 - Medium risk
 
-### [M-1] Send tokens cross-chain while the OFT tokens are paused leads to users losing their funds permanently
+### [M-1] Sending tokens cross-chain while the OFT tokens are paused leads to users losing their funds permanently
 
 Both OFT tokens (`thUSD` and `TRWA`) inherit both the OFT standard from LayerZero, and the `Pausable` from OpenZeppelin. 
 
@@ -123,21 +133,21 @@ In a normal scenario, when tokens are sent cross-chain using `OFT.send()`, the t
     }
 ```
 
-On the other hand, the `OFT.send()` function doesn't have such modifier, so sending tokens cross-chain is possible even if origin and destination chains are paused. 
+On the other hand, the `OFT.send()` function doesn't have such a modifier, so sending tokens cross-chain is possible even if the origin and destination chains are paused. 
 
-If users try to send tokens cross-chain when the destination chain is paused, the `whenNotPaused` modifier will revert in the destination chain. However, due to the non-atomic nature of cross-chain messages, the destination chain is incapable to roll back the transaction already minted in the origin chain. This means that the tokens are successfully burned in the origin chain, but never minted in the destination chain. The user loses the funds that attempted to transfer
+If users try to send tokens cross-chain when the destination chain is paused, the `whenNotPaused` modifier will revert in the destination chain. However, due to the non-atomic nature of cross-chain messages, the destination chain is incapable of rolling back the transaction already minted in the origin chain. This means that the tokens are successfully burned in the origin chain, but never minted in the destination chain. The user loses the funds that they attempted to transfer
 
 #### Impact: medium
 
 *If users attempt to **send** tokens cross-chain when the destination chain is **paused**, the users will **loose** the transferred tokens.*
 
-- **Probability**: *low*, because the contracts are not meant to be paused except in case of exploit or emergency. 
-- **Severity**: *high*, as the users lose the funds that attempted to send cross chain. 
+- **Probability**: *low*, because the contracts are not meant to be paused except in case of an exploit or emergency. 
+- **Severity**: *high*, as the users lose the funds that they attempted to send cross chain. 
 
 #### Suggested mitigation
 
 - The fastest fix: override the `OFT.send()` function adding the `whenNotPaused` modifier. Note however, that the described scenario is also possible even with this modifier if one of the origin chain is not paused but the destination chain is. So it would require an orchestrated way of pausing transactions in all chains, which is not trivial
-- The simplest and most secure fix is to simply remove the Pausable functionality from the OFT tokens. I suggest to use pausability feature in more targeted areas of future contracts (or even in the swap functions from the `thUSDSwap` contract). 
+- The simplest and most secure fix is to simply remove the Pausable functionality from the OFT tokens. I suggest to use the pausability feature in more targeted areas of future contracts (or even in the swap functions from the `thUSDSwap` contract). 
 
 #### Team response: fixed
 
@@ -146,7 +156,7 @@ The team removed the `Pausable` feature from both OFT contracts.
 
 
 
-## Low risk
+## 2.3 - Low risk
 
 ### [L-1] If moving stablecoins from the thUSDSwap to the treasury reverts for one of the stablecoins, all three will be stuck in the contract
 
@@ -174,7 +184,7 @@ When a user swaps stablecoins (USDC, USDT, DAI) for thUSD, the stablecoins are t
     }
 ```
 
-As it can be seen, the three tokens are coupled, as the admin cannot chose to transfer one of them only: the three of them have to be transferred together. 
+As can be seen, the three tokens are coupled, as the admin cannot choose to transfer one of them individually; all three must be transferred together. 
 
 If the transfer of any of the three tokens fails, the entire transaction reverts. Some (unlikely) scenarios that could make these transactions revert are:
 - USDC / USDCT blacklisting the treasury or the thUSDSwap contracts
@@ -184,7 +194,7 @@ In those unlikely scenarios, if one of them cannot be transferred, the funds fro
 
 #### Impact: low
 
-A failing transfer of one of the stablecoins causes the other two to also stay locked in the thUSDSwap contract.
+A failure to transfer one of the stablecoins causes the other two to also remain locked in the thUSDSwap contract.
 
 - **Probability**: *very low*
 - **Impact**: *medium*, as only the funds that are currently in the thUSDCSwap are affected, but any funds that have already been transferred are not. 
@@ -219,9 +229,9 @@ In this way, the stablecoins don't have to be held in the `thUSDSwap` contract, 
 
 #### Team response: fixed
 
-The team followed the suggestion and the stablecoins are transferred directly to the treasury. A generic function to rescue ERC20 tokens was added.
+The team followed the suggestion, and the stablecoins are transferred directly to the treasury. A generic function to rescue ERC20 tokens was added.
 
-## Informational issues
+## 2.4 - Informational issues
 
 - In `thUSDSwap.swapUSDC()`, the calculation `thAmount = usdcAmount * SCALING_FACTOR;` is done twice, and I don't see any reason why doing that. I believe the line is simply duplicated by mistake and can be removed. 
 
