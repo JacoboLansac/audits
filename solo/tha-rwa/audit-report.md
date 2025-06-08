@@ -242,4 +242,4 @@ The following issues are considered informational, and not even worth adding to 
 
 - In `TRWA`, the error TradingNotOpen() is not used. It can be removed. 
 
-
+- The `thUSDSwap` contract implements a `receive()` function (which is `payable`) and a `rescueETH()`. However, as this contract is not expected to handle any ether balance, and there are no other `payable` functions, a cleaner solution would be to remove both of them. No ether can enter the contract (except for self-destructs), so no need to rescue it either. 
