@@ -1,3 +1,11 @@
+# Jacopod - Smart Contracts Security Researcher
+
+- Telegram: [@jacopod_eth](https://t.me/jacopod_eth)
+- X: [@jacopod](https://x.com/jacolansac)
+
+
+![original-jacopod](https://github.com/user-attachments/assets/82562c1d-01b0-4cb2-99dc-8d1b849b7a13)
+
 # Security-reviews
 
 ## 2025 - June
