@@ -1,8 +1,11 @@
 # Jacopod - Smart Contracts Security Researcher
 
+I do audits. 
+
 - Telegram: [@jacopod_eth](https://t.me/jacopod_eth)
 - X: [@jacopod](https://x.com/jacolansac)
 
+_In the deeper bugs there is less competition. Slow is good._
 
 ![original-jacopod](https://github.com/user-attachments/assets/82562c1d-01b0-4cb2-99dc-8d1b849b7a13)
 
