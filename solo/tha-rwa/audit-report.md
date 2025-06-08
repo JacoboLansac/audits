@@ -4,9 +4,12 @@
 
 _Prism delivers specialized security solutions for blockchain and AI companies. We go beyond traditional audits, offering bespoke penetration testing, adversary simulation, and AI security solutions to meet the needs of every client. With tailored services and best-in-class expertise, we safeguard your business against the most sophisticated threats, allowing you to focus on innovation._
 
-Read more: [prismsec.xyz](http://prismsec.xyz/)
-
 <br>
+
+- Read more: [prismsec.xyz](http://prismsec.xyz/)
+- Telegram: [@prismsec](https://t.me/prismsec)
+- X: [@prismsec](https://x.com/prismsec)
+
 <br>
 <br>
 <br>
@@ -14,8 +17,7 @@ Read more: [prismsec.xyz](http://prismsec.xyz/)
 # Tharwa Stage 0 - security review
 A time-boxed security review of **THARWA - Stage 0 contracts** for [**Tharwa Finance**](https://tharwa.finance/), with a focus on smart contract security, conducted by [prismsec.xyz](http://prismsec.xyz/).
 
-Lead Security Researcher: [**Jacopod**](https://twitter.com/jacolansac), an independent security researcher.
-Read [complete portfolio](https://github.com/JacoboLansac/audits/blob/main/README.md).
+- Lead Security Researcher: [**Jacopod**](https://github.com/JacoboLansac/audits/blob/main/README.md)
 
 ## 1.1 - Findings Summary
 
@@ -233,6 +235,8 @@ In this way, the stablecoins don't have to be held in the `thUSDSwap` contract, 
 The team followed the suggestion, and the stablecoins are transferred directly to the treasury. A generic function to rescue ERC20 tokens was added.
 
 ## 2.4 - Informational issues
+
+The following issues are considered informational, and not even worth adding to the summary table, as they have little to no impact on smart contract security or gas optimizations. They adhere to code correctness.
 
 - In `thUSDSwap.swapUSDC()`, the variable `thAmount` is declared twice using the same expression, while none of the factors differ between the two declarations: `thAmount = usdcAmount * SCALING_FACTOR;`. The second declaration can therefore be removed.
 
