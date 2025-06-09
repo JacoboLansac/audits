@@ -12,7 +12,7 @@ _In the deeper bugs, there is less competition. Slow is good._
 # Security-reviews
 
 ## 2025 - June
-- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.md). [[pdf version]](solo/tha-rwa/audit-report.pdf)
+- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.md). Open [[pdf version]](solo/tha-rwa/audit-report.pdf)
 
 ## 2025 - May
 - [Origami - AutoStaking vaults](solo/origami/origami-autostaking-review.md). Security review.
