@@ -5,14 +5,14 @@ I do audits.
 - Telegram: [@jacopod_eth](https://t.me/jacopod_eth)
 - X: [@jacopod](https://x.com/jacolansac)
 
-_In the deeper bugs there is less competition. Slow is good._
+_In the deeper bugs, there is less competition. Slow is good._
 
 ![original-jacopod](https://github.com/user-attachments/assets/82562c1d-01b0-4cb2-99dc-8d1b849b7a13)
 
 # Security-reviews
 
 ## 2025 - June
-- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.md). Security review
+- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.md). [[pdf version]](solo/tha-rwa/audit-report.pdf)
 
 ## 2025 - May
 - [Origami - AutoStaking vaults](solo/origami/origami-autostaking-review.md). Security review.
