@@ -7,7 +7,7 @@ I do audits.
 
 _In the deeper bugs, there is less competition. Slow is good._
 
-![image](logo_jacopod_rounded.png)
+![image](logo_rounded.png)
 
 # Security-reviews
 
@@ -56,7 +56,7 @@ _In the deeper bugs, there is less competition. Slow is good._
 | [Origami Finance](https://origami.finance/)                      | Lov Tokens                                    | [Competition results](https://app.hats.finance/audit-competitions/origami-0x998f1b716a5022be026ca6b919c0ddf45ca31abd/leaderboard)                | Audit contest |
 | **February 2024**                                                |                                               |                                                                                                                                                  |               |
 | [Blast Futures](https://blastfutures.com/)                       | Blast Futures                                 | [Competition results](https://app.hats.finance/audit-competitions/blast-futures-exchange-0x97895c329b950755566ddcdad3395caaea395074/leaderboard) | Audit contest |
-| Paladin                                                          | Paladin                                       | [Competition results](https://app.hats.finance/audit-competitions/paladin-0x1610bfde27e57b068af7f38aec3d2a7b1d146989/leaderboard)                | Audit contest |
+| [Paladin Vote](https://paladin.vote/#/)                                                          | Paladin                                       | [Competition results](https://app.hats.finance/audit-competitions/paladin-0x1610bfde27e57b068af7f38aec3d2a7b1d146989/leaderboard)                | Audit contest |
 | **January 2024**                                                 |                                               |                                                                                                                                                  |               |
 | [Vector Reserve](https://linktr.ee/kernelprotocol)               | Vector Reserve protocol (rebranded to Kernel) | [Report pdf](solo/vector-reserve.md)                                                                                                             | Private audit |
 | **December 2023**                                                |                                               |                                                                                                                                                  |               |
