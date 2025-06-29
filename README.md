@@ -12,7 +12,8 @@ _In the deeper bugs, there is less competition. Slow is good._
 # Security-reviews
 
 ## 2025 - June
-- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.md). . . . . . . . . [[pdf version]](solo/tha-rwa/audit-report.pdf)
+- [Origami Finance - **SKY+** vault](solo/origami/audit-report_OrigamiFinance_SKY_jacopod.pdf). Security review.
+- [Tharwa finance - stage 0](solo/tha-rwa/audit-report.pdf). Security review
 
 ## 2025 - May
 - [Origami - AutoStaking vaults](solo/origami/origami-autostaking-review.md). Security review.
