@@ -2,12 +2,15 @@
 
 _In the deeper bugs, there is less competition. Slow is good._
 
+![image](logo_rounded.png)
+
+
 - Telegram: [@jacopod_eth](https://t.me/jacopod_eth)
 - X: [@jacopod](https://x.com/jacolansac)
 
+----
 
-![image](logo_rounded.png)
-
+---
 # Security-reviews
 
 | Protocol                                                         | Project                        | Report                                                                                                                                           | Type          |
