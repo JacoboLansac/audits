@@ -1,12 +1,18 @@
 # Jacopod - Smart Contracts Audits
 
-_In the deeper bugs, there is less competition. Slow is good._
+_Slow is good._
 
 ![image](logo_rounded.png)
 
+**Highlights:**
+- Ranked **#6** all-time Hats Finance ([Leaderboard](https://app.hats.finance/leaderboard)).
+- More than **\$200M TVL** secured: [Origami\_fi](https://x.com/origami_fi) (\$138M TVL), [Templedao](https://x.com/templedao) (\$60M TVL), [PinLinkAi](https://x.com/PinLinkAi) (\$21M TVL), [Vectorreserve](https://x.com/vectorreserve) (\$45M peak TVL, now inactive).
 
-- Telegram: [@jacopod_eth](https://t.me/jacopod_eth)
+**Contact for audits:**
 - X: [@jacopod](https://x.com/jacolansac)
+- Telegram: [@jacopod_eth](https://t.me/jacopod_eth)
+- Check the [Complete Audit Portfolio](https://github.com/JacoboLansac/audits/blob/main/README.md).
+
 
 ----
 
